@@ -1,9 +1,10 @@
+import bcrypt from "bcryptjs";
 import "dotenv/config";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 
 import * as schema from "./schema";
-import { categories, products, settings } from "./schema";
+import { categories, products, settings, users } from "./schema";
 
 const db = drizzle({ connection: process.env.DATABASE_URL!, schema });
 
@@ -12,6 +13,20 @@ async function main() {
     .insert(settings)
     .values({ id: "global" })
     .onConflictDoUpdate({ target: settings.id, set: { id: "global" } });
+
+  const adminPassword = await bcrypt.hash("admin123", 10);
+  await db
+    .insert(users)
+    .values({
+      name: "Admin",
+      email: "admin@festejosaurora.com",
+      passwordHash: adminPassword,
+      role: "ADMIN",
+    })
+    .onConflictDoUpdate({
+      target: users.email,
+      set: { name: "Admin", role: "ADMIN", passwordHash: adminPassword },
+    });
 
   const categoryData = [
     {
