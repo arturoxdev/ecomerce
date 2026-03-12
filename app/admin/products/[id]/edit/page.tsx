@@ -1,6 +1,9 @@
+import { asc } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
-import { db } from "@/lib/db";
+import { categories } from "@/lib/db/schema";
+import * as categoryRepo from "@/lib/repositories/category";
+import * as productRepo from "@/lib/repositories/product";
 
 import { updateProduct } from "../../actions";
 import { ProductForm } from "../../product-form";
@@ -12,9 +15,12 @@ type Props = {
 export default async function EditProductPage({ params }: Props) {
   const { id } = await params;
 
-  const [product, categories] = await Promise.all([
-    db.product.findUnique({ where: { id } }),
-    db.category.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
+  const [product, categoryList] = await Promise.all([
+    productRepo.findById(id),
+    categoryRepo.findAll({
+      columns: { id: true, name: true },
+      orderBy: asc(categories.sortOrder),
+    }),
   ]);
 
   if (!product) notFound();
@@ -27,13 +33,13 @@ export default async function EditProductPage({ params }: Props) {
       <div className="rounded-lg border border-gray-200 bg-white p-6">
         <ProductForm
           action={boundAction}
-          categories={categories}
+          categories={categoryList}
           defaultValues={{
             name: product.name,
             slug: product.slug,
             description: product.description ?? "",
             categoryId: product.categoryId,
-            basePrice: product.basePrice.toString(),
+            basePrice: product.basePrice,
             priceType: product.priceType,
             stock: product.stock.toString(),
             photos: product.photos.join("\n"),

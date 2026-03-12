@@ -1,14 +1,16 @@
 import Link from "next/link";
 
-import { db } from "@/lib/db";
+import * as categoryRepo from "@/lib/repositories/category";
 
 import { CategoryTable } from "./category-table";
 
 export default async function AdminCategoriesPage() {
-  const categories = await db.category.findMany({
-    include: { _count: { select: { products: true } } },
-    orderBy: { name: "asc" },
-  });
+  const categoriesWithProducts = await categoryRepo.findAllWithProductCount();
+
+  const categories = categoriesWithProducts.map((c) => ({
+    ...c,
+    _count: { products: c.products.length },
+  }));
 
   return (
     <div>

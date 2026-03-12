@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { db } from "@/lib/db";
+import * as availabilityRepo from "@/lib/repositories/availability";
+import * as productRepo from "@/lib/repositories/product";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
-
-type OccupiedResult = [{ occupied: number }];
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -58,19 +57,13 @@ export async function GET(request: NextRequest) {
     );
 
   // Product lookup
-  const product = await db.product.findUnique({ where: { id: productId } });
+  const product = await productRepo.findById(productId);
   if (!product || !product.isActive)
     return NextResponse.json({ error: "Product not found" }, { status: 404 });
 
   // Availability aggregate query + business logic
   try {
-    const result = await db.$queryRaw<OccupiedResult>`
-      SELECT COALESCE(SUM(quantity), 0)::int AS occupied
-      FROM availability
-      WHERE product_id = ${productId}::uuid
-        AND start_date < ${endDate}::timestamp
-        AND end_date > ${startDate}::timestamp
-    `;
+    const result = await availabilityRepo.findByDateRange(productId, startDate, endDate);
 
     // SUM() from $queryRaw can return BigInt — use Number() to convert safely
     const occupied = Number(result[0]?.occupied ?? 0);

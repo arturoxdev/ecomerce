@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 
 import { AvailabilityChecker } from "@/components/catalog/availability-checker";
 import { Badge } from "@/components/ui/badge";
-import { db } from "@/lib/db";
+import * as productRepo from "@/lib/repositories/product";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
 
@@ -18,10 +18,7 @@ export async function generateMetadata({
   params,
 }: ProductDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = await db.product.findUnique({
-    where: { slug },
-    select: { name: true, description: true },
-  });
+  const product = await productRepo.findBySlugMeta(slug);
   if (!product) return {};
   return {
     title: `${product.name} | Festejos Aurora`,
@@ -40,18 +37,13 @@ export default async function ProductDetailPage({
   const typedLocale = locale as Locale;
   const m = getMessages(typedLocale);
 
-  const product = await db.product.findUnique({
-    where: { slug },
-    include: {
-      category: { select: { name: true, slug: true } },
-    },
-  });
+  const product = await productRepo.findBySlug(slug);
 
   if (!product || !product.isActive) {
     notFound();
   }
 
-  const basePrice = product.basePrice.toNumber();
+  const basePrice = parseFloat(product.basePrice);
 
   return (
     <div className="min-h-screen bg-white">
