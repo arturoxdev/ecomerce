@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { db } from "@/lib/db";
+import * as categoryRepo from "@/lib/repositories/category";
 
 import { updateCategory } from "../../actions";
 import { CategoryForm } from "../../category-form";
@@ -12,7 +12,7 @@ type Props = {
 export default async function EditCategoryPage({ params }: Props) {
   const { id } = await params;
 
-  const category = await db.category.findUnique({ where: { id } });
+  const category = await categoryRepo.findById(id);
   if (!category) notFound();
 
   const boundAction = updateCategory.bind(null, id);

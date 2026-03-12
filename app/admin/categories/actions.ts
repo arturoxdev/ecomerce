@@ -1,10 +1,12 @@
 "use server";
 
+import { desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-import { db } from "@/lib/db";
+import { categories } from "@/lib/db/schema";
+import * as categoryRepo from "@/lib/repositories/category";
 
 const categorySchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -34,10 +36,15 @@ export async function createCategory(
   }
 
   try {
-    await db.category.create({ data: parsed.data });
+    const existing = await categoryRepo.findAll({
+      orderBy: desc(categories.sortOrder),
+      limit: 1,
+      columns: { sortOrder: true },
+    });
+    const nextOrder = (existing[0]?.sortOrder ?? -1) + 1;
+    await categoryRepo.create({ ...parsed.data, sortOrder: nextOrder });
   } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : "Unknown error";
-    if (msg.includes("Unique constraint") && msg.includes("slug")) {
+    if (hasCode(e, "23505")) {
       return { fieldErrors: { slug: ["Slug already exists"] } };
     }
     return { error: "Failed to create category" };
@@ -64,10 +71,9 @@ export async function updateCategory(
   }
 
   try {
-    await db.category.update({ where: { id }, data: parsed.data });
+    await categoryRepo.update(id, parsed.data);
   } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : "Unknown error";
-    if (msg.includes("Unique constraint") && msg.includes("slug")) {
+    if (hasCode(e, "23505")) {
       return { fieldErrors: { slug: ["Slug already exists"] } };
     }
     return { error: "Failed to update category" };
@@ -77,12 +83,40 @@ export async function updateCategory(
   redirect("/admin/categories");
 }
 
+// --- Category Reorder ---
+
+const reorderSchema = z.array(
+  z.object({
+    id: z.string().min(1),
+    sortOrder: z.number().int().min(0),
+  }),
+);
+
+export async function updateCategoryOrder(
+  items: { id: string; sortOrder: number }[],
+): Promise<CategoryFormState> {
+  const parsed = reorderSchema.safeParse(items);
+  if (!parsed.success) {
+    return { error: "Invalid order data" };
+  }
+
+  try {
+    await categoryRepo.updateOrder(parsed.data);
+  } catch {
+    return { error: "Failed to update category order" };
+  }
+
+  revalidatePath("/admin/categories");
+  return { success: true };
+}
+
+// --- Category CRUD ---
+
 export async function deleteCategory(id: string): Promise<CategoryFormState> {
   try {
-    await db.category.delete({ where: { id } });
+    await categoryRepo.remove(id);
   } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : "Unknown error";
-    if (msg.includes("Foreign key constraint") || msg.includes("Restrict")) {
+    if (hasCode(e, "23503")) {
       return { error: "Cannot delete: category has associated products" };
     }
     return { error: "Failed to delete category" };
@@ -90,4 +124,10 @@ export async function deleteCategory(id: string): Promise<CategoryFormState> {
 
   revalidatePath("/admin/categories");
   return { success: true };
+}
+
+// --- Helpers ---
+
+function hasCode(e: unknown, code: string): boolean {
+  return typeof e === "object" && e !== null && "code" in e && (e as { code: string }).code === code;
 }

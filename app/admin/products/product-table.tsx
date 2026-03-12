@@ -1,6 +1,6 @@
 "use client";
 
-import { Pencil, Trash2 } from "lucide-react";
+import { CalendarX2, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -33,12 +33,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { deleteProduct } from "./actions";
+import { deleteProduct, toggleProductActive } from "./actions";
 
 type Product = {
   id: string;
   name: string;
-  basePrice: { toString(): string };
+  basePrice: string;
   priceType: string;
   stock: number;
   isActive: boolean;
@@ -49,9 +49,17 @@ type Props = {
   products: Product[];
   page: number;
   totalPages: number;
+  status?: string;
 };
 
-export function ProductTable({ products, page, totalPages }: Props) {
+function paginationHref(page: number, status?: string) {
+  const params = new URLSearchParams();
+  params.set("page", String(page));
+  if (status && status !== "all") params.set("status", status);
+  return `/admin/products?${params.toString()}`;
+}
+
+export function ProductTable({ products, page, totalPages, status }: Props) {
   const router = useRouter();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -65,6 +73,17 @@ export function ProductTable({ products, page, totalPages }: Props) {
         toast.error(result.error);
       } else {
         toast.success("Product deleted");
+        router.refresh();
+      }
+    });
+  }
+
+  function handleToggle(productId: string) {
+    startTransition(async () => {
+      const result = await toggleProductActive(productId);
+      if (result.error) {
+        toast.error(result.error);
+      } else {
         router.refresh();
       }
     });
@@ -100,7 +119,10 @@ export function ProductTable({ products, page, totalPages }: Props) {
           </TableHeader>
           <TableBody>
             {products.map((product) => (
-              <TableRow key={product.id} className="hover:bg-gray-50">
+              <TableRow
+                key={product.id}
+                className={`hover:bg-gray-50 ${!product.isActive ? "opacity-60" : ""}`}
+              >
                 <TableCell className="font-medium">{product.name}</TableCell>
                 <TableCell>{product.category.name}</TableCell>
                 <TableCell>
@@ -111,18 +133,31 @@ export function ProductTable({ products, page, totalPages }: Props) {
                 </TableCell>
                 <TableCell>{product.stock}</TableCell>
                 <TableCell>
-                  <span
-                    className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                      product.isActive
-                        ? "bg-green-100 text-green-700"
-                        : "bg-gray-100 text-gray-600"
-                    }`}
+                  <button
+                    onClick={() => handleToggle(product.id)}
+                    disabled={isPending}
+                    className="cursor-pointer"
                   >
-                    {product.isActive ? "Active" : "Inactive"}
-                  </span>
+                    <span
+                      className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
+                        product.isActive
+                          ? "bg-green-100 text-green-700"
+                          : "bg-gray-100 text-gray-600"
+                      }`}
+                    >
+                      {product.isActive ? "Active" : "Inactive"}
+                    </span>
+                  </button>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
+                    <Link
+                      href={`/admin/products/${product.id}/availability`}
+                      className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                      title="Manage availability"
+                    >
+                      <CalendarX2 className="size-4" />
+                    </Link>
                     <Link
                       href={`/admin/products/${product.id}/edit`}
                       className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
@@ -149,7 +184,7 @@ export function ProductTable({ products, page, totalPages }: Props) {
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
-                  href={page > 1 ? `/admin/products?page=${page - 1}` : undefined}
+                  href={page > 1 ? paginationHref(page - 1, status) : undefined}
                   aria-disabled={page <= 1}
                   className={page <= 1 ? "pointer-events-none opacity-50" : ""}
                 />
@@ -157,7 +192,7 @@ export function ProductTable({ products, page, totalPages }: Props) {
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <PaginationItem key={p}>
                   <PaginationLink
-                    href={`/admin/products?page=${p}`}
+                    href={paginationHref(p, status)}
                     isActive={p === page}
                   >
                     {p}
@@ -168,7 +203,7 @@ export function ProductTable({ products, page, totalPages }: Props) {
                 <PaginationNext
                   href={
                     page < totalPages
-                      ? `/admin/products?page=${page + 1}`
+                      ? paginationHref(page + 1, status)
                       : undefined
                   }
                   aria-disabled={page >= totalPages}

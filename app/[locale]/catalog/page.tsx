@@ -1,8 +1,11 @@
+import { asc } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 import { CategoryFilter } from "@/components/catalog/category-filter";
 import { ProductCard } from "@/components/catalog/product-card";
-import { db } from "@/lib/db";
+import { categories, products } from "@/lib/db/schema";
+import * as categoryRepo from "@/lib/repositories/category";
+import * as productRepo from "@/lib/repositories/product";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
 
@@ -25,29 +28,22 @@ export default async function CatalogPage({
 
   const { category: categorySlug } = await searchParams;
 
-  const categoryFilter =
+  const categoryList = await categoryRepo.findAll({
+    orderBy: asc(categories.sortOrder),
+    columns: { id: true, name: true, slug: true },
+  });
+
+  const productList =
     categorySlug && categorySlug !== "all"
-      ? { category: { slug: categorySlug } }
-      : {};
+      ? await productRepo.findAllByCategorySlug(categorySlug, {
+          orderBy: asc(products.name),
+        })
+      : await productRepo.findAllWithCategory({
+          where: { isActive: true },
+          orderBy: asc(products.name),
+        });
 
-  const [categories, products] = await Promise.all([
-    db.category.findMany({
-      orderBy: { name: "asc" },
-      select: { id: true, name: true, slug: true },
-    }),
-    db.product.findMany({
-      where: {
-        isActive: true,
-        ...categoryFilter,
-      },
-      include: {
-        category: { select: { name: true, slug: true } },
-      },
-      orderBy: { name: "asc" },
-    }),
-  ]);
-
-  const noProducts = products.length === 0;
+  const noProducts = productList.length === 0;
   const emptyMessage = categorySlug
     ? m.catalog.noProductsInCategory
     : m.catalog.noProducts;
@@ -65,7 +61,7 @@ export default async function CatalogPage({
         {/* Category filter (client island) */}
         <div className="mb-8">
           <CategoryFilter
-            categories={categories}
+            categories={categoryList}
             currentSlug={categorySlug ?? null}
             allLabel={m.catalog.filterAll}
           />
@@ -76,14 +72,14 @@ export default async function CatalogPage({
           <p className="py-16 text-center text-slate-500">{emptyMessage}</p>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {products.map((product) => (
+            {productList.map((product) => (
               <ProductCard
                 key={product.id}
                 product={{
                   id: product.id,
                   name: product.name,
                   slug: product.slug,
-                  basePrice: product.basePrice.toNumber(),
+                  basePrice: parseFloat(product.basePrice),
                   priceType: product.priceType,
                   photos: product.photos,
                   category: product.category,

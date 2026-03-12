@@ -1,28 +1,38 @@
+import { desc } from "drizzle-orm";
 import Link from "next/link";
 
-import { db } from "@/lib/db";
+import { products } from "@/lib/db/schema";
+import * as productRepo from "@/lib/repositories/product";
 
+import { ProductStatusFilter } from "./product-status-filter";
 import { ProductTable } from "./product-table";
 
 const PAGE_SIZE = 20;
 
 type Props = {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; status?: string }>;
 };
 
 export default async function AdminProductsPage({ searchParams }: Props) {
-  const { page: pageParam } = await searchParams;
+  const { page: pageParam, status } = await searchParams;
   const page = Math.max(1, parseInt(pageParam ?? "1", 10));
   const skip = (page - 1) * PAGE_SIZE;
 
-  const [products, total] = await Promise.all([
-    db.product.findMany({
-      skip,
-      take: PAGE_SIZE,
-      include: { category: { select: { name: true } } },
-      orderBy: { createdAt: "desc" },
+  const where =
+    status === "active"
+      ? { isActive: true as const }
+      : status === "inactive"
+        ? { isActive: false as const }
+        : {};
+
+  const [productList, total] = await Promise.all([
+    productRepo.findAllWithCategory({
+      offset: skip,
+      limit: PAGE_SIZE,
+      where,
+      orderBy: desc(products.createdAt),
     }),
-    db.product.count(),
+    productRepo.count(where),
   ]);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
@@ -39,7 +49,16 @@ export default async function AdminProductsPage({ searchParams }: Props) {
         </Link>
       </div>
 
-      <ProductTable products={products} page={page} totalPages={totalPages} />
+      <div className="mb-4">
+        <ProductStatusFilter />
+      </div>
+
+      <ProductTable
+        products={productList}
+        page={page}
+        totalPages={totalPages}
+        status={status}
+      />
     </div>
   );
 }
