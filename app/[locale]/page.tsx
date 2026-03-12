@@ -9,6 +9,7 @@ import {
   Truck,
   Utensils,
 } from "lucide-react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
@@ -43,18 +44,18 @@ export default async function Home({ params }: HomeProps) {
           </div>
 
           <nav className="hidden items-center gap-8 md:flex">
-            <a
+            <Link
               className="text-sm font-medium text-slate-600 transition-colors hover:text-primary"
-              href="#"
+              href={`/${typedLocale}`}
             >
               {m.nav.home}
-            </a>
-            <a
+            </Link>
+            <Link
               className="text-sm font-medium text-slate-600 transition-colors hover:text-primary"
-              href="#"
+              href={`/${typedLocale}/catalog`}
             >
               {m.nav.catalogue}
-            </a>
+            </Link>
             <a
               className="text-sm font-medium text-slate-600 transition-colors hover:text-primary"
               href="#"
@@ -101,10 +102,13 @@ export default async function Home({ params }: HomeProps) {
                 {m.hero.description}
               </p>
               <div className="flex flex-col gap-4 sm:flex-row">
-                <button className="inline-flex items-center justify-center rounded-lg bg-secondary px-6 py-3.5 text-base font-bold text-white shadow-sm transition-all hover:bg-green-800">
+                <Link
+                  href={`/${typedLocale}/catalog`}
+                  className="inline-flex items-center justify-center rounded-lg bg-secondary px-6 py-3.5 text-base font-bold text-white shadow-sm transition-all hover:bg-green-800"
+                >
                   <CalendarDays className="mr-2 size-5" />
                   {m.hero.primaryCta}
-                </button>
+                </Link>
                 <button className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-6 py-3.5 text-base font-bold text-slate-900 shadow-sm transition-all hover:bg-slate-50">
                   {m.hero.secondaryCta}
                 </button>

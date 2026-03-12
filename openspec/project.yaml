@@ -1,0 +1,6 @@
+project: festejos-aurora
+artifact_store:
+  mode: hybrid
+linear_project: Festejos Aurora
+repo: /Users/arturo/git/ecomerce
+initialized_at: 2026-03-12

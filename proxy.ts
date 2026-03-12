@@ -6,6 +6,21 @@ import { defaultLocale, locales } from "@/lib/i18n/config";
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Admin auth guard: protect /admin/* except /admin/login
+  if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
+    const session = request.cookies.get("admin-session");
+    if (!session) {
+      return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
+    return NextResponse.next();
+  }
+
+  // Skip locale redirect for admin routes
+  if (pathname.startsWith("/admin")) {
+    return NextResponse.next();
+  }
+
+  // Locale redirect for storefront
   const hasLocale = locales.some(
     (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`),
   );
