@@ -1,0 +1,16 @@
+change: catalog-availability
+project: festejos-aurora
+linear_issue: CON-71
+artifact_store:
+  mode: hybrid
+status:
+  explore: complete
+  proposal: complete
+  spec: complete
+  design: complete
+  tasks: complete
+  apply: complete
+  verify: pending
+  archive: pending
+updated_at: 2026-03-12
+apply_batch: "1+2+3 (tasks 0.1-4.2 — all 11 complete)"

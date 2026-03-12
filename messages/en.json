@@ -71,6 +71,31 @@
   },
   "footer": {
     "rights": "© 2026 Festejos Aurora. All rights reserved."
+  },
+  "catalog": {
+    "title": "Our Catalog",
+    "filterAll": "All Items",
+    "noProducts": "No products available at this time.",
+    "noProductsInCategory": "No products found in this category.",
+    "viewDetails": "View Details",
+    "product": {
+      "price": "Price",
+      "pricePerUnit": "per unit",
+      "stock": "Stock",
+      "category": "Category",
+      "gallery": "Product gallery"
+    },
+    "availability": {
+      "title": "Check Availability",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "loading": "Checking availability...",
+      "available": "Available",
+      "notAvailable": "Not available for selected dates",
+      "unitsAvailable": "units available",
+      "invalidRange": "End date must be after start date",
+      "errorFetch": "Could not check availability. Please try again."
+    }
   }
 }
 
