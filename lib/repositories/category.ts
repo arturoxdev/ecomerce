@@ -28,6 +28,12 @@ export function findById(id: string) {
   });
 }
 
+export function findBySlug(slug: string) {
+  return db.query.categories.findFirst({
+    where: eq(categories.slug, slug),
+  });
+}
+
 export function create(
   data: typeof categories.$inferInsert,
 ) {
