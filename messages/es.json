@@ -81,7 +81,15 @@
     "feature2Desc": "Cada artículo se limpia e inspecciona antes de la entrega."
   },
   "footer": {
-    "rights": "© 2026 Festejos Aurora. Todos los derechos reservados."
+    "rights": "© 2026 Festejos Aurora. Todos los derechos reservados.",
+    "links": {
+      "about": "Nosotros",
+      "contact": "Contacto",
+      "faq": "Preguntas frecuentes",
+      "terms": "Términos y condiciones",
+      "privacy": "Privacidad",
+      "refundPolicy": "Política de reembolso"
+    }
   },
   "catalog": {
     "title": "Nuestro Catálogo",
@@ -109,4 +117,3 @@
     }
   }
 }
-

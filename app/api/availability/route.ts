@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
     const result = await availabilityRepo.findByDateRange(productId, startDate, endDate);
 
     // SUM() from $queryRaw can return BigInt — use Number() to convert safely
-    const occupied = Number(result[0]?.occupied ?? 0);
+    const occupied = Number(result.rows[0]?.occupied ?? 0);
 
     let available: number;
     if (product.priceType === "FIXED") {

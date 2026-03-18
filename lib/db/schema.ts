@@ -10,7 +10,6 @@ import {
   timestamp,
   unique,
   uuid,
-  varchar,
 } from "drizzle-orm/pg-core";
 
 // ── Enums ──────────────────────────────────────────────────────
@@ -44,6 +43,17 @@ export type DeliveryMode = (typeof deliveryModeEnum.enumValues)[number];
 
 export const userRoleEnum = pgEnum("user_role", ["ROOT", "ADMIN", "EMPLOYEE"]);
 export type UserRole = (typeof userRoleEnum.enumValues)[number];
+
+export const contentLocaleEnum = pgEnum("content_locale", ["en", "es"]);
+export type ContentLocale = (typeof contentLocaleEnum.enumValues)[number];
+
+export const aboutPageSlugEnum = pgEnum("about_page_slug", ["about"]);
+export const contactPageSlugEnum = pgEnum("contact_page_slug", ["contact"]);
+export const legalPageSlugEnum = pgEnum("legal_page_slug", [
+  "terms",
+  "privacy",
+  "refund-policy",
+]);
 
 // ── Tables ─────────────────────────────────────────────────────
 
@@ -156,6 +166,80 @@ export const zipDeliveryZones = pgTable("zip_delivery_zones", {
   zipCode: text("zip_code").notNull().unique(),
   fee: numeric("fee", { precision: 10, scale: 2 }).notNull(),
 });
+
+export const aboutPageContents = pgTable(
+  "about_page_contents",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    slug: aboutPageSlugEnum("slug").notNull().default("about"),
+    locale: contentLocaleEnum("locale").notNull(),
+    eyebrow: text("eyebrow").notNull(),
+    title: text("title").notNull(),
+    subtitle: text("subtitle").notNull(),
+    storyTitle: text("story_title").notNull(),
+    storyBody: text("story_body").notNull(),
+    valuesTitle: text("values_title").notNull(),
+    valuesBody: text("values_body").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [unique("idx_about_page_locale").on(t.slug, t.locale)],
+);
+
+export const legalPageDocuments = pgTable(
+  "legal_page_documents",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    slug: legalPageSlugEnum("slug").notNull(),
+    locale: contentLocaleEnum("locale").notNull(),
+    title: text("title").notNull(),
+    subtitle: text("subtitle").notNull(),
+    body: text("body").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [unique("idx_legal_page_locale").on(t.slug, t.locale)],
+);
+
+export const contactPageContents = pgTable(
+  "contact_page_contents",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    slug: contactPageSlugEnum("slug").notNull().default("contact"),
+    locale: contentLocaleEnum("locale").notNull(),
+    title: text("title").notNull(),
+    subtitle: text("subtitle").notNull(),
+    location: text("location").notNull(),
+    phone: text("phone").notNull(),
+    email: text("email").notNull(),
+    businessHours: text("business_hours").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [unique("idx_contact_page_locale").on(t.slug, t.locale)],
+);
+
+export const faqEntries = pgTable(
+  "faq_entries",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    locale: contentLocaleEnum("locale").notNull(),
+    question: text("question").notNull(),
+    answer: text("answer").notNull(),
+    sortOrder: integer("sort_order").notNull().default(0),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [index("idx_faq_locale_order").on(t.locale, t.sortOrder)],
+);
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),

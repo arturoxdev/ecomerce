@@ -40,21 +40,19 @@ export function AvailabilityChecker({
   const [endDate, setEndDate] = useState("");
   const [status, setStatus] = useState<AvailabilityStatus>("idle");
   const [available, setAvailable] = useState(0);
+  const hasValidRange = Boolean(startDate && endDate && endDate > startDate);
+  const resolvedStatus: AvailabilityStatus =
+    !startDate || !endDate
+      ? "idle"
+      : endDate <= startDate
+        ? "invalid"
+        : status;
 
   useEffect(() => {
-    // Step 1: if either date is missing → idle
-    if (!startDate || !endDate) {
-      setStatus("idle");
+    if (!hasValidRange) {
       return;
     }
 
-    // Step 2: if end <= start → invalid (no fetch)
-    if (endDate <= startDate) {
-      setStatus("invalid");
-      return;
-    }
-
-    // Step 3: debounce 400ms then fetch
     const timer = setTimeout(async () => {
       setStatus("loading");
       try {
@@ -76,10 +74,10 @@ export function AvailabilityChecker({
 
     // Cleanup: cancel timer on re-run
     return () => clearTimeout(timer);
-  }, [startDate, endDate, productId]);
+  }, [endDate, hasValidRange, productId, startDate]);
 
   function renderStatus() {
-    switch (status) {
+    switch (resolvedStatus) {
       case "idle":
         return (
           <p className="text-sm text-slate-500">

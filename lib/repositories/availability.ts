@@ -3,6 +3,10 @@ import { desc, eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { availability } from "@/lib/db/schema";
 
+function firstOccupiedRow(result: { rows: { occupied: number }[] }) {
+  return result.rows[0]?.occupied ?? 0;
+}
+
 export function findByProduct(productId: string) {
   return db.query.availability.findMany({
     where: eq(availability.productId, productId),
@@ -59,7 +63,7 @@ export function checkOverlapAndCreate(
         AND start_date < ${endDate}::timestamp
         AND end_date > ${startDate}::timestamp
     `);
-    const occupied = Number(result[0]?.occupied ?? 0);
+    const occupied = Number(firstOccupiedRow(result));
 
     if (occupied + quantity > stock) {
       return { ok: false as const, occupied };

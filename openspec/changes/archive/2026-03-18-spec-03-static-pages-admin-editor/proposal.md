@@ -13,6 +13,7 @@ El `SPEC-03` del roadmap de Festejos Aurora exige páginas informativas y legale
 ## Capabilities
 
 ### New Capabilities
+
 - `static-informational-pages`: Páginas públicas localizadas para contenido informativo y legal con rutas estables y renderizado desde contenido persistente
 - `admin-static-page-editor`: Gestión administrativa del contenido de páginas estáticas predefinidas, incluyendo listado, edición y guardado por idioma
 
@@ -26,6 +27,7 @@ El `SPEC-03` del roadmap de Festejos Aurora exige páginas informativas y legale
 - **Panel admin**: nueva sección para administrar páginas estáticas, con formularios por tipo de contenido y CRUD de FAQs
 - **i18n**: cada página pública debe persistir una versión `en` y una versión `es`
 - **Diseño de referencia**: alineación con las pantallas de `untitled.pen` para `About Us`, `Contact`, `Terms & Conditions`, `Privacy Policy`, `Refund Policy` y `FAQ`
+- **Diseño de referencia panel admin**: alineación con las pantallas de `untitled.pen` para el panel de admin para controla lar informacion de las paginas `Admin — Pages List`, `Admin — Markdown Editor`, `Admin — Contact Editor`, `Admin — FAQ Editor`
 - **Archivos principales afectados**:
   - `lib/db/schema.ts`
   - `lib/repositories/`
