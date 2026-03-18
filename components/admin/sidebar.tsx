@@ -1,18 +1,47 @@
 "use client";
 
-import { FolderOpen, LogOut, Package, PartyPopper } from "lucide-react";
+import {
+  Calendar,
+  FolderOpen,
+  LogOut,
+  Package,
+  PartyPopper,
+  Settings,
+  ShoppingBag,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { logoutAdmin } from "@/app/admin/actions";
+import { logoutAdmin } from "@/app/admin/(dashboard)/actions";
+import type { UserRole } from "@/lib/db/schema";
 
-const navItems = [
+type NavItem = {
+  href: string;
+  label: string;
+  icon: typeof Package;
+  roles?: UserRole[];
+};
+
+const navItems: NavItem[] = [
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/categories", label: "Categories", icon: FolderOpen },
+  { href: "/admin/users", label: "Users", icon: Users, roles: ["ROOT", "ADMIN"] },
+  { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
+  { href: "/admin/calendar", label: "Calendar", icon: Calendar },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
-export function AdminSidebar() {
+type Props = {
+  userRole?: UserRole;
+};
+
+export function AdminSidebar({ userRole = "EMPLOYEE" }: Props) {
   const pathname = usePathname();
+
+  const visibleItems = navItems.filter(
+    (item) => !item.roles || item.roles.includes(userRole),
+  );
 
   return (
     <aside className="flex h-screen w-60 flex-col bg-gray-900 text-white">
@@ -26,7 +55,7 @@ export function AdminSidebar() {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4">
-        {navItems.map(({ href, label, icon: Icon }) => {
+        {visibleItems.map(({ href, label, icon: Icon }) => {
           const active = pathname.startsWith(href);
           return (
             <Link

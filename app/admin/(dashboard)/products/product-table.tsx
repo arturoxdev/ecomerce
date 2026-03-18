@@ -50,6 +50,7 @@ type Props = {
   page: number;
   totalPages: number;
   status?: string;
+  canWrite?: boolean;
 };
 
 function paginationHref(page: number, status?: string) {
@@ -59,7 +60,7 @@ function paginationHref(page: number, status?: string) {
   return `/admin/products?${params.toString()}`;
 }
 
-export function ProductTable({ products, page, totalPages, status }: Props) {
+export function ProductTable({ products, page, totalPages, status, canWrite = true }: Props) {
   const router = useRouter();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -114,7 +115,7 @@ export function ProductTable({ products, page, totalPages, status }: Props) {
               <TableHead>Price</TableHead>
               <TableHead>Stock</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="w-20">Actions</TableHead>
+              {canWrite && <TableHead className="w-20">Actions</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -133,11 +134,23 @@ export function ProductTable({ products, page, totalPages, status }: Props) {
                 </TableCell>
                 <TableCell>{product.stock}</TableCell>
                 <TableCell>
-                  <button
-                    onClick={() => handleToggle(product.id)}
-                    disabled={isPending}
-                    className="cursor-pointer"
-                  >
+                  {canWrite ? (
+                    <button
+                      onClick={() => handleToggle(product.id)}
+                      disabled={isPending}
+                      className="cursor-pointer"
+                    >
+                      <span
+                        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
+                          product.isActive
+                            ? "bg-green-100 text-green-700"
+                            : "bg-gray-100 text-gray-600"
+                        }`}
+                      >
+                        {product.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </button>
+                  ) : (
                     <span
                       className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
                         product.isActive
@@ -147,31 +160,33 @@ export function ProductTable({ products, page, totalPages, status }: Props) {
                     >
                       {product.isActive ? "Active" : "Inactive"}
                     </span>
-                  </button>
+                  )}
                 </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Link
-                      href={`/admin/products/${product.id}/availability`}
-                      className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                      title="Manage availability"
-                    >
-                      <CalendarX2 className="size-4" />
-                    </Link>
-                    <Link
-                      href={`/admin/products/${product.id}/edit`}
-                      className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                    >
-                      <Pencil className="size-4" />
-                    </Link>
-                    <button
-                      onClick={() => setDeleteId(product.id)}
-                      className="rounded p-1 text-gray-500 hover:bg-red-50 hover:text-red-600"
-                    >
-                      <Trash2 className="size-4" />
-                    </button>
-                  </div>
-                </TableCell>
+                {canWrite && (
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/admin/products/${product.id}/availability`}
+                        className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                        title="Manage availability"
+                      >
+                        <CalendarX2 className="size-4" />
+                      </Link>
+                      <Link
+                        href={`/admin/products/${product.id}/edit`}
+                        className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                      >
+                        <Pencil className="size-4" />
+                      </Link>
+                      <button
+                        onClick={() => setDeleteId(product.id)}
+                        className="rounded p-1 text-gray-500 hover:bg-red-50 hover:text-red-600"
+                      >
+                        <Trash2 className="size-4" />
+                      </button>
+                    </div>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>

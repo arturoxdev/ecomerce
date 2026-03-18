@@ -1,6 +1,8 @@
 import { desc } from "drizzle-orm";
 import Link from "next/link";
 
+import { getSessionUser } from "@/lib/auth/session";
+import { canWriteData } from "@/lib/auth/permissions";
 import { products } from "@/lib/db/schema";
 import * as productRepo from "@/lib/repositories/product";
 
@@ -14,6 +16,8 @@ type Props = {
 };
 
 export default async function AdminProductsPage({ searchParams }: Props) {
+  const user = await getSessionUser();
+  const canWrite = canWriteData(user.role);
   const { page: pageParam, status } = await searchParams;
   const page = Math.max(1, parseInt(pageParam ?? "1", 10));
   const skip = (page - 1) * PAGE_SIZE;
@@ -41,12 +45,14 @@ export default async function AdminProductsPage({ searchParams }: Props) {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Products</h1>
-        <Link
-          href="/admin/products/new"
-          className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
-        >
-          Add product
-        </Link>
+        {canWrite && (
+          <Link
+            href="/admin/products/new"
+            className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
+          >
+            Add product
+          </Link>
+        )}
       </div>
 
       <div className="mb-4">
@@ -58,6 +64,7 @@ export default async function AdminProductsPage({ searchParams }: Props) {
         page={page}
         totalPages={totalPages}
         status={status}
+        canWrite={canWrite}
       />
     </div>
   );
