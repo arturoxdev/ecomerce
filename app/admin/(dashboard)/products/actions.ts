@@ -65,6 +65,8 @@ export async function createProduct(
   }
 
   revalidatePath("/admin/products");
+  revalidatePath("/[locale]", "page");
+  revalidatePath("/[locale]/catalog", "page");
   redirect("/admin/products");
 }
 
@@ -107,6 +109,8 @@ export async function updateProduct(
   }
 
   revalidatePath("/admin/products");
+  revalidatePath("/[locale]", "page");
+  revalidatePath("/[locale]/catalog", "page");
   redirect("/admin/products");
 }
 
@@ -207,6 +211,8 @@ export async function toggleProductActive(productId: string): Promise<ProductFor
   }
 
   revalidatePath("/admin/products");
+  revalidatePath("/[locale]", "page");
+  revalidatePath("/[locale]/catalog", "page");
   return { success: true };
 }
 
@@ -224,6 +230,8 @@ export async function deleteProduct(id: string): Promise<ProductFormState> {
   }
 
   revalidatePath("/admin/products");
+  revalidatePath("/[locale]", "page");
+  revalidatePath("/[locale]/catalog", "page");
   return { success: true };
 }
 
