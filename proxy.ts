@@ -7,16 +7,19 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Admin auth guard: protect /admin/* except /admin/login
+  // Auth.js stores session in DB; check for the session cookie
   if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
-    const session = request.cookies.get("admin-session");
-    if (!session) {
+    const sessionToken =
+      request.cookies.get("authjs.session-token") ??
+      request.cookies.get("__Secure-authjs.session-token");
+    if (!sessionToken) {
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }
     return NextResponse.next();
   }
 
-  // Skip locale redirect for admin routes
-  if (pathname.startsWith("/admin")) {
+  // Skip locale redirect for admin routes and API
+  if (pathname.startsWith("/admin") || pathname.startsWith("/api")) {
     return NextResponse.next();
   }
 
@@ -37,4 +40,3 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)"],
 };
-

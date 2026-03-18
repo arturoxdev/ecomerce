@@ -26,6 +26,17 @@
     "safetyTitle": "Seguridad Certificada",
     "safetySubtitle": "Equipo inspeccionado"
   },
+  "howItWorks": {
+    "badge": "Proceso Simple",
+    "title": "Cómo Funciona",
+    "subtitle": "Rentar equipo para fiestas nunca fue tan fácil. Cuatro pasos simples para tu evento perfecto.",
+    "steps": [
+      { "number": "1", "title": "Navega el Catálogo", "description": "Explora nuestra colección de brincolines, mesas, sillas y más.", "icon": "search" },
+      { "number": "2", "title": "Selecciona Fechas", "description": "Elige las fechas de tu evento y verifica disponibilidad en tiempo real.", "icon": "calendar" },
+      { "number": "3", "title": "Paga 50% en Línea", "description": "Asegura tu reservación con un 50% de anticipo. El resto se paga al recibir.", "icon": "credit-card" },
+      { "number": "4", "title": "Te Entregamos", "description": "Llevamos todo a tu evento, lo instalamos y lo recogemos al terminar.", "icon": "truck" }
+    ]
+  },
   "equipment": {
     "title": "Nuestro Equipo",
     "description": "Explora nuestra selección de esenciales para tu fiesta.",

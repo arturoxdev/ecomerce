@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import { requireWriteAccess } from "@/lib/auth/session";
 import { priceTypeEnum } from "@/lib/db/schema";
 import * as availabilityRepo from "@/lib/repositories/availability";
 import * as productRepo from "@/lib/repositories/product";
@@ -30,6 +31,7 @@ export async function createProduct(
   _prev: ProductFormState,
   formData: FormData,
 ): Promise<ProductFormState> {
+  await requireWriteAccess();
   const raw = {
     name: formData.get("name"),
     slug: formData.get("slug"),
@@ -71,6 +73,7 @@ export async function updateProduct(
   _prev: ProductFormState,
   formData: FormData,
 ): Promise<ProductFormState> {
+  await requireWriteAccess();
   const raw = {
     name: formData.get("name"),
     slug: formData.get("slug"),
@@ -128,6 +131,7 @@ export async function createManualBlock(
   _prev: ManualBlockFormState,
   formData: FormData,
 ): Promise<ManualBlockFormState> {
+  await requireWriteAccess();
   const raw = {
     startDate: formData.get("startDate"),
     endDate: formData.get("endDate"),
@@ -168,6 +172,7 @@ export async function createManualBlock(
 }
 
 export async function deleteManualBlock(blockId: string): Promise<ManualBlockFormState> {
+  await requireWriteAccess();
   const block = await availabilityRepo.findBlockById(blockId);
   if (!block) {
     return { error: "Block not found" };
@@ -189,6 +194,7 @@ export async function getProductBlocks(productId: string) {
 // --- Product State ---
 
 export async function toggleProductActive(productId: string): Promise<ProductFormState> {
+  await requireWriteAccess();
   const product = await productRepo.findById(productId);
   if (!product) {
     return { error: "Product not found" };
@@ -207,6 +213,7 @@ export async function toggleProductActive(productId: string): Promise<ProductFor
 // --- Product CRUD ---
 
 export async function deleteProduct(id: string): Promise<ProductFormState> {
+  await requireWriteAccess();
   try {
     await productRepo.remove(id);
   } catch (e: unknown) {

@@ -38,9 +38,10 @@ type Category = {
 
 type Props = {
   categories: Category[];
+  canWrite?: boolean;
 };
 
-export function CategoryTable({ categories }: Props) {
+export function CategoryTable({ categories, canWrite = true }: Props) {
   const router = useRouter();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -104,8 +105,8 @@ export function CategoryTable({ categories }: Props) {
               <TableHead>Slug</TableHead>
               <TableHead>Description</TableHead>
               <TableHead>Products</TableHead>
-              <TableHead className="w-16">Order</TableHead>
-              <TableHead className="w-20">Actions</TableHead>
+              {canWrite && <TableHead className="w-16">Order</TableHead>}
+              {canWrite && <TableHead className="w-20">Actions</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -121,40 +122,44 @@ export function CategoryTable({ categories }: Props) {
                     {category._count.products}
                   </span>
                 </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-0.5">
-                    <button
-                      onClick={() => handleReorder(index, "up")}
-                      disabled={index === 0 || isPending}
-                      className="rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 disabled:opacity-30 disabled:pointer-events-none"
-                    >
-                      <ChevronUp className="size-4" />
-                    </button>
-                    <button
-                      onClick={() => handleReorder(index, "down")}
-                      disabled={index === categories.length - 1 || isPending}
-                      className="rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 disabled:opacity-30 disabled:pointer-events-none"
-                    >
-                      <ChevronDown className="size-4" />
-                    </button>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Link
-                      href={`/admin/categories/${category.id}/edit`}
-                      className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                    >
-                      <Pencil className="size-4" />
-                    </Link>
-                    <button
-                      onClick={() => setDeleteId(category.id)}
-                      className="rounded p-1 text-gray-500 hover:bg-red-50 hover:text-red-600"
-                    >
-                      <Trash2 className="size-4" />
-                    </button>
-                  </div>
-                </TableCell>
+                {canWrite && (
+                  <TableCell>
+                    <div className="flex items-center gap-0.5">
+                      <button
+                        onClick={() => handleReorder(index, "up")}
+                        disabled={index === 0 || isPending}
+                        className="rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 disabled:opacity-30 disabled:pointer-events-none"
+                      >
+                        <ChevronUp className="size-4" />
+                      </button>
+                      <button
+                        onClick={() => handleReorder(index, "down")}
+                        disabled={index === categories.length - 1 || isPending}
+                        className="rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 disabled:opacity-30 disabled:pointer-events-none"
+                      >
+                        <ChevronDown className="size-4" />
+                      </button>
+                    </div>
+                  </TableCell>
+                )}
+                {canWrite && (
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/admin/categories/${category.id}/edit`}
+                        className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                      >
+                        <Pencil className="size-4" />
+                      </Link>
+                      <button
+                        onClick={() => setDeleteId(category.id)}
+                        className="rounded p-1 text-gray-500 hover:bg-red-50 hover:text-red-600"
+                      >
+                        <Trash2 className="size-4" />
+                      </button>
+                    </div>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>

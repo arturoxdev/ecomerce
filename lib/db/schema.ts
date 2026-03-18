@@ -42,7 +42,7 @@ export const deliveryModeEnum = pgEnum("delivery_mode", [
 ]);
 export type DeliveryMode = (typeof deliveryModeEnum.enumValues)[number];
 
-export const userRoleEnum = pgEnum("user_role", ["ADMIN", "EMPLOYEE"]);
+export const userRoleEnum = pgEnum("user_role", ["ROOT", "ADMIN", "EMPLOYEE"]);
 export type UserRole = (typeof userRoleEnum.enumValues)[number];
 
 // ── Tables ─────────────────────────────────────────────────────

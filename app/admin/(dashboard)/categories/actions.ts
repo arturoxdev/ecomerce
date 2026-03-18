@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import { requireWriteAccess } from "@/lib/auth/session";
 import { categories } from "@/lib/db/schema";
 import * as categoryRepo from "@/lib/repositories/category";
 
@@ -24,6 +25,7 @@ export async function createCategory(
   _prev: CategoryFormState,
   formData: FormData,
 ): Promise<CategoryFormState> {
+  await requireWriteAccess();
   const raw = {
     name: formData.get("name"),
     slug: formData.get("slug"),
@@ -59,6 +61,7 @@ export async function updateCategory(
   _prev: CategoryFormState,
   formData: FormData,
 ): Promise<CategoryFormState> {
+  await requireWriteAccess();
   const raw = {
     name: formData.get("name"),
     slug: formData.get("slug"),
@@ -95,6 +98,7 @@ const reorderSchema = z.array(
 export async function updateCategoryOrder(
   items: { id: string; sortOrder: number }[],
 ): Promise<CategoryFormState> {
+  await requireWriteAccess();
   const parsed = reorderSchema.safeParse(items);
   if (!parsed.success) {
     return { error: "Invalid order data" };
@@ -113,6 +117,7 @@ export async function updateCategoryOrder(
 // --- Category CRUD ---
 
 export async function deleteCategory(id: string): Promise<CategoryFormState> {
+  await requireWriteAccess();
   try {
     await categoryRepo.remove(id);
   } catch (e: unknown) {

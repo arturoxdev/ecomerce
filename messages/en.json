@@ -26,6 +26,17 @@
     "safetyTitle": "Safety Certified",
     "safetySubtitle": "Inspected Equipment"
   },
+  "howItWorks": {
+    "badge": "Simple Process",
+    "title": "How It Works",
+    "subtitle": "Renting party equipment has never been easier. Four simple steps to your perfect event.",
+    "steps": [
+      { "number": "1", "title": "Browse Catalog", "description": "Explore our collection of bounce houses, tables, chairs and more.", "icon": "search" },
+      { "number": "2", "title": "Select Dates", "description": "Pick your event dates and check real-time availability for each item.", "icon": "calendar" },
+      { "number": "3", "title": "Pay 50% Online", "description": "Secure your reservation with a 50% deposit. Pay the rest on delivery day.", "icon": "credit-card" },
+      { "number": "4", "title": "We Deliver & Setup", "description": "We bring everything to your venue, set it up and pick it up after your event.", "icon": "truck" }
+    ]
+  },
   "equipment": {
     "title": "Our Equipment",
     "description": "Browse our selection of party essentials available for rent.",

@@ -9,7 +9,7 @@
   --font-display: "Plus Jakarta Sans", sans-serif;
   --color-primary: #f28b0d;
   --color-secondary: #2d6a4f;
-  --color-background-light: #ffffff;
+  --color-background-light: #f8f7f5;
   --color-background-dark: #221a10;
 }
 
@@ -33,10 +33,10 @@ body {
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: oklch(0.7322 0.1678 60.875);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.4758 0.0777 162.163);
+  --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
   --accent: oklch(0.97 0 0);
