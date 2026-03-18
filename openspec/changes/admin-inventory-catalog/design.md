@@ -1,10 +1,10 @@
 ## Contexto
 
-Festejos Aurora opera un e-commerce de renta de artículos para fiestas construido con Next.js 16, React 19, Prisma 7 y PostgreSQL. El panel admin (`/admin`) ya tiene CRUD completo de productos y categorías, subida de fotos a S3/MinIO, y una API de disponibilidad que calcula stock disponible por rango de fechas.
+Festejos Aurora opera un e-commerce de renta de artículos para fiestas construido con Next.js 16, React 19, Drizzle ORM y PostgreSQL. El panel admin (`/admin`) ya tiene CRUD completo de productos y categorías, subida de fotos a S3/MinIO, y una API de disponibilidad que calcula stock disponible por rango de fechas.
 
 El modelo `Availability` ya soporta `orderId: null` a nivel de BD, lo que permite bloqueos sin orden asociada, pero no existe interfaz ni server actions para gestionarlos. Las categorías no tienen campo de orden. Los productos no tienen toggle rápido ni filtro por estado.
 
-**Stack**: Next.js 16 (App Router), React 19 (`useActionState`), Prisma 7, PostgreSQL, Zod, shadcn/ui, Tailwind 4, Sonner (toasts), Lucide icons.
+**Stack**: Next.js 16 (App Router), React 19 (`useActionState`), Drizzle ORM, PostgreSQL, Zod, shadcn/ui, Tailwind 4, Sonner (toasts), Lucide icons.
 
 **Patrones existentes**: Server actions con Zod + `FormState` pattern, `revalidatePath` para invalidación, componentes client con `"use client"` y `useTransition` para mutaciones.
 

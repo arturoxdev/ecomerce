@@ -81,7 +81,15 @@
     "feature2Desc": "Every item is cleaned and inspected before delivery."
   },
   "footer": {
-    "rights": "© 2026 Festejos Aurora. All rights reserved."
+    "rights": "© 2026 Festejos Aurora. All rights reserved.",
+    "links": {
+      "about": "About Us",
+      "contact": "Contact",
+      "faq": "FAQ",
+      "terms": "Terms & Conditions",
+      "privacy": "Privacy Policy",
+      "refundPolicy": "Refund Policy"
+    }
   },
   "catalog": {
     "title": "Our Catalog",
@@ -109,4 +117,3 @@
     }
   }
 }
-

@@ -3,8 +3,24 @@ import "dotenv/config";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 
+import {
+  aboutPageFallbacks,
+  contactPageFallbacks,
+  faqFallbacks,
+  legalPageFallbacks,
+} from "@/lib/static-pages/fallbacks";
+
 import * as schema from "./schema";
-import { categories, products, settings, users } from "./schema";
+import {
+  aboutPageContents,
+  categories,
+  contactPageContents,
+  faqEntries,
+  legalPageDocuments,
+  products,
+  settings,
+  users,
+} from "./schema";
 
 const db = drizzle({ connection: process.env.DATABASE_URL!, schema });
 
@@ -115,6 +131,55 @@ async function main() {
         set: product,
       });
   }
+
+  for (const locale of ["en", "es"] as const) {
+    const aboutContent = aboutPageFallbacks[locale];
+    await db
+      .insert(aboutPageContents)
+      .values({
+        slug: "about",
+        locale,
+        ...aboutContent,
+      })
+      .onConflictDoUpdate({
+        target: [aboutPageContents.slug, aboutPageContents.locale],
+        set: aboutContent,
+      });
+
+    const contactContent = contactPageFallbacks[locale];
+    await db
+      .insert(contactPageContents)
+      .values({
+        slug: "contact",
+        locale,
+        ...contactContent,
+      })
+      .onConflictDoUpdate({
+        target: [contactPageContents.slug, contactPageContents.locale],
+        set: contactContent,
+      });
+
+    for (const slug of ["terms", "privacy", "refund-policy"] as const) {
+      const legalContent = legalPageFallbacks[slug][locale];
+      await db
+        .insert(legalPageDocuments)
+        .values({
+          slug,
+          locale,
+          ...legalContent,
+        })
+        .onConflictDoUpdate({
+          target: [legalPageDocuments.slug, legalPageDocuments.locale],
+          set: legalContent,
+        });
+    }
+  }
+
+  await db.delete(faqEntries);
+  await db.insert(faqEntries).values([
+    ...faqFallbacks.en,
+    ...faqFallbacks.es,
+  ]);
 
   console.log("Seed completed successfully");
 }

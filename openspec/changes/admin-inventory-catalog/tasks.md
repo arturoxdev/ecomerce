@@ -16,11 +16,11 @@
 
 ## 3. Migración de Base de Datos
 
-- [x] 3.1 Agregar campo `reason String?` al modelo `Availability` en `prisma/schema.prisma`
-- [x] 3.2 Agregar campo `sortOrder Int @default(0) @map("sort_order")` al modelo `Category` en `prisma/schema.prisma`
-- [x] 3.3 Ejecutar `npx prisma migrate dev --name add-availability-reason-and-category-sort-order`
+- [x] 3.1 Agregar el campo `reason` al schema de `availability` en `lib/db/schema.ts`
+- [x] 3.2 Agregar el campo `sortOrder` al schema de `categories` en `lib/db/schema.ts`
+- [x] 3.3 Generar y aplicar la migración SQL `add-availability-reason-and-category-sort-order` con Drizzle
 - [x] 3.4 Ejecutar backfill SQL para asignar sortOrder secuencial a categorías existentes basado en orden alfabético
-- [x] 3.5 Verificar que `npx prisma generate` completa sin errores y los tipos incluyen los nuevos campos
+- [x] 3.5 Verificar que el schema y los tipos inferidos de Drizzle incluyen los nuevos campos
 
 ## 4. Bloqueo Manual de Fechas — Server Actions
 

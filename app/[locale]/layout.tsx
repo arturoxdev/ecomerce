@@ -60,7 +60,11 @@ export default async function LocaleLayout({
     <div lang={locale} className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-[#f8f7f5] font-display text-slate-900 antialiased">
       <PublicHeader locale={typedLocale} messages={messages} />
       <main className="flex-1">{children}</main>
-      <PublicFooter rights={messages.footer.rights} />
+      <PublicFooter
+        locale={typedLocale}
+        rights={messages.footer.rights}
+        links={messages.footer.links}
+      />
     </div>
   );
 }

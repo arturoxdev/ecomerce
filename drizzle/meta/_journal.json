@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1772452800000,
+      "tag": "20260302120000_init",
+      "breakpoints": false
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1773273600000,
+      "tag": "20260312000000_add_availability_reason_and_category_sort_order",
+      "breakpoints": false
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1773824400000,
+      "tag": "20260318090000_add_static_pages_spec_03",
+      "breakpoints": false
+    }
+  ]
+}
