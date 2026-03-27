@@ -19,11 +19,23 @@ export function findByDateRange(
   productId: string,
   startDate: Date,
   endDate: Date,
+  variantId?: string | null,
 ) {
+  if (variantId) {
+    return db.execute<{ occupied: number }>(sql`
+      SELECT COALESCE(SUM(quantity), 0)::int AS occupied
+      FROM availability
+      WHERE product_id = ${productId}::uuid
+        AND variant_id = ${variantId}::uuid
+        AND start_date < ${endDate}::timestamp
+        AND end_date > ${startDate}::timestamp
+    `);
+  }
   return db.execute<{ occupied: number }>(sql`
     SELECT COALESCE(SUM(quantity), 0)::int AS occupied
     FROM availability
     WHERE product_id = ${productId}::uuid
+      AND variant_id IS NULL
       AND start_date < ${endDate}::timestamp
       AND end_date > ${startDate}::timestamp
   `);
@@ -53,16 +65,28 @@ export function checkOverlapAndCreate(
   endDate: Date,
   quantity: number,
   stock: number,
-  extra?: { reason?: string },
+  extra?: { reason?: string; variantId?: string | null },
 ) {
+  const variantId = extra?.variantId ?? null;
+
   return db.transaction(async (tx) => {
-    const result = await tx.execute<{ occupied: number }>(sql`
-      SELECT COALESCE(SUM(quantity), 0)::int AS occupied
-      FROM availability
-      WHERE product_id = ${productId}::uuid
-        AND start_date < ${endDate}::timestamp
-        AND end_date > ${startDate}::timestamp
-    `);
+    const result = variantId
+      ? await tx.execute<{ occupied: number }>(sql`
+          SELECT COALESCE(SUM(quantity), 0)::int AS occupied
+          FROM availability
+          WHERE product_id = ${productId}::uuid
+            AND variant_id = ${variantId}::uuid
+            AND start_date < ${endDate}::timestamp
+            AND end_date > ${startDate}::timestamp
+        `)
+      : await tx.execute<{ occupied: number }>(sql`
+          SELECT COALESCE(SUM(quantity), 0)::int AS occupied
+          FROM availability
+          WHERE product_id = ${productId}::uuid
+            AND variant_id IS NULL
+            AND start_date < ${endDate}::timestamp
+            AND end_date > ${startDate}::timestamp
+        `);
     const occupied = Number(firstOccupiedRow(result));
 
     if (occupied + quantity > stock) {
@@ -77,6 +101,7 @@ export function checkOverlapAndCreate(
         endDate,
         quantity,
         orderId: null,
+        ...(variantId ? { variantId } : {}),
         ...(extra?.reason ? { reason: extra.reason } : {}),
       })
       .returning();

@@ -81,26 +81,37 @@ export default async function CategoryLandingPage({
           </p>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {productList.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={{
-                  id: product.id,
-                  name: product.name,
-                  slug: product.slug,
-                  basePrice: parseFloat(product.basePrice),
-                  priceType: product.priceType,
-                  photos: product.photos,
-                  category: product.category,
-                }}
-                locale={typedLocale}
-                labels={{
-                  viewDetails: m.catalog.viewDetails,
-                  perUnit: m.catalog.product.pricePerUnit,
-                  price: m.catalog.product.price,
-                }}
-              />
-            ))}
+            {productList.map((product) => {
+              const activeVariants = product.variants?.filter((v) => v.isActive) ?? [];
+              const hasVariants = activeVariants.length > 0;
+              const minVariantPrice = hasVariants
+                ? Math.min(...activeVariants.map((v) => parseFloat(v.price)))
+                : undefined;
+
+              return (
+                <ProductCard
+                  key={product.id}
+                  product={{
+                    id: product.id,
+                    name: product.name,
+                    slug: product.slug,
+                    basePrice: parseFloat(product.basePrice),
+                    priceType: product.priceType,
+                    photos: product.photos,
+                    category: product.category,
+                    hasVariants,
+                    minVariantPrice,
+                  }}
+                  locale={typedLocale}
+                  labels={{
+                    viewDetails: m.catalog.viewDetails,
+                    perUnit: m.catalog.product.pricePerUnit,
+                    price: m.catalog.product.price,
+                    fromPrice: m.catalog.product.fromPrice,
+                  }}
+                />
+              );
+            })}
           </div>
         )}
       </div>

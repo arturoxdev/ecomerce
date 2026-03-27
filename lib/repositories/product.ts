@@ -1,4 +1,4 @@
-import { and, count as countFn, eq, SQL } from "drizzle-orm";
+import { and, count as countFn, eq, ilike, SQL } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import { categories, products } from "@/lib/db/schema";
@@ -23,7 +23,7 @@ export function findAll(opts?: {
 }
 
 export function findAllWithCategory(opts?: {
-  where?: { isActive?: boolean };
+  where?: { isActive?: boolean; categoryId?: string; search?: string };
   orderBy?: SQL;
   limit?: number;
   offset?: number;
@@ -32,13 +32,19 @@ export function findAllWithCategory(opts?: {
   if (opts?.where?.isActive !== undefined) {
     conditions.push(eq(products.isActive, opts.where.isActive));
   }
+  if (opts?.where?.categoryId) {
+    conditions.push(eq(products.categoryId, opts.where.categoryId));
+  }
+  if (opts?.where?.search) {
+    conditions.push(ilike(products.name, `%${opts.where.search}%`));
+  }
 
   return db.query.products.findMany({
     where: conditions.length > 0 ? and(...conditions) : undefined,
     orderBy: opts?.orderBy ? () => [opts.orderBy!] : undefined,
     limit: opts?.limit,
     offset: opts?.offset,
-    with: { category: true },
+    with: { category: true, variants: true },
   });
 }
 
@@ -58,7 +64,7 @@ export async function findAllByCategorySlug(
       eq(products.categoryId, category.id),
     ),
     orderBy: opts?.orderBy ? () => [opts.orderBy!] : undefined,
-    with: { category: true },
+    with: { category: true, variants: true },
   });
 }
 
@@ -71,7 +77,14 @@ export function findById(id: string) {
 export function findBySlug(slug: string) {
   return db.query.products.findFirst({
     where: eq(products.slug, slug),
-    with: { category: true },
+    with: { category: true, variants: true },
+  });
+}
+
+export function findByIdWithVariants(id: string) {
+  return db.query.products.findFirst({
+    where: eq(products.id, id),
+    with: { variants: true },
   });
 }
 
@@ -113,10 +126,16 @@ export function toggleActive(id: string, currentIsActive: boolean) {
     .where(eq(products.id, id));
 }
 
-export function count(where?: { isActive?: boolean }) {
+export function count(where?: { isActive?: boolean; categoryId?: string; search?: string }) {
   const conditions: SQL[] = [];
   if (where?.isActive !== undefined) {
     conditions.push(eq(products.isActive, where.isActive));
+  }
+  if (where?.categoryId) {
+    conditions.push(eq(products.categoryId, where.categoryId));
+  }
+  if (where?.search) {
+    conditions.push(ilike(products.name, `%${where.search}%`));
   }
   return db
     .select({ count: countFn() })

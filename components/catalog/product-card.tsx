@@ -12,12 +12,15 @@ export type ProductCardProduct = {
   priceType: "FIXED" | "PER_UNIT";
   photos: string[];
   category: { name: string; slug: string };
+  hasVariants?: boolean;
+  minVariantPrice?: number;
 };
 
 export type ProductCardLabels = {
   viewDetails: string; // m.catalog.viewDetails
   perUnit: string; // m.catalog.product.pricePerUnit
   price: string; // m.catalog.product.price
+  fromPrice?: string; // m.catalog.product.fromPrice
 };
 
 export type ProductCardProps = {
@@ -28,10 +31,16 @@ export type ProductCardProps = {
 
 export function ProductCard({ product, locale, labels }: ProductCardProps) {
   const photo = product.photos[0] ?? null;
+
+  const lowestPrice = product.hasVariants && product.minVariantPrice !== undefined
+    ? Math.min(product.basePrice, product.minVariantPrice)
+    : product.basePrice;
+
+  const prefix = product.hasVariants ? `${labels.fromPrice ?? "From"} ` : "";
   const priceDisplay =
     product.priceType === "PER_UNIT"
-      ? `$${product.basePrice.toFixed(2)} / ${labels.perUnit}`
-      : `$${product.basePrice.toFixed(2)}`;
+      ? `${prefix}$${lowestPrice.toFixed(2)} / ${labels.perUnit}`
+      : `${prefix}$${lowestPrice.toFixed(2)}`;
 
   return (
     <div className="group relative rounded-xl border border-slate-100 bg-white p-4 shadow-sm transition-all duration-300 hover:shadow-lg">

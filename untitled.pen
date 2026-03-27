@@ -286,7 +286,8 @@
                       "content": "Premium bounce houses, tables, and chairs for every occasion. We bring the fun, you make the memories. Book your equipment today with instant confirmation.",
                       "lineHeight": 1.6,
                       "fontFamily": "Plus Jakarta Sans",
-                      "fontSize": 18
+                      "fontSize": 18,
+                      "fontWeight": "normal"
                     },
                     {
                       "type": "frame",
@@ -483,7 +484,8 @@
                           "fill": "#64748b",
                           "content": "Trusted by 500+ happy families",
                           "fontFamily": "Plus Jakarta Sans",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     }
@@ -631,7 +633,8 @@
                               "fill": "#64748b",
                               "content": "Inspected Equipment",
                               "fontFamily": "Plus Jakarta Sans",
-                              "fontSize": 12
+                              "fontSize": 12,
+                              "fontWeight": "normal"
                             }
                           ]
                         }
@@ -688,7 +691,8 @@
                       "fill": "#475569",
                       "content": "Browse our selection of party essentials available for rent.",
                       "fontFamily": "Plus Jakarta Sans",
-                      "fontSize": 16
+                      "fontSize": 16,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -887,7 +891,8 @@
                                   "fill": "#64748b",
                                   "content": "Ideal for ages 3-10",
                                   "fontFamily": "Plus Jakarta Sans",
-                                  "fontSize": 14
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -948,7 +953,8 @@
                                   "fill": "#64748b",
                                   "content": "15' x 15'",
                                   "fontFamily": "Plus Jakarta Sans",
-                                  "fontSize": 12
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -1047,7 +1053,8 @@
                                   "fill": "#64748b",
                                   "content": "Includes supplies for 50",
                                   "fontFamily": "Plus Jakarta Sans",
-                                  "fontSize": 14
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -1108,7 +1115,8 @@
                                   "fill": "#64748b",
                                   "content": "Concession",
                                   "fontFamily": "Plus Jakarta Sans",
-                                  "fontSize": 12
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -1217,7 +1225,8 @@
                                   "fill": "#64748b",
                                   "content": "Durable & lightweight",
                                   "fontFamily": "Plus Jakarta Sans",
-                                  "fontSize": 14
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -1278,7 +1287,8 @@
                                   "fill": "#64748b",
                                   "content": "10 Pack",
                                   "fontFamily": "Plus Jakarta Sans",
-                                  "fontSize": 12
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -1377,7 +1387,8 @@
                                   "fill": "#64748b",
                                   "content": "Wet or dry use",
                                   "fontFamily": "Plus Jakarta Sans",
-                                  "fontSize": 14
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -1438,7 +1449,8 @@
                                   "fill": "#64748b",
                                   "content": "18' High",
                                   "fontFamily": "Plus Jakarta Sans",
-                                  "fontSize": 12
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -1547,7 +1559,8 @@
                                   "fill": "#64748b",
                                   "content": "Seats 8-10 people",
                                   "fontFamily": "Plus Jakarta Sans",
-                                  "fontSize": 14
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -1608,7 +1621,8 @@
                                   "fill": "#64748b",
                                   "content": "60\" Round",
                                   "fontFamily": "Plus Jakarta Sans",
-                                  "fontSize": 12
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -1707,7 +1721,8 @@
                                   "fill": "#64748b",
                                   "content": "Sweet treat favorite",
                                   "fontFamily": "Plus Jakarta Sans",
-                                  "fontSize": 14
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -1768,7 +1783,8 @@
                                   "fill": "#64748b",
                                   "content": "Machine",
                                   "fontFamily": "Plus Jakarta Sans",
-                                  "fontSize": 12
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -1890,7 +1906,8 @@
                       "content": "Contact us for custom packages, large event discounts, and availability for upcoming dates. We're here to help you organize the perfect celebration.",
                       "lineHeight": 1.6,
                       "fontFamily": "Plus Jakarta Sans",
-                      "fontSize": 18
+                      "fontSize": 18,
+                      "fontWeight": "normal"
                     },
                     {
                       "type": "frame",
@@ -1923,7 +1940,8 @@
                               "fill": "#94a3b8",
                               "content": "Enter your email",
                               "fontFamily": "Plus Jakarta Sans",
-                              "fontSize": 14
+                              "fontSize": 14,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -2033,7 +2051,8 @@
                           "content": "We handle the heavy lifting. All rentals include professional setup and takedown.",
                           "lineHeight": 1.7,
                           "fontFamily": "Plus Jakarta Sans",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -2093,7 +2112,8 @@
                           "content": "Safety first. Every item is thoroughly cleaned and inspected before delivery.",
                           "lineHeight": 1.7,
                           "fontFamily": "Plus Jakarta Sans",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     }
@@ -2130,7 +2150,8 @@
               "fill": "#64748b",
               "content": "© 2026 Festejos Aurora, Inc. All rights reserved.",
               "fontFamily": "Plus Jakarta Sans",
-              "fontSize": 12
+              "fontSize": 12,
+              "fontWeight": "normal"
             },
             {
               "type": "frame",
@@ -2405,7 +2426,8 @@
               "lineHeight": 1.6,
               "textAlign": "center",
               "fontFamily": "Plus Jakarta Sans",
-              "fontSize": 18
+              "fontSize": 18,
+              "fontWeight": "normal"
             }
           ]
         },
@@ -2485,7 +2507,8 @@
                   "content": "Festejos Aurora was born from a love for bringing people together. What started as renting a single bounce house to neighbors has grown into a full-service party equipment rental business serving the greater Houston area.",
                   "lineHeight": 1.7,
                   "fontFamily": "Plus Jakarta Sans",
-                  "fontSize": 16
+                  "fontSize": 16,
+                  "fontWeight": "normal"
                 },
                 {
                   "type": "text",
@@ -2497,7 +2520,8 @@
                   "content": "We believe every family deserves a memorable celebration without the stress. That's why we handle everything — from delivery and setup to pickup — so you can focus on what matters most: enjoying the moment with your loved ones.",
                   "lineHeight": 1.7,
                   "fontFamily": "Plus Jakarta Sans",
-                  "fontSize": 16
+                  "fontSize": 16,
+                  "fontWeight": "normal"
                 }
               ]
             }
@@ -2547,7 +2571,8 @@
                   "lineHeight": 1.6,
                   "textAlign": "center",
                   "fontFamily": "Plus Jakarta Sans",
-                  "fontSize": 16
+                  "fontSize": 16,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -2625,7 +2650,8 @@
                       "lineHeight": 1.6,
                       "textAlign": "center",
                       "fontFamily": "Plus Jakarta Sans",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -2696,7 +2722,8 @@
                       "lineHeight": 1.6,
                       "textAlign": "center",
                       "fontFamily": "Plus Jakarta Sans",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -2767,7 +2794,8 @@
                       "lineHeight": 1.6,
                       "textAlign": "center",
                       "fontFamily": "Plus Jakarta Sans",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     }
                   ]
                 }
@@ -2802,7 +2830,8 @@
               "fill": "#64748b",
               "content": "© 2026 Festejos Aurora, Inc. All rights reserved.",
               "fontFamily": "Plus Jakarta Sans",
-              "fontSize": 12
+              "fontSize": 12,
+              "fontWeight": "normal"
             },
             {
               "type": "frame",
@@ -3039,7 +3068,8 @@
               "lineHeight": 1.6,
               "textAlign": "center",
               "fontFamily": "Plus Jakarta Sans",
-              "fontSize": 18
+              "fontSize": 18,
+              "fontWeight": "normal"
             }
           ]
         },
@@ -3887,7 +3917,8 @@
               "lineHeight": 1.6,
               "textAlign": "center",
               "fontFamily": "Plus Jakarta Sans",
-              "fontSize": 18
+              "fontSize": 18,
+              "fontWeight": "normal"
             }
           ]
         },
@@ -3958,7 +3989,8 @@
                       "content": "By placing an order through Festejos Aurora, you agree to rent the specified equipment for the agreed-upon dates. All rentals are subject to availability and confirmation.",
                       "lineHeight": 1.7,
                       "fontFamily": "Plus Jakarta Sans",
-                      "fontSize": 16
+                      "fontSize": 16,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -3990,7 +4022,8 @@
                       "content": "A 50% deposit is required at the time of booking to secure your reservation. The remaining 50% is due in cash upon delivery of the equipment.",
                       "lineHeight": 1.7,
                       "fontFamily": "Plus Jakarta Sans",
-                      "fontSize": 16
+                      "fontSize": 16,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -4022,7 +4055,8 @@
                       "content": "Cancellations made 48 hours or more before the scheduled delivery will receive a full refund of the deposit. Cancellations within 48 hours are subject to a 50% cancellation fee.",
                       "lineHeight": 1.7,
                       "fontFamily": "Plus Jakarta Sans",
-                      "fontSize": 16
+                      "fontSize": 16,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -4054,7 +4088,8 @@
                       "content": "The renter is responsible for the proper use and care of all rented equipment. Any damage beyond normal wear and tear will be charged to the renter at replacement cost.",
                       "lineHeight": 1.7,
                       "fontFamily": "Plus Jakarta Sans",
-                      "fontSize": 16
+                      "fontSize": 16,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -4086,7 +4121,8 @@
                       "content": "Festejos Aurora is not liable for injuries resulting from improper use of rental equipment. The renter assumes all responsibility for the safe operation and supervision of rented items.",
                       "lineHeight": 1.7,
                       "fontFamily": "Plus Jakarta Sans",
-                      "fontSize": 16
+                      "fontSize": 16,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -4118,7 +4154,8 @@
                       "content": "Delivery and setup times are estimates and may vary. The renter must provide adequate space and access for delivery, setup, and pickup of equipment.",
                       "lineHeight": 1.7,
                       "fontFamily": "Plus Jakarta Sans",
-                      "fontSize": 16
+                      "fontSize": 16,
+                      "fontWeight": "normal"
                     }
                   ]
                 }
@@ -4391,7 +4428,8 @@
               "lineHeight": 1.6,
               "textAlign": "center",
               "fontFamily": "Plus Jakarta Sans",
-              "fontSize": 18
+              "fontSize": 18,
+              "fontWeight": "normal"
             }
           ]
         },
@@ -4462,7 +4500,8 @@
                       "content": "We collect personal information you provide when placing an order, including your name, email address, phone number, and delivery address. Payment information is processed securely through Square and is never stored on our servers.",
                       "lineHeight": 1.7,
                       "fontFamily": "Plus Jakarta Sans",
-                      "fontSize": 16
+                      "fontSize": 16,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -4494,7 +4533,8 @@
                       "content": "Your information is used solely to process your rental orders, coordinate delivery and pickup, communicate about your reservation, and improve our services.",
                       "lineHeight": 1.7,
                       "fontFamily": "Plus Jakarta Sans",
-                      "fontSize": 16
+                      "fontSize": 16,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -4526,7 +4566,8 @@
                       "content": "We do not sell, trade, or share your personal information with third parties except as necessary to process payments through Square or as required by law.",
                       "lineHeight": 1.7,
                       "fontFamily": "Plus Jakarta Sans",
-                      "fontSize": 16
+                      "fontSize": 16,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -4558,7 +4599,8 @@
                       "content": "We implement industry-standard security measures to protect your personal information. All payment transactions are encrypted and processed through Square's secure payment infrastructure.",
                       "lineHeight": 1.7,
                       "fontFamily": "Plus Jakarta Sans",
-                      "fontSize": 16
+                      "fontSize": 16,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -4590,7 +4632,8 @@
                       "content": "You may request access to, correction of, or deletion of your personal data at any time by contacting us at info@festejosaurora.com.",
                       "lineHeight": 1.7,
                       "fontFamily": "Plus Jakarta Sans",
-                      "fontSize": 16
+                      "fontSize": 16,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -4622,7 +4665,8 @@
                       "content": "If you have questions about this Privacy Policy, please contact us at info@festejosaurora.com or call (555) 123-4567.",
                       "lineHeight": 1.7,
                       "fontFamily": "Plus Jakarta Sans",
-                      "fontSize": 16
+                      "fontSize": 16,
+                      "fontWeight": "normal"
                     }
                   ]
                 }
@@ -4895,7 +4939,8 @@
               "lineHeight": 1.6,
               "textAlign": "center",
               "fontFamily": "Plus Jakarta Sans",
-              "fontSize": 18
+              "fontSize": 18,
+              "fontWeight": "normal"
             }
           ]
         },
@@ -4966,7 +5011,8 @@
                       "content": "The 50% deposit paid at booking is fully refundable if the reservation is cancelled at least 48 hours before the scheduled delivery time.",
                       "lineHeight": 1.7,
                       "fontFamily": "Plus Jakarta Sans",
-                      "fontSize": 16
+                      "fontSize": 16,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -4998,7 +5044,8 @@
                       "content": "Cancellations made within 48 hours of the scheduled delivery will forfeit 50% of the deposit amount. No-shows will forfeit the entire deposit.",
                       "lineHeight": 1.7,
                       "fontFamily": "Plus Jakarta Sans",
-                      "fontSize": 16
+                      "fontSize": 16,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -5030,7 +5077,8 @@
                       "content": "In the event of severe weather conditions that make outdoor use unsafe, we will work with you to reschedule at no additional cost or provide a full refund.",
                       "lineHeight": 1.7,
                       "fontFamily": "Plus Jakarta Sans",
-                      "fontSize": 16
+                      "fontSize": 16,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -5062,7 +5110,8 @@
                       "content": "If rented equipment arrives damaged or malfunctions during your event, we will replace it as quickly as possible or provide a proportional refund for the affected items.",
                       "lineHeight": 1.7,
                       "fontFamily": "Plus Jakarta Sans",
-                      "fontSize": 16
+                      "fontSize": 16,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -5094,7 +5143,8 @@
                       "content": "To request a refund, contact us at info@festejosaurora.com or call (555) 123-4567. Refunds are processed within 5-7 business days to the original payment method.",
                       "lineHeight": 1.7,
                       "fontFamily": "Plus Jakarta Sans",
-                      "fontSize": 16
+                      "fontSize": 16,
+                      "fontWeight": "normal"
                     }
                   ]
                 }
@@ -5367,7 +5417,8 @@
               "lineHeight": 1.6,
               "textAlign": "center",
               "fontFamily": "Plus Jakarta Sans",
-              "fontSize": 18
+              "fontSize": 18,
+              "fontWeight": "normal"
             }
           ]
         },

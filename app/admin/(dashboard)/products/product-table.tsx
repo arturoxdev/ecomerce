@@ -50,17 +50,21 @@ type Props = {
   page: number;
   totalPages: number;
   status?: string;
+  category?: string;
+  search?: string;
   canWrite?: boolean;
 };
 
-function paginationHref(page: number, status?: string) {
+function paginationHref(page: number, filters?: { status?: string; category?: string; search?: string }) {
   const params = new URLSearchParams();
   params.set("page", String(page));
-  if (status && status !== "all") params.set("status", status);
+  if (filters?.status && filters.status !== "all") params.set("status", filters.status);
+  if (filters?.category && filters.category !== "all") params.set("category", filters.category);
+  if (filters?.search) params.set("search", filters.search);
   return `/admin/products?${params.toString()}`;
 }
 
-export function ProductTable({ products, page, totalPages, status, canWrite = true }: Props) {
+export function ProductTable({ products, page, totalPages, status, category, search, canWrite = true }: Props) {
   const router = useRouter();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -199,7 +203,7 @@ export function ProductTable({ products, page, totalPages, status, canWrite = tr
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
-                  href={page > 1 ? paginationHref(page - 1, status) : undefined}
+                  href={page > 1 ? paginationHref(page - 1, { status, category, search }) : undefined}
                   aria-disabled={page <= 1}
                   className={page <= 1 ? "pointer-events-none opacity-50" : ""}
                 />
@@ -207,7 +211,7 @@ export function ProductTable({ products, page, totalPages, status, canWrite = tr
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <PaginationItem key={p}>
                   <PaginationLink
-                    href={paginationHref(p, status)}
+                    href={paginationHref(p, { status, category, search })}
                     isActive={p === page}
                   >
                     {p}
@@ -218,7 +222,7 @@ export function ProductTable({ products, page, totalPages, status, canWrite = tr
                 <PaginationNext
                   href={
                     page < totalPages
-                      ? paginationHref(page + 1, status)
+                      ? paginationHref(page + 1, { status, category, search })
                       : undefined
                   }
                   aria-disabled={page >= totalPages}

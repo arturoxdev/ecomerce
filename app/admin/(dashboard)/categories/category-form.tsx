@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toSlug } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 
 import type { CategoryFormState } from "./actions";
@@ -16,13 +17,6 @@ type Props = {
     description?: string;
   };
 };
-
-function toSlug(value: string) {
-  return value
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9-]/g, '');
-}
 
 export function CategoryForm({ action, defaultValues }: Props) {
   const [state, formAction, pending] = useActionState(action, {});

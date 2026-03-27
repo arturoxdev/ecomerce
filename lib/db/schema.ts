@@ -74,6 +74,7 @@ export const products = pgTable("products", {
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
   description: text("description"),
+  about: text("about"),
   basePrice: numeric("base_price", { precision: 10, scale: 2 }).notNull(),
   priceType: priceTypeEnum("price_type").notNull(),
   stock: integer("stock").notNull().default(1),
@@ -82,6 +83,22 @@ export const products = pgTable("products", {
   categoryId: uuid("category_id")
     .notNull()
     .references(() => categories.id, { onDelete: "restrict" }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export const productVariants = pgTable("product_variants", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  productId: uuid("product_id")
+    .notNull()
+    .references(() => products.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+  stock: integer("stock").notNull().default(1),
+  sortOrder: integer("sort_order").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
@@ -125,6 +142,9 @@ export const orderItems = pgTable("order_items", {
   productId: uuid("product_id")
     .notNull()
     .references(() => products.id, { onDelete: "restrict" }),
+  variantId: uuid("variant_id").references(() => productVariants.id, {
+    onDelete: "set null",
+  }),
   quantity: integer("quantity").notNull(),
   unitPrice: numeric("unit_price", { precision: 10, scale: 2 }).notNull(),
   subtotal: numeric("subtotal", { precision: 10, scale: 2 }).notNull(),
@@ -137,6 +157,9 @@ export const availability = pgTable(
     productId: uuid("product_id")
       .notNull()
       .references(() => products.id, { onDelete: "restrict" }),
+    variantId: uuid("variant_id").references(() => productVariants.id, {
+      onDelete: "set null",
+    }),
     startDate: timestamp("start_date", { precision: 6 }).notNull(),
     endDate: timestamp("end_date", { precision: 6 }).notNull(),
     quantity: integer("quantity").notNull().default(1),
@@ -307,9 +330,20 @@ export const productsRelations = relations(products, ({ one, many }) => ({
     fields: [products.categoryId],
     references: [categories.id],
   }),
+  variants: many(productVariants),
   orderItems: many(orderItems),
   availability: many(availability),
 }));
+
+export const productVariantsRelations = relations(
+  productVariants,
+  ({ one }) => ({
+    product: one(products, {
+      fields: [productVariants.productId],
+      references: [products.id],
+    }),
+  }),
+);
 
 export const ordersRelations = relations(orders, ({ many }) => ({
   orderItems: many(orderItems),
@@ -325,12 +359,20 @@ export const orderItemsRelations = relations(orderItems, ({ one }) => ({
     fields: [orderItems.productId],
     references: [products.id],
   }),
+  variant: one(productVariants, {
+    fields: [orderItems.variantId],
+    references: [productVariants.id],
+  }),
 }));
 
 export const availabilityRelations = relations(availability, ({ one }) => ({
   product: one(products, {
     fields: [availability.productId],
     references: [products.id],
+  }),
+  variant: one(productVariants, {
+    fields: [availability.variantId],
+    references: [productVariants.id],
   }),
   order: one(orders, {
     fields: [availability.orderId],

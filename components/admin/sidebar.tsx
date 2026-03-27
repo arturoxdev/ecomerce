@@ -16,6 +16,18 @@ import { usePathname } from "next/navigation";
 
 import { logoutAdmin } from "@/app/admin/(dashboard)/actions";
 import type { UserRole } from "@/lib/db/schema";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+} from "@/components/ui/sidebar";
 
 type NavItem = {
   href: string;
@@ -46,48 +58,53 @@ export function AdminSidebar({ userRole = "EMPLOYEE" }: Props) {
   );
 
   return (
-    <aside className="flex h-screen w-60 flex-col bg-[#1a1410] text-white">
-      {/* Header */}
-      <div className="flex items-center gap-2.5 border-b border-white/10 px-5 py-4">
-        <div className="flex size-7 items-center justify-center rounded-md bg-white/10">
-          <PartyPopper className="size-4 text-white" />
+    <Sidebar collapsible="icon">
+      <SidebarHeader>
+        <div className="flex items-center gap-2.5 px-2 py-1">
+          <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-white/10">
+            <PartyPopper />
+          </div>
+          <span className="font-bold tracking-tight group-data-[collapsible=icon]:hidden">
+            Aurora Admin
+          </span>
         </div>
-        <span className="font-bold tracking-tight">Aurora Admin</span>
-      </div>
+      </SidebarHeader>
 
-      {/* Nav */}
-      <nav className="flex-1 px-3 py-4">
-        {visibleItems.map(({ href, label, icon: Icon }) => {
-          const active = pathname.startsWith(href);
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                active
-                  ? "bg-white/10 text-white"
-                  : "text-slate-400 hover:bg-white/5 hover:text-white"
-              }`}
-            >
-              <Icon className="size-4" />
-              {label}
-            </Link>
-          );
-        })}
-      </nav>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {visibleItems.map(({ href, label, icon: Icon }) => (
+                <SidebarMenuItem key={href}>
+                  <SidebarMenuButton
+                    isActive={pathname.startsWith(href)}
+                    tooltip={label}
+                    render={<Link href={href} />}
+                  >
+                    <Icon />
+                    <span>{label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
 
-      {/* Footer */}
-      <div className="border-t border-white/10 px-3 py-4">
-        <form action={logoutAdmin}>
-          <button
-            type="submit"
-            className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-slate-400 transition-colors hover:bg-white/5 hover:text-white"
-          >
-            <LogOut className="size-4" />
-            Logout
-          </button>
-        </form>
-      </div>
-    </aside>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <form action={logoutAdmin}>
+              <SidebarMenuButton tooltip="Logout" render={<button type="submit" />}>
+                <LogOut />
+                <span>Logout</span>
+              </SidebarMenuButton>
+            </form>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+
+      <SidebarRail />
+    </Sidebar>
   );
 }

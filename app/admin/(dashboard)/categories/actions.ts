@@ -8,6 +8,7 @@ import { z } from "zod";
 import { requireWriteAccess } from "@/lib/auth/session";
 import { categories } from "@/lib/db/schema";
 import * as categoryRepo from "@/lib/repositories/category";
+import { toSlug } from "@/lib/utils";
 
 const categorySchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -44,7 +45,7 @@ export async function createCategory(
       columns: { sortOrder: true },
     });
     const nextOrder = (existing[0]?.sortOrder ?? -1) + 1;
-    await categoryRepo.create({ ...parsed.data, sortOrder: nextOrder });
+    await categoryRepo.create({ ...parsed.data, slug: toSlug(parsed.data.slug), sortOrder: nextOrder });
   } catch (e: unknown) {
     if (hasCode(e, "23505")) {
       return { fieldErrors: { slug: ["Slug already exists"] } };
@@ -74,7 +75,7 @@ export async function updateCategory(
   }
 
   try {
-    await categoryRepo.update(id, parsed.data);
+    await categoryRepo.update(id, { ...parsed.data, slug: toSlug(parsed.data.slug) });
   } catch (e: unknown) {
     if (hasCode(e, "23505")) {
       return { fieldErrors: { slug: ["Slug already exists"] } };

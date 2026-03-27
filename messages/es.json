@@ -102,7 +102,9 @@
       "pricePerUnit": "por unidad",
       "stock": "Stock",
       "category": "Categoría",
-      "gallery": "Galería del producto"
+      "gallery": "Galería del producto",
+      "selectVariant": "Selecciona una opción",
+      "fromPrice": "Desde"
     },
     "availability": {
       "title": "Verificar Disponibilidad",

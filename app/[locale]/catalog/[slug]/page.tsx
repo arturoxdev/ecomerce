@@ -5,6 +5,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AvailabilityChecker } from "@/components/catalog/availability-checker";
+import { VariantSelector } from "@/components/catalog/variant-selector";
+import { MarkdownContent } from "@/components/public/markdown-content";
 import { Badge } from "@/components/ui/badge";
 import * as productRepo from "@/lib/repositories/product";
 import { isLocale, type Locale } from "@/lib/i18n/config";
@@ -44,6 +46,8 @@ export default async function ProductDetailPage({
   }
 
   const basePrice = parseFloat(product.basePrice);
+  const activeVariants = product.variants?.filter((v) => v.isActive) ?? [];
+  const hasVariants = activeVariants.length > 0;
 
   return (
     <div className="min-h-screen bg-white">
@@ -104,21 +108,6 @@ export default async function ProductDetailPage({
               </h1>
             </div>
 
-            {/* Price */}
-            <div>
-              <p className="text-sm font-medium text-slate-500">
-                {m.catalog.product.price}
-              </p>
-              <p className="text-2xl font-bold text-primary">
-                ${basePrice.toFixed(2)}
-                {product.priceType === "PER_UNIT" && (
-                  <span className="ml-1 text-base font-normal text-slate-500">
-                    / {m.catalog.product.pricePerUnit}
-                  </span>
-                )}
-              </p>
-            </div>
-
             {/* Description */}
             {product.description && (
               <p className="text-slate-600 leading-relaxed">
@@ -126,33 +115,98 @@ export default async function ProductDetailPage({
               </p>
             )}
 
-            {/* Stock (PER_UNIT only) */}
-            {product.priceType === "PER_UNIT" && (
-              <p className="text-sm text-slate-500">
-                <span className="font-medium">{m.catalog.product.stock}:</span>{" "}
-                {product.stock ?? 0}
-              </p>
-            )}
+            {hasVariants ? (
+              <VariantSelector
+                productId={product.id}
+                basePrice={basePrice}
+                baseStock={product.stock ?? 0}
+                pricingModel={product.priceType}
+                variants={activeVariants.map((v) => ({
+                  id: v.id,
+                  name: v.name,
+                  price: parseFloat(v.price),
+                  stock: v.stock,
+                }))}
+                labels={{
+                  price: m.catalog.product.price,
+                  pricePerUnit: m.catalog.product.pricePerUnit,
+                  stock: m.catalog.product.stock,
+                  selectVariant:
+                    m.catalog.product.selectVariant ?? "Select an option",
+                  availability: {
+                    checkDates: m.catalog.availability.title,
+                    startDate: m.catalog.availability.startDate,
+                    endDate: m.catalog.availability.endDate,
+                    loading: m.catalog.availability.loading,
+                    available: m.catalog.availability.available,
+                    notAvailable: m.catalog.availability.notAvailable,
+                    unitsAvailable: m.catalog.availability.unitsAvailable,
+                    invalidRange: m.catalog.availability.invalidRange,
+                    errorFetch: m.catalog.availability.errorFetch,
+                  },
+                }}
+              />
+            ) : (
+              <>
+                {/* Price */}
+                <div>
+                  <p className="text-sm font-medium text-slate-500">
+                    {m.catalog.product.price}
+                  </p>
+                  <p className="text-2xl font-bold text-primary">
+                    ${basePrice.toFixed(2)}
+                    {product.priceType === "PER_UNIT" && (
+                      <span className="ml-1 text-base font-normal text-slate-500">
+                        / {m.catalog.product.pricePerUnit}
+                      </span>
+                    )}
+                  </p>
+                </div>
 
-            {/* Availability checker (client island) */}
-            <AvailabilityChecker
-              productId={product.id}
-              pricingModel={product.priceType}
-              stock={product.stock ?? 0}
-              labels={{
-                checkDates: m.catalog.availability.title,
-                startDate: m.catalog.availability.startDate,
-                endDate: m.catalog.availability.endDate,
-                loading: m.catalog.availability.loading,
-                available: m.catalog.availability.available,
-                notAvailable: m.catalog.availability.notAvailable,
-                unitsAvailable: m.catalog.availability.unitsAvailable,
-                invalidRange: m.catalog.availability.invalidRange,
-                errorFetch: m.catalog.availability.errorFetch,
-              }}
-            />
+                {/* Stock (PER_UNIT only) */}
+                {product.priceType === "PER_UNIT" && (
+                  <p className="text-sm text-slate-500">
+                    <span className="font-medium">
+                      {m.catalog.product.stock}:
+                    </span>{" "}
+                    {product.stock ?? 0}
+                  </p>
+                )}
+
+                {/* Availability checker (client island) */}
+                <AvailabilityChecker
+                  productId={product.id}
+                  pricingModel={product.priceType}
+                  stock={product.stock ?? 0}
+                  labels={{
+                    checkDates: m.catalog.availability.title,
+                    startDate: m.catalog.availability.startDate,
+                    endDate: m.catalog.availability.endDate,
+                    loading: m.catalog.availability.loading,
+                    available: m.catalog.availability.available,
+                    notAvailable: m.catalog.availability.notAvailable,
+                    unitsAvailable: m.catalog.availability.unitsAvailable,
+                    invalidRange: m.catalog.availability.invalidRange,
+                    errorFetch: m.catalog.availability.errorFetch,
+                  }}
+                />
+              </>
+            )}
           </div>
         </div>
+
+        {/* About This Product */}
+        {product.about && (
+          <div className="mt-16 space-y-6">
+            <div className="border-t border-slate-200" />
+            <h2 className="text-2xl font-extrabold text-slate-900">
+              About This Product
+            </h2>
+            <div className="rounded-2xl border border-slate-100 bg-white p-8">
+              <MarkdownContent markdown={product.about} />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

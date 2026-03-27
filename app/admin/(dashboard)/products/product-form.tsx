@@ -4,6 +4,7 @@ import { useActionState, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toSlug } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -24,6 +25,7 @@ type Props = {
     name?: string;
     slug?: string;
     description?: string;
+    about?: string;
     categoryId?: string;
     basePrice?: string;
     priceType?: string;
@@ -33,19 +35,14 @@ type Props = {
   };
 };
 
-function toSlug(value: string) {
-  return value
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9-]/g, '');
-}
-
 export function ProductForm({ action, categories, defaultValues }: Props) {
   const [state, formAction, pending] = useActionState(action, {});
 
   const [name, setName] = useState(defaultValues?.name ?? '');
   const [slug, setSlug] = useState(defaultValues?.slug ?? '');
   const [slugTouched, setSlugTouched] = useState(!!defaultValues?.slug);
+
+  const [description, setDescription] = useState(defaultValues?.description ?? '');
 
   const [photos, setPhotos] = useState<string[]>(
     defaultValues?.photos?.split('\n').filter(Boolean) ?? []
@@ -121,8 +118,23 @@ export function ProductForm({ action, categories, defaultValues }: Props) {
       <Field label="Description" error={state.fieldErrors?.description?.[0]}>
         <textarea
           name="description"
-          defaultValue={defaultValues?.description}
-          rows={3}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          maxLength={150}
+          rows={2}
+          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        />
+        <p className={`text-xs ${description.length >= 140 ? 'text-amber-600' : 'text-muted-foreground'}`}>
+          {description.length}/150
+        </p>
+      </Field>
+
+      <Field label="About this product" error={state.fieldErrors?.about?.[0]}>
+        <textarea
+          name="about"
+          defaultValue={defaultValues?.about}
+          rows={6}
+          placeholder="Supports markdown: ## headings, **bold**, - lists"
           className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         />
       </Field>

@@ -1,35 +1,40 @@
-import { desc } from "drizzle-orm";
+import { asc, desc } from "drizzle-orm";
 import Link from "next/link";
 
 import { getSessionUser } from "@/lib/auth/session";
 import { canWriteData } from "@/lib/auth/permissions";
-import { products } from "@/lib/db/schema";
+import { categories, products } from "@/lib/db/schema";
+import * as categoryRepo from "@/lib/repositories/category";
 import * as productRepo from "@/lib/repositories/product";
 
-import { ProductStatusFilter } from "./product-status-filter";
+import { ProductFilters } from "./product-status-filter";
 import { ProductTable } from "./product-table";
 
 const PAGE_SIZE = 20;
 
 type Props = {
-  searchParams: Promise<{ page?: string; status?: string }>;
+  searchParams: Promise<{
+    page?: string;
+    status?: string;
+    category?: string;
+    search?: string;
+  }>;
 };
 
 export default async function AdminProductsPage({ searchParams }: Props) {
   const user = await getSessionUser();
   const canWrite = canWriteData(user.role);
-  const { page: pageParam, status } = await searchParams;
+  const { page: pageParam, status, category, search } = await searchParams;
   const page = Math.max(1, parseInt(pageParam ?? "1", 10));
   const skip = (page - 1) * PAGE_SIZE;
 
-  const where =
-    status === "active"
-      ? { isActive: true as const }
-      : status === "inactive"
-        ? { isActive: false as const }
-        : {};
+  const where: { isActive?: boolean; categoryId?: string; search?: string } = {};
+  if (status === "active") where.isActive = true;
+  if (status === "inactive") where.isActive = false;
+  if (category && category !== "all") where.categoryId = category;
+  if (search) where.search = search;
 
-  const [productList, total] = await Promise.all([
+  const [productList, total, categoryList] = await Promise.all([
     productRepo.findAllWithCategory({
       offset: skip,
       limit: PAGE_SIZE,
@@ -37,6 +42,7 @@ export default async function AdminProductsPage({ searchParams }: Props) {
       orderBy: desc(products.createdAt),
     }),
     productRepo.count(where),
+    categoryRepo.findAll({ orderBy: asc(categories.name) }),
   ]);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
@@ -56,7 +62,7 @@ export default async function AdminProductsPage({ searchParams }: Props) {
       </div>
 
       <div className="mb-4">
-        <ProductStatusFilter />
+        <ProductFilters categories={categoryList} />
       </div>
 
       <ProductTable
@@ -64,6 +70,8 @@ export default async function AdminProductsPage({ searchParams }: Props) {
         page={page}
         totalPages={totalPages}
         status={status}
+        category={category}
+        search={search}
         canWrite={canWrite}
       />
     </div>

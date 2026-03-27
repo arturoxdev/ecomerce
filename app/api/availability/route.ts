@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import * as availabilityRepo from "@/lib/repositories/availability";
 import * as productRepo from "@/lib/repositories/product";
+import * as variantRepo from "@/lib/repositories/variant";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -10,6 +11,7 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const productId = searchParams.get("productId");
+  const variantId = searchParams.get("variantId");
   const start = searchParams.get("start");
   const end = searchParams.get("end");
 
@@ -28,6 +30,11 @@ export async function GET(request: NextRequest) {
   if (!UUID_RE.test(productId))
     return NextResponse.json(
       { error: "productId must be a valid UUID" },
+      { status: 400 }
+    );
+  if (variantId && !UUID_RE.test(variantId))
+    return NextResponse.json(
+      { error: "variantId must be a valid UUID" },
       { status: 400 }
     );
 
@@ -61,9 +68,23 @@ export async function GET(request: NextRequest) {
   if (!product || !product.isActive)
     return NextResponse.json({ error: "Product not found" }, { status: 404 });
 
+  // If variantId provided, validate it belongs to the product
+  let stock = product.stock ?? 0;
+  if (variantId) {
+    const variant = await variantRepo.findById(variantId);
+    if (!variant || variant.productId !== productId || !variant.isActive)
+      return NextResponse.json({ error: "Variant not found" }, { status: 404 });
+    stock = variant.stock;
+  }
+
   // Availability aggregate query + business logic
   try {
-    const result = await availabilityRepo.findByDateRange(productId, startDate, endDate);
+    const result = await availabilityRepo.findByDateRange(
+      productId,
+      startDate,
+      endDate,
+      variantId,
+    );
 
     // SUM() from $queryRaw can return BigInt — use Number() to convert safely
     const occupied = Number(result.rows[0]?.occupied ?? 0);
@@ -74,7 +95,7 @@ export async function GET(request: NextRequest) {
       available = occupied >= 1 ? 0 : 1;
     } else {
       // PER_UNIT: available = max(0, stock - occupied)
-      available = Math.max(0, (product.stock ?? 0) - occupied);
+      available = Math.max(0, stock - occupied);
     }
 
     return NextResponse.json({
