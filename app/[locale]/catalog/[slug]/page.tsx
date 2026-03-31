@@ -9,6 +9,7 @@ import { VariantSelector } from "@/components/catalog/variant-selector";
 import { MarkdownContent } from "@/components/public/markdown-content";
 import { Badge } from "@/components/ui/badge";
 import * as productRepo from "@/lib/repositories/product";
+import { siteConfig } from "@/lib/config/site";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
 
@@ -23,7 +24,7 @@ export async function generateMetadata({
   const product = await productRepo.findBySlugMeta(slug);
   if (!product) return {};
   return {
-    title: `${product.name} | Festejos Aurora`,
+    title: `${product.name} | ${siteConfig.name}`,
     description: product.description ?? undefined,
   };
 }

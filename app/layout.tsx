@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Geist } from "next/font/google";
+import { siteConfig } from "@/lib/config/site";
 import { cn } from "@/lib/utils";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
-  title: "Festejos Aurora",
-  description: "Landing page de ecommerce para renta de equipo de fiesta.",
+  title: siteConfig.name,
+  description: siteConfig.description || "Ecommerce platform",
 };
 
 export default function RootLayout({

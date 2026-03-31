@@ -1,3 +1,4 @@
+import { siteConfig } from "@/lib/config/site";
 import type { Locale } from "@/lib/i18n/config";
 import type { LegalPageSlug } from "@/lib/static-pages/catalog";
 
@@ -41,7 +42,7 @@ export const aboutPageFallbacks: Record<Locale, Omit<AboutPageContent, "locale">
     eyebrow: "Family-owned party rentals",
     title: "Making celebrations special since day one",
     subtitle:
-      "Festejos Aurora helps families and event planners create memorable moments with dependable party equipment and warm service.",
+      `${siteConfig.name} helps families and event planners create memorable moments with dependable party equipment and warm service.`,
     storyTitle: "Our story",
     storyBody:
       "We started with a simple promise: make event planning easier for busy families. From bounce houses to tables and chairs, we focus on clean equipment, punctual delivery, and support that feels personal.",
@@ -53,7 +54,7 @@ export const aboutPageFallbacks: Record<Locale, Omit<AboutPageContent, "locale">
     eyebrow: "Renta de fiestas familiar",
     title: "Haciendo cada celebración especial desde el primer día",
     subtitle:
-      "Festejos Aurora ayuda a familias y organizadores a crear momentos memorables con equipo confiable y atención cercana.",
+      `${siteConfig.name} ayuda a familias y organizadores a crear momentos memorables con equipo confiable y atención cercana.`,
     storyTitle: "Nuestra historia",
     storyBody:
       "Empezamos con una promesa sencilla: facilitar la planeación de eventos para familias ocupadas. Desde brincolines hasta mesas y sillas, nos enfocamos en equipo limpio, entregas puntuales y una atención personalizada.",
@@ -73,7 +74,7 @@ export const contactPageFallbacks: Record<
       "Have questions about availability, packages, or a custom event setup? We would love to help.",
     location: "Houston, Texas, United States",
     phone: "+1 (713) 555-0198",
-    email: "hello@festejosaurora.com",
+    email: siteConfig.supportEmail,
     businessHours: "Monday to Saturday, 9:00 AM to 6:00 PM",
   },
   es: {
@@ -82,7 +83,7 @@ export const contactPageFallbacks: Record<
       "¿Tienes dudas sobre disponibilidad, paquetes o una instalación especial? Con gusto te ayudamos.",
     location: "Houston, Texas, Estados Unidos",
     phone: "+1 (713) 555-0198",
-    email: "hola@festejosaurora.com",
+    email: siteConfig.supportEmail,
     businessHours: "Lunes a sábado, 9:00 AM a 6:00 PM",
   },
 };

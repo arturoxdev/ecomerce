@@ -34,14 +34,14 @@ async function main() {
   await db
     .insert(users)
     .values({
-      name: "Aurora Admin",
-      email: "admin@festejosaurora.com",
+      name: process.env.NEXT_PUBLIC_ADMIN_TITLE ?? "Admin",
+      email: process.env.ADMIN_EMAIL ?? "admin@example.com",
       passwordHash: adminPassword,
       role: "ROOT",
     })
     .onConflictDoUpdate({
       target: users.email,
-      set: { name: "Aurora Admin", role: "ROOT", passwordHash: adminPassword },
+      set: { name: process.env.NEXT_PUBLIC_ADMIN_TITLE ?? "Admin", role: "ROOT", passwordHash: adminPassword },
     });
 
   const categoryData = [

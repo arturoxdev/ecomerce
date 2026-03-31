@@ -28,6 +28,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { siteConfig } from "@/lib/config/site";
 
 type NavItem = {
   href: string;
@@ -65,7 +66,7 @@ export function AdminSidebar({ userRole = "EMPLOYEE" }: Props) {
             <PartyPopper />
           </div>
           <span className="font-bold tracking-tight group-data-[collapsible=icon]:hidden">
-            Aurora Admin
+            {siteConfig.adminTitle}
           </span>
         </div>
       </SidebarHeader>

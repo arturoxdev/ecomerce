@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "Festejos Aurora",
+    "title": "{{siteName}}",
     "description": "Landing page for party equipment rental ecommerce."
   },
   "nav": {
@@ -81,7 +81,7 @@
     "feature2Desc": "Every item is cleaned and inspected before delivery."
   },
   "footer": {
-    "rights": "© 2026 Festejos Aurora. All rights reserved.",
+    "rights": "© {{year}} {{siteName}}. All rights reserved.",
     "links": {
       "about": "About Us",
       "contact": "Contact",

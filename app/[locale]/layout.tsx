@@ -3,8 +3,15 @@ import { notFound } from "next/navigation";
 
 import { PublicFooter } from "@/components/public/footer";
 import { PublicHeader } from "@/components/public/header";
+import { siteConfig } from "@/lib/config/site";
 import { isLocale, locales, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
+
+function interpolate(text: string): string {
+  return text
+    .replace(/\{\{siteName\}\}/g, siteConfig.name)
+    .replace(/\{\{year\}\}/g, new Date().getFullYear().toString());
+}
 
 type LocaleLayoutProps = {
   children: React.ReactNode;
@@ -26,19 +33,21 @@ export async function generateMetadata({
   }
 
   const messages = getMessages(locale as Locale);
+  const title = interpolate(messages.meta.title);
+  const description = interpolate(messages.meta.description);
   return {
-    title: messages.meta.title,
-    description: messages.meta.description,
+    title,
+    description,
     openGraph: {
-      title: messages.meta.title,
-      description: messages.meta.description,
+      title,
+      description,
       type: "website",
       locale: locale === "en" ? "en_US" : "es_MX",
     },
     twitter: {
       card: "summary_large_image",
-      title: messages.meta.title,
-      description: messages.meta.description,
+      title,
+      description,
     },
   };
 }
@@ -62,7 +71,7 @@ export default async function LocaleLayout({
       <main className="flex-1">{children}</main>
       <PublicFooter
         locale={typedLocale}
-        rights={messages.footer.rights}
+        rights={interpolate(messages.footer.rights)}
         links={messages.footer.links}
       />
     </div>

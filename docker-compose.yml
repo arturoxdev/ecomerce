@@ -1,17 +1,17 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: festejos-postgres
+    container_name: ecommerce-postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: festejos_aurora
+      POSTGRES_DB: ecommerce
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d festejos_aurora"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ecommerce"]
       interval: 10s
       timeout: 5s
       retries: 5

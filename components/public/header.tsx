@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Suspense } from "react";
 
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { siteConfig } from "@/lib/config/site";
 import type { Locale } from "@/lib/i18n/config";
 
 type Messages = {
@@ -32,11 +33,19 @@ export function PublicHeader({ locale, messages: m }: Props) {
     <header className="sticky top-0 z-50 w-full border-b border-[#fed7aa]/25 bg-[#f8f7f5]/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href={`/${locale}`} className="flex items-center gap-2">
-          <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-white">
-            <PartyPopper className="size-4" />
-          </div>
+          {siteConfig.logoUrl ? (
+            <img
+              src={siteConfig.logoUrl}
+              alt={siteConfig.name}
+              className="size-8 rounded-lg object-contain"
+            />
+          ) : (
+            <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-white">
+              <PartyPopper className="size-4" />
+            </div>
+          )}
           <span className="text-xl font-bold tracking-tight text-slate-900">
-            Festejos Aurora
+            {siteConfig.name}
           </span>
         </Link>
 

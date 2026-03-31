@@ -1,6 +1,6 @@
-# Festejos Aurora Ecommerce
+# Ecommerce Platform
 
-Next.js + PostgreSQL + Drizzle base architecture for the Festejos Aurora rental ecommerce.
+Next.js + PostgreSQL + Drizzle base architecture for a reusable rental ecommerce.
 
 ## Requirements
 
@@ -17,6 +17,17 @@ cp .env.example .env
 
 Drizzle reads the datasource URL from `drizzle.config.ts` and `DATABASE_URL`.
 
+### Branding Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `NEXT_PUBLIC_SITE_NAME` | Brand name shown in header, metadata, footer | `My Store` |
+| `NEXT_PUBLIC_SITE_DESCRIPTION` | Site description for SEO metadata | `""` |
+| `NEXT_PUBLIC_LOGO_URL` | Logo image URL (falls back to icon if empty) | `""` |
+| `NEXT_PUBLIC_ADMIN_TITLE` | Admin panel title | `Admin` |
+| `ADMIN_EMAIL` | Default admin email (used in seed) | `admin@example.com` |
+| `SUPPORT_EMAIL` | Support contact email | `support@example.com` |
+
 ## Local PostgreSQL with Docker
 
 ```bash
@@ -26,7 +37,7 @@ docker compose up -d
 This starts PostgreSQL at `localhost:5432` with:
 - user: `postgres`
 - password: `postgres`
-- database: `festejos_aurora`
+- database: `ecommerce`
 
 ## Database Commands
 

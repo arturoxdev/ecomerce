@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "Festejos Aurora",
+    "title": "{{siteName}}",
     "description": "Landing page de ecommerce para renta de equipo de fiesta."
   },
   "nav": {
@@ -81,7 +81,7 @@
     "feature2Desc": "Cada artículo se limpia e inspecciona antes de la entrega."
   },
   "footer": {
-    "rights": "© 2026 Festejos Aurora. Todos los derechos reservados.",
+    "rights": "© {{year}} {{siteName}}. Todos los derechos reservados.",
     "links": {
       "about": "Nosotros",
       "contact": "Contacto",

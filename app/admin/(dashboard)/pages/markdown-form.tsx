@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { MarkdownEditor } from "@/components/admin/markdown-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +22,7 @@ type Props = {
 
 export function MarkdownForm({ action, defaultValues, canWrite }: Props) {
   const [state, formAction, pending] = useActionState(action, {});
+  const [body, setBody] = useState(defaultValues.body);
 
   useEffect(() => {
     if (state.success) {
@@ -46,12 +48,11 @@ export function MarkdownForm({ action, defaultValues, canWrite }: Props) {
       </div>
 
       <Field label="Markdown content" error={state.fieldErrors?.body?.[0]}>
-        <textarea
+        <MarkdownEditor
+          value={body}
+          onChange={setBody}
           name="body"
-          defaultValue={defaultValues.body}
-          rows={18}
-          disabled={!canWrite}
-          className="w-full rounded-xl border border-[#e2e8f0] px-4 py-3 font-mono text-sm text-slate-700 outline-none transition focus:border-primary disabled:bg-slate-50"
+          readOnly={!canWrite}
         />
       </Field>
 

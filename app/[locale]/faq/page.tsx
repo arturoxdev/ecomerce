@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { FaqSection, StaticPageHero } from "@/components/public/static-pages";
+import { siteConfig } from "@/lib/config/site";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getFaqEntries } from "@/lib/static-pages/service";
 
@@ -20,7 +21,7 @@ export default async function FaqPage({ params }: Props) {
       ? {
           title: "Preguntas frecuentes",
           subtitle:
-            "Todo lo que necesitas saber sobre la renta de equipo para fiestas con Festejos Aurora.",
+            `Todo lo que necesitas saber sobre la renta de equipo para fiestas con ${siteConfig.name}.`,
           ctaTitle: "¿Aún tienes dudas?",
           ctaSubtitle:
             "Escríbenos y con gusto te ayudamos a elegir el mejor montaje para tu evento.",
@@ -29,7 +30,7 @@ export default async function FaqPage({ params }: Props) {
       : {
           title: "Frequently Asked Questions",
           subtitle:
-            "Everything you need to know about renting party equipment with Festejos Aurora.",
+            `Everything you need to know about renting party equipment with ${siteConfig.name}.`,
           ctaTitle: "Still have questions?",
           ctaSubtitle:
             "Reach out and our team will gladly help you choose the right setup for your event.",

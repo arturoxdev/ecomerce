@@ -4,6 +4,7 @@ import { Lock } from "lucide-react";
 import { useActionState } from "react";
 
 import { loginAction } from "@/app/admin/login/actions";
+import { siteConfig } from "@/lib/config/site";
 
 export default function AdminLoginPage() {
   const [state, action, pending] = useActionState(loginAction, undefined);
@@ -16,7 +17,7 @@ export default function AdminLoginPage() {
             <Lock className="size-[26px] text-white" />
           </div>
           <h1 className="text-2xl font-extrabold text-[#0f172a]">
-            Aurora Admin
+            {siteConfig.adminTitle}
           </h1>
           <p className="text-sm text-[#64748b]">Sign in to continue</p>
         </div>
@@ -36,7 +37,7 @@ export default function AdminLoginPage() {
                 type="email"
                 autoComplete="email"
                 required
-                placeholder="admin@festejosaurora.com"
+                placeholder="admin@example.com"
                 className="w-full rounded-lg border border-[#e2e8f0] bg-white px-3.5 py-3 text-sm text-[#0f172a] placeholder:text-[#94a3b8] focus:border-[#f28b0d] focus:outline-none focus:ring-1 focus:ring-[#f28b0d]"
               />
             </div>
