@@ -4,7 +4,6 @@ import { AdminSidebar } from "@/components/admin/sidebar";
 import {
   SidebarInset,
   SidebarProvider,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { getSessionUser } from "@/lib/auth/session";
 
@@ -17,13 +16,25 @@ export default async function AdminLayout({
 
   return (
     <TooltipProvider>
-      <SidebarProvider>
-        <AdminSidebar userRole={user.role} />
+      <SidebarProvider
+        style={
+          {
+            "--sidebar-width": "calc(var(--spacing) * 56)",
+            "--header-height": "calc(var(--spacing) * 12)",
+          } as React.CSSProperties
+        }
+      >
+        <AdminSidebar
+          userRole={user.role}
+          userName={user.name ?? ""}
+          userEmail={user.email ?? ""}
+        />
         <SidebarInset>
-          <header className="flex h-12 items-center gap-2 border-b px-4">
-            <SidebarTrigger />
-          </header>
-          <main className="flex-1 bg-[#f8f7f5] p-8">{children}</main>
+          <div className="flex flex-1 flex-col">
+            <div className="@container/main flex flex-1 flex-col gap-2">
+              {children}
+            </div>
+          </div>
         </SidebarInset>
         <Toaster />
       </SidebarProvider>

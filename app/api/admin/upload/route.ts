@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 
 import { requireWriteAccess } from '@/lib/auth/session'
+import { getStoreId } from '@/lib/config/tenant'
 import { s3Bucket, s3Client, s3PublicUrl } from '@/lib/minio'
 
 const ALLOWED_EXTENSIONS = new Set(['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'avif'])
@@ -26,7 +27,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Only image files are allowed' }, { status: 400 })
   }
 
-  const objectName = `products/${randomUUID()}.${ext}`
+  const storeId = getStoreId()
+  const objectName = `${storeId}/products/${randomUUID()}.${ext}`
+
   const buffer = Buffer.from(await file.arrayBuffer())
 
   try {

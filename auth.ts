@@ -1,9 +1,10 @@
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import bcrypt from "bcryptjs";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
+import { getStoreId } from "@/lib/config/tenant";
 import { db } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
 import type { UserRole } from "@/lib/db/schema";
@@ -34,7 +35,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!email || !password) return null;
 
         const user = await db.query.users.findFirst({
-          where: eq(schema.users.email, email),
+          where: and(
+            eq(schema.users.email, email),
+            eq(schema.users.storeId, getStoreId()),
+          ),
         });
 
         if (!user || !user.passwordHash) return null;

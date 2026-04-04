@@ -1,6 +1,6 @@
 "use client";
 
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil } from "lucide-react";
 import Link from "next/link";
 
 import { useDeleteDialog } from "@/hooks/use-delete-dialog";
@@ -15,6 +15,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -41,10 +44,10 @@ type Props = {
   currentUserRole: UserRole;
 };
 
-const roleBadgeStyles: Record<UserRole, string> = {
-  ROOT: "bg-purple-100 text-purple-700",
-  ADMIN: "bg-orange-100 text-orange-700",
-  EMPLOYEE: "bg-blue-100 text-blue-700",
+const roleBadgeVariant: Record<UserRole, "default" | "secondary" | "outline"> = {
+  ROOT: "default",
+  ADMIN: "secondary",
+  EMPLOYEE: "outline",
 };
 
 export function UserTable({ users, currentUserRole }: Props) {
@@ -56,84 +59,75 @@ export function UserTable({ users, currentUserRole }: Props) {
 
   return (
     <>
-      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead className="w-20">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow
-                key={user.id}
-                className={`hover:bg-gray-50 ${!user.isActive ? "opacity-60" : ""}`}
-              >
-                <TableCell className="font-medium">
-                  {user.name ?? "—"}
-                </TableCell>
-                <TableCell className="text-sm text-gray-500">
-                  {user.email}
-                </TableCell>
-                <TableCell>
-                  <span
-                    className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${roleBadgeStyles[user.role]}`}
-                  >
-                    {user.role}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  {user.role !== "ROOT" ? (
-                    <button
-                      onClick={() => setToggleId(user.id)}
-                      disabled={isPending}
-                      className="cursor-pointer"
-                    >
-                      <span
-                        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                          user.isActive
-                            ? "bg-green-100 text-green-700"
-                            : "bg-gray-100 text-gray-600"
-                        }`}
-                      >
-                        {user.isActive ? "Active" : "Inactive"}
-                      </span>
-                    </button>
-                  ) : (
-                    <span className="inline-flex rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
-                      Active
-                    </span>
-                  )}
-                </TableCell>
-                <TableCell className="text-sm text-gray-500">
-                  {user.createdAt.toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    {user.role !== "ROOT" && (
-                      <Link
-                        href={`/admin/users/${user.id}/edit`}
-                        className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                      >
-                        <Pencil className="size-4" />
-                      </Link>
-                    )}
-                  </div>
-                </TableCell>
+      <Card>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Created</TableHead>
+                <TableHead className="w-20">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+            </TableHeader>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow
+                  key={user.id}
+                  className={!user.isActive ? "opacity-60" : ""}
+                >
+                  <TableCell className="font-medium">
+                    {user.name ?? "—"}
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {user.email}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={roleBadgeVariant[user.role]}>
+                      {user.role}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {user.role !== "ROOT" ? (
+                      <button
+                        onClick={() => setToggleId(user.id)}
+                        disabled={isPending}
+                        className="cursor-pointer"
+                      >
+                        <Badge variant="outline" className={user.isActive ? "border-green-200 bg-green-50 text-green-700" : ""}>
+                          {user.isActive ? "Active" : "Inactive"}
+                        </Badge>
+                      </button>
+                    ) : (
+                      <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700">
+                        Active
+                      </Badge>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {user.createdAt.toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1">
+                      {user.role !== "ROOT" && (
+                        <Button variant="ghost" size="icon" className="size-7" render={<Link href={`/admin/users/${user.id}/edit`} />}>
+                          <Pencil className="size-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
       <AlertDialog open={!!toggleId} onOpenChange={(o) => !o && closeDialog()}>
         <AlertDialogContent>

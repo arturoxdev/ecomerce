@@ -16,6 +16,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -69,88 +72,90 @@ export function CategoryTable({ categories, canWrite = true }: Props) {
 
   if (categories.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-4 rounded-lg border border-gray-200 bg-white py-16 text-center">
-        <p className="text-gray-500">No categories yet.</p>
-        <Link
-          href="/admin/categories/new"
-          className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
-        >
-          Create category
-        </Link>
-      </div>
+      <Card>
+        <CardContent className="flex flex-col items-center gap-4 py-16 text-center">
+          <p className="text-muted-foreground">No categories yet.</p>
+          <Button render={<Link href="/admin/categories/new" />}>
+            Create category
+          </Button>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
     <>
-      <div className="rounded-lg border border-gray-200 bg-white">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Slug</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Products</TableHead>
-              {canWrite && <TableHead className="w-16">Order</TableHead>}
-              {canWrite && <TableHead className="w-20">Actions</TableHead>}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {categories.map((category, index) => (
-              <TableRow key={category.id} className="hover:bg-gray-50">
-                <TableCell className="font-medium">{category.name}</TableCell>
-                <TableCell className="text-sm text-gray-500">{category.slug}</TableCell>
-                <TableCell className="max-w-xs truncate text-sm text-gray-500">
-                  {category.description ?? "—"}
-                </TableCell>
-                <TableCell>
-                  <span className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
-                    {category._count.products}
-                  </span>
-                </TableCell>
-                {canWrite && (
-                  <TableCell>
-                    <div className="flex items-center gap-0.5">
-                      <button
-                        onClick={() => handleReorder(index, "up")}
-                        disabled={index === 0 || isPending}
-                        className="rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 disabled:opacity-30 disabled:pointer-events-none"
-                      >
-                        <ChevronUp className="size-4" />
-                      </button>
-                      <button
-                        onClick={() => handleReorder(index, "down")}
-                        disabled={index === categories.length - 1 || isPending}
-                        className="rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 disabled:opacity-30 disabled:pointer-events-none"
-                      >
-                        <ChevronDown className="size-4" />
-                      </button>
-                    </div>
-                  </TableCell>
-                )}
-                {canWrite && (
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href={`/admin/categories/${category.id}/edit`}
-                        className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                      >
-                        <Pencil className="size-4" />
-                      </Link>
-                      <button
-                        onClick={() => setDeleteId(category.id)}
-                        className="rounded p-1 text-gray-500 hover:bg-red-50 hover:text-red-600"
-                      >
-                        <Trash2 className="size-4" />
-                      </button>
-                    </div>
-                  </TableCell>
-                )}
+      <Card>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Slug</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Products</TableHead>
+                {canWrite && <TableHead className="w-16">Order</TableHead>}
+                {canWrite && <TableHead className="w-20">Actions</TableHead>}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+            </TableHeader>
+            <TableBody>
+              {categories.map((category, index) => (
+                <TableRow key={category.id}>
+                  <TableCell className="font-medium">{category.name}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{category.slug}</TableCell>
+                  <TableCell className="max-w-xs truncate text-sm text-muted-foreground">
+                    {category.description ?? "—"}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">{category._count.products}</Badge>
+                  </TableCell>
+                  {canWrite && (
+                    <TableCell>
+                      <div className="flex items-center gap-0.5">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-7"
+                          onClick={() => handleReorder(index, "up")}
+                          disabled={index === 0 || isPending}
+                        >
+                          <ChevronUp className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-7"
+                          onClick={() => handleReorder(index, "down")}
+                          disabled={index === categories.length - 1 || isPending}
+                        >
+                          <ChevronDown className="size-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  )}
+                  {canWrite && (
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <Button variant="ghost" size="icon" className="size-7" render={<Link href={`/admin/categories/${category.id}/edit`} />}>
+                          <Pencil className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-7 text-muted-foreground hover:text-destructive"
+                          onClick={() => setDeleteId(category.id)}
+                        >
+                          <Trash2 className="size-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
       <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && closeDialog()}>
         <AlertDialogContent>

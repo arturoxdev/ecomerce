@@ -4,6 +4,8 @@ import Link from "next/link";
 import { getSessionUser } from "@/lib/auth/session";
 import { canWriteData } from "@/lib/auth/permissions";
 import { categories, products } from "@/lib/db/schema";
+import { Button } from "@/components/ui/button";
+import { SiteHeader } from "@/components/admin/site-header";
 import * as categoryRepo from "@/lib/repositories/category";
 import * as productRepo from "@/lib/repositories/product";
 
@@ -48,32 +50,33 @@ export default async function AdminProductsPage({ searchParams }: Props) {
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Products</h1>
-        {canWrite && (
-          <Link
-            href="/admin/products/new"
-            className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
-          >
-            Add product
-          </Link>
-        )}
-      </div>
-
-      <div className="mb-4">
-        <ProductFilters categories={categoryList} />
-      </div>
-
-      <ProductTable
-        products={productList}
-        page={page}
-        totalPages={totalPages}
-        status={status}
-        category={category}
-        search={search}
-        canWrite={canWrite}
+    <>
+      <SiteHeader
+        title="Products"
+        actions={
+          canWrite && (
+            <Button size="sm" render={<Link href="/admin/products/new" />}>
+              Add product
+            </Button>
+          )
+        }
       />
-    </div>
+      <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+        <div className="px-4 lg:px-6">
+          <ProductFilters categories={categoryList} />
+        </div>
+        <div className="px-4 lg:px-6">
+          <ProductTable
+            products={productList}
+            page={page}
+            totalPages={totalPages}
+            status={status}
+            category={category}
+            search={search}
+            canWrite={canWrite}
+          />
+        </div>
+      </div>
+    </>
   );
 }

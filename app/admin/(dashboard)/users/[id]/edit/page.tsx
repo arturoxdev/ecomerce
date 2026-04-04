@@ -1,11 +1,18 @@
 import { eq } from "drizzle-orm";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { getSessionUser } from "@/lib/auth/session";
 import { getAssignableRoles } from "@/lib/auth/permissions";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { SiteHeader } from "@/components/admin/site-header";
 
 import { updateUser } from "../../actions";
 import { UserForm } from "../../user-form";
@@ -27,39 +34,46 @@ export default async function EditUserPage({ params }: Props) {
 
   if (user.role === "ROOT") {
     return (
-      <div className="flex flex-col items-center justify-center py-24">
-        <h1 className="text-2xl font-bold text-gray-900">Cannot Edit</h1>
-        <p className="mt-2 text-gray-500">The ROOT user cannot be modified.</p>
-      </div>
+      <>
+        <SiteHeader title="Edit User" />
+        <div className="flex flex-1 flex-col items-center justify-center py-24">
+          <h2 className="text-lg font-medium">Cannot Edit</h2>
+          <p className="mt-2 text-sm text-muted-foreground">The ROOT user cannot be modified.</p>
+        </div>
+      </>
     );
   }
 
   const boundUpdate = updateUser.bind(null, id);
 
   return (
-    <div>
-      <Link
-        href="/admin/users"
-        className="mb-4 inline-block text-sm text-gray-500 hover:text-gray-700"
-      >
-        ← Back to users
-      </Link>
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">
-        Edit User — {user.name ?? user.email}
-      </h1>
-      <div className="max-w-lg rounded-lg border border-gray-200 bg-white p-6">
-        <UserForm
-          action={boundUpdate}
-          assignableRoles={assignableRoles}
-          user={{
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            isActive: user.isActive,
-          }}
-        />
+    <>
+      <SiteHeader title={`Edit User — ${user.name ?? user.email}`} />
+      <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+        <div className="mx-auto w-full max-w-lg px-4 lg:px-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>User details</CardTitle>
+              <CardDescription>
+                Update this user&apos;s information and permissions.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <UserForm
+                action={boundUpdate}
+                assignableRoles={assignableRoles}
+                user={{
+                  id: user.id,
+                  name: user.name,
+                  email: user.email,
+                  role: user.role,
+                  isActive: user.isActive,
+                }}
+              />
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

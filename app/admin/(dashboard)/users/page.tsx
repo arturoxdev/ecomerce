@@ -1,9 +1,12 @@
-import { asc } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import Link from "next/link";
 
 import { getSessionUser } from "@/lib/auth/session";
+import { getStoreId } from "@/lib/config/tenant";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
+import { Button } from "@/components/ui/button";
+import { SiteHeader } from "@/components/admin/site-header";
 
 import { UserTable } from "./user-table";
 
@@ -12,30 +15,38 @@ export default async function AdminUsersPage() {
 
   if (currentUser.role === "EMPLOYEE") {
     return (
-      <div className="flex flex-col items-center justify-center py-24">
-        <h1 className="text-2xl font-bold text-gray-900">Access Denied</h1>
-        <p className="mt-2 text-gray-500">You do not have permission to view this page.</p>
-      </div>
+      <>
+        <SiteHeader title="Users" />
+        <div className="flex flex-1 flex-col items-center justify-center py-24">
+          <h2 className="text-lg font-medium">Access Denied</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            You do not have permission to view this page.
+          </p>
+        </div>
+      </>
     );
   }
 
   const userList = await db.query.users.findMany({
+    where: eq(users.storeId, getStoreId()),
     orderBy: asc(users.createdAt),
   });
 
   return (
-    <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Users</h1>
-        <Link
-          href="/admin/users/new"
-          className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
-        >
-          Add user
-        </Link>
+    <>
+      <SiteHeader
+        title="Users"
+        actions={
+          <Button size="sm" render={<Link href="/admin/users/new" />}>
+            Add user
+          </Button>
+        }
+      />
+      <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+        <div className="px-4 lg:px-6">
+          <UserTable users={userList} currentUserRole={currentUser.role} />
+        </div>
       </div>
-
-      <UserTable users={userList} currentUserRole={currentUser.role} />
-    </div>
+    </>
   );
 }

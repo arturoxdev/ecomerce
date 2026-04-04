@@ -1,5 +1,6 @@
 import { and, asc, eq, gt, lt, SQL } from "drizzle-orm";
 
+import { getStoreId } from "@/lib/config/tenant";
 import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
 
@@ -10,6 +11,7 @@ export function findAll(opts?: {
   with?: Record<string, boolean>;
 }) {
   return db.query.orders.findMany({
+    where: eq(orders.storeId, getStoreId()),
     orderBy: opts?.orderBy ? () => [opts.orderBy!] : undefined,
     limit: opts?.limit,
     offset: opts?.offset,
@@ -19,14 +21,14 @@ export function findAll(opts?: {
 
 export function findById(id: string) {
   return db.query.orders.findFirst({
-    where: eq(orders.id, id),
+    where: and(eq(orders.id, id), eq(orders.storeId, getStoreId())),
   });
 }
 
-export function create(data: typeof orders.$inferInsert) {
+export function create(data: Omit<typeof orders.$inferInsert, "storeId">) {
   return db
     .insert(orders)
-    .values(data)
+    .values({ ...data, storeId: getStoreId() })
     .returning()
     .then((r) => r[0]);
 }
@@ -38,14 +40,18 @@ export function update(
   return db
     .update(orders)
     .set(data)
-    .where(eq(orders.id, id))
+    .where(and(eq(orders.id, id), eq(orders.storeId, getStoreId())))
     .returning()
     .then((r) => r[0]);
 }
 
 export function findByDateRange(startDate: Date, endDate: Date) {
   return db.query.orders.findMany({
-    where: and(lt(orders.rentStartDate, endDate), gt(orders.rentEndDate, startDate)),
+    where: and(
+      eq(orders.storeId, getStoreId()),
+      lt(orders.rentStartDate, endDate),
+      gt(orders.rentEndDate, startDate),
+    ),
     orderBy: [asc(orders.rentStartDate)],
   });
 }

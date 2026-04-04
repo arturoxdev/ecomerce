@@ -17,6 +17,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Pagination,
   PaginationContent,
@@ -83,106 +86,96 @@ export function ProductTable({ products, page, totalPages, status, category, sea
 
   if (products.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-4 rounded-lg border border-gray-200 bg-white py-16 text-center">
-        <p className="text-gray-500">No products yet.</p>
-        <Link
-          href="/admin/products/new"
-          className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
-        >
-          Create product
-        </Link>
-      </div>
+      <Card>
+        <CardContent className="flex flex-col items-center gap-4 py-16 text-center">
+          <p className="text-muted-foreground">No products yet.</p>
+          <Button render={<Link href="/admin/products/new" />}>
+            Create product
+          </Button>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
     <>
-      <div className="rounded-lg border border-gray-200 bg-white">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Stock</TableHead>
-              <TableHead>Status</TableHead>
-              {canWrite && <TableHead className="w-20">Actions</TableHead>}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {products.map((product) => (
-              <TableRow
-                key={product.id}
-                className={`hover:bg-gray-50 ${!product.isActive ? "opacity-60" : ""}`}
-              >
-                <TableCell className="font-medium">{product.name}</TableCell>
-                <TableCell>{product.category.name}</TableCell>
-                <TableCell>
-                  ${product.basePrice.toString()}{" "}
-                  <span className="text-xs text-gray-500">
-                    {product.priceType === "PER_UNIT" ? "/unit" : ""}
-                  </span>
-                </TableCell>
-                <TableCell>{product.stock}</TableCell>
-                <TableCell>
-                  {canWrite ? (
-                    <button
-                      onClick={() => handleToggle(product.id)}
-                      disabled={isPending}
-                      className="cursor-pointer"
-                    >
-                      <span
-                        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                          product.isActive
-                            ? "bg-green-100 text-green-700"
-                            : "bg-gray-100 text-gray-600"
-                        }`}
+      <Card>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Stock</TableHead>
+                <TableHead>Status</TableHead>
+                {canWrite && <TableHead className="w-20">Actions</TableHead>}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {products.map((product) => (
+                <TableRow
+                  key={product.id}
+                  className={!product.isActive ? "opacity-60" : ""}
+                >
+                  <TableCell className="font-medium">{product.name}</TableCell>
+                  <TableCell>{product.category.name}</TableCell>
+                  <TableCell>
+                    ${product.basePrice.toString()}{" "}
+                    <span className="text-xs text-muted-foreground">
+                      {product.priceType === "PER_UNIT" ? "/unit" : ""}
+                    </span>
+                  </TableCell>
+                  <TableCell>{product.stock}</TableCell>
+                  <TableCell>
+                    {canWrite ? (
+                      <button
+                        onClick={() => handleToggle(product.id)}
+                        disabled={isPending}
+                        className="cursor-pointer"
+                      >
+                        <Badge
+                          variant="outline"
+                          className={product.isActive ? "border-green-200 bg-green-50 text-green-700" : ""}
+                        >
+                          {product.isActive ? "Active" : "Inactive"}
+                        </Badge>
+                      </button>
+                    ) : (
+                      <Badge
+                        variant="outline"
+                        className={product.isActive ? "border-green-200 bg-green-50 text-green-700" : ""}
                       >
                         {product.isActive ? "Active" : "Inactive"}
-                      </span>
-                    </button>
-                  ) : (
-                    <span
-                      className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                        product.isActive
-                          ? "bg-green-100 text-green-700"
-                          : "bg-gray-100 text-gray-600"
-                      }`}
-                    >
-                      {product.isActive ? "Active" : "Inactive"}
-                    </span>
-                  )}
-                </TableCell>
-                {canWrite && (
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href={`/admin/products/${product.id}/availability`}
-                        className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                        title="Manage availability"
-                      >
-                        <CalendarX2 className="size-4" />
-                      </Link>
-                      <Link
-                        href={`/admin/products/${product.id}/edit`}
-                        className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                      >
-                        <Pencil className="size-4" />
-                      </Link>
-                      <button
-                        onClick={() => setDeleteId(product.id)}
-                        className="rounded p-1 text-gray-500 hover:bg-red-50 hover:text-red-600"
-                      >
-                        <Trash2 className="size-4" />
-                      </button>
-                    </div>
+                      </Badge>
+                    )}
                   </TableCell>
-                )}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+                  {canWrite && (
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <Button variant="ghost" size="icon" className="size-7" title="Manage availability" render={<Link href={`/admin/products/${product.id}/availability`} />}>
+                          <CalendarX2 className="size-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="size-7" render={<Link href={`/admin/products/${product.id}/edit`} />}>
+                          <Pencil className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-7 text-muted-foreground hover:text-destructive"
+                          onClick={() => setDeleteId(product.id)}
+                        >
+                          <Trash2 className="size-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
       {totalPages > 1 && (
         <div className="mt-4">

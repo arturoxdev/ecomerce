@@ -235,7 +235,7 @@ export function AvailabilityChecker({
         </div>
 
         {/* Calendar */}
-        <div className="[--primary:var(--secondary)] [--primary-foreground:var(--secondary-foreground)] [--muted:oklch(0.96_0.04_148)]">
+        <div>
           <Calendar
             mode="range"
             selected={dateRange}
