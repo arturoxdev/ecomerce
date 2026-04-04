@@ -4,9 +4,13 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+
 import { requireWriteAccess } from "@/lib/auth/session";
 import { isForeignKeyViolation, isUniqueViolation } from "@/lib/db/errors";
 import { priceTypeEnum } from "@/lib/db/schema";
+import { MAX_MEDIA_COUNT } from "@/lib/media";
+import { s3Bucket, s3Client, s3PublicUrl } from "@/lib/minio";
 import { revalidateProductEdit, revalidateProductPages } from "@/lib/revalidation";
 import * as availabilityRepo from "@/lib/repositories/availability";
 import * as productRepo from "@/lib/repositories/product";
@@ -23,7 +27,17 @@ const productSchema = z.object({
   basePrice: z.coerce.number().positive("Price must be positive"),
   priceType: z.enum(priceTypeEnum.enumValues),
   stock: z.coerce.number().int().min(0, "Stock must be 0 or more"),
-  photos: z.string().optional(),
+  photos: z
+    .string()
+    .optional()
+    .refine(
+      (val) => {
+        if (!val) return true;
+        const urls = val.split("\n").filter(Boolean);
+        return urls.length <= MAX_MEDIA_COUNT;
+      },
+      `Maximum ${MAX_MEDIA_COUNT} files allowed`,
+    ),
   isActive: z.boolean().default(true),
 });
 
@@ -115,7 +129,54 @@ export async function updateProduct(
   }
 
   revalidateProductPages();
-  redirect("/admin/products");
+  revalidateProductEdit(id);
+  return { success: true };
+}
+
+// --- Media Actions ---
+
+export async function appendProductPhoto(
+  productId: string,
+  url: string,
+): Promise<{ photos?: string[]; error?: string }> {
+  await requireWriteAccess();
+  const product = await productRepo.findById(productId);
+  if (!product) return { error: "Product not found" };
+  if (product.photos.length >= MAX_MEDIA_COUNT) {
+    return { error: `Maximum ${MAX_MEDIA_COUNT} files allowed` };
+  }
+
+  const result = await productRepo.appendPhoto(productId, url);
+  if (!result) return { error: "Failed to add media" };
+
+  revalidateProductPages();
+  revalidateProductEdit(productId);
+  return { photos: result.photos };
+}
+
+export async function removeProductPhoto(
+  productId: string,
+  url: string,
+): Promise<{ photos?: string[]; error?: string }> {
+  await requireWriteAccess();
+
+  const result = await productRepo.removePhoto(productId, url);
+  if (!result) return { error: "Failed to remove media" };
+
+  // Delete from R2 (best-effort)
+  const prefix = s3PublicUrl.endsWith("/") ? s3PublicUrl : `${s3PublicUrl}/`;
+  if (url.startsWith(prefix)) {
+    const key = url.slice(prefix.length);
+    try {
+      await s3Client.send(new DeleteObjectCommand({ Bucket: s3Bucket, Key: key }));
+    } catch (err) {
+      console.error("[removeProductPhoto] Failed to delete from R2:", err);
+    }
+  }
+
+  revalidateProductPages();
+  revalidateProductEdit(productId);
+  return { photos: result.photos };
 }
 
 // --- Manual Block Actions ---

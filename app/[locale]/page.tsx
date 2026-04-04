@@ -12,6 +12,7 @@ import { asc } from "drizzle-orm";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
 import * as categoryRepo from "@/lib/repositories/category";
+import { findThumbnail } from "@/lib/media";
 import * as productRepo from "@/lib/repositories/product";
 import { categories as categoriesTable } from "@/lib/db/schema";
 
@@ -156,7 +157,7 @@ export default async function Home({ params }: HomeProps) {
               return (
                 <div key={colIndex} className="flex flex-1 flex-col gap-6">
                   {colProducts.map((product, rowIndex) => {
-                    const photo = product.photos?.[0];
+                    const photo = findThumbnail(product.photos ?? []);
                     const priceLabel =
                       product.priceType === "PER_UNIT"
                         ? `$${product.basePrice}/unit`

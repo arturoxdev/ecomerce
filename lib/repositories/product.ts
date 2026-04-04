@@ -1,4 +1,4 @@
-import { and, count as countFn, eq, ilike, SQL } from "drizzle-orm";
+import { and, count as countFn, eq, ilike, sql, SQL } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import { categories, products } from "@/lib/db/schema";
@@ -112,6 +112,24 @@ export function update(
     .set(data)
     .where(eq(products.id, id))
     .returning()
+    .then((r) => r[0]);
+}
+
+export function appendPhoto(id: string, url: string) {
+  return db
+    .update(products)
+    .set({ photos: sql`array_append(${products.photos}, ${url})` })
+    .where(eq(products.id, id))
+    .returning({ photos: products.photos })
+    .then((r) => r[0]);
+}
+
+export function removePhoto(id: string, url: string) {
+  return db
+    .update(products)
+    .set({ photos: sql`array_remove(${products.photos}, ${url})` })
+    .where(eq(products.id, id))
+    .returning({ photos: products.photos })
     .then((r) => r[0]);
 }
 

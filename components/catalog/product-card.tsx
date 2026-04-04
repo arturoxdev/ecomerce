@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
+import { findThumbnail } from "@/lib/media";
 
 export type ProductCardProduct = {
   id: string;
@@ -30,7 +31,7 @@ export type ProductCardProps = {
 };
 
 export function ProductCard({ product, locale, labels }: ProductCardProps) {
-  const photo = product.photos[0] ?? null;
+  const photo = findThumbnail(product.photos);
 
   const lowestPrice = product.hasVariants && product.minVariantPrice !== undefined
     ? Math.min(product.basePrice, product.minVariantPrice)

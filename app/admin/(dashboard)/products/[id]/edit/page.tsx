@@ -56,6 +56,7 @@ export default async function EditProductPage({ params }: Props) {
       <ProductForm
         action={boundAction}
         categories={categoryList}
+        productId={id}
         defaultValues={{
           name: product.name,
           slug: product.slug,

@@ -1,10 +1,10 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 
 import { Field } from "@/components/admin/field";
 import { MarkdownEditor } from "@/components/admin/markdown-editor";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -17,9 +17,19 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSlugField } from "@/hooks/use-slug-field";
+import { ExternalLink, Film } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import {
+  isVideoUrl,
+  isVideoMime,
+  getAcceptString,
+  getMaxSizeForMime,
+  MAX_MEDIA_COUNT,
+} from "@/lib/media";
 
 import type { ProductFormState, VariantFormState } from "./actions";
+import { appendProductPhoto, removeProductPhoto } from "./actions";
 import { VariantManager } from "./variant-manager";
 
 type Category = { id: string; name: string };
@@ -34,6 +44,8 @@ type Variant = {
 type Props = {
   action: (prev: ProductFormState, formData: FormData) => Promise<ProductFormState>;
   categories: Category[];
+  /** When set, media uploads/deletes are persisted to DB immediately. */
+  productId?: string;
   defaultValues?: {
     name?: string;
     slug?: string;
@@ -64,6 +76,7 @@ const ABOUT_FIELDS = ["about"];
 export function ProductForm({
   action,
   categories,
+  productId,
   defaultValues,
   variants,
   createVariantAction,
@@ -74,6 +87,12 @@ export function ProductForm({
     defaultValues?.name,
     defaultValues?.slug,
   );
+
+  useEffect(() => {
+    if (state.success) {
+      toast.success("Product saved");
+    }
+  }, [state]);
 
   const [description, setDescription] = useState(defaultValues?.description ?? "");
   const [about, setAbout] = useState(defaultValues?.about ?? "");
@@ -88,15 +107,69 @@ export function ProductForm({
     const files = Array.from(e.target.files ?? []);
     if (!files.length) return;
 
+    const remaining = MAX_MEDIA_COUNT - photos.length;
+    if (remaining <= 0) return;
+    const batch = files.slice(0, remaining);
+
     setUploading(true);
     try {
-      for (const file of files) {
-        const fd = new FormData();
-        fd.append("file", file);
-        const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-        if (!res.ok) throw new Error("Upload failed");
-        const { url } = await res.json();
-        setPhotos((prev) => [...prev, url]);
+      for (const file of batch) {
+        const maxSize = getMaxSizeForMime(file.type);
+        if (file.size > maxSize) {
+          const limitMB = maxSize / (1024 * 1024);
+          const label = isVideoMime(file.type) ? "Videos" : "Images";
+          toast.error(`${label} must be under ${limitMB}MB`, {
+            description: file.name,
+          });
+          continue;
+        }
+
+        // Get presigned URL
+        const presignRes = await fetch("/api/admin/upload/presign", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            filename: file.name,
+            contentType: file.type,
+            fileSize: file.size,
+          }),
+        });
+
+        if (!presignRes.ok) {
+          const err = await presignRes.json();
+          toast.error(typeof err.error === "string" ? err.error : "Upload failed", {
+            description: file.name,
+          });
+          continue;
+        }
+
+        const { presignedUrl, publicUrl } = await presignRes.json();
+
+        // Upload directly to R2
+        const uploadRes = await fetch(presignedUrl, {
+          method: "PUT",
+          body: file,
+          headers: { "Content-Type": file.type },
+        });
+
+        if (!uploadRes.ok) {
+          toast.error("Upload to storage failed", {
+            description: "Please try again.",
+          });
+          continue;
+        }
+
+        // Persist to DB immediately if editing an existing product
+        if (productId) {
+          const result = await appendProductPhoto(productId, publicUrl);
+          if (result.error) {
+            toast.error(result.error);
+            continue;
+          }
+        }
+
+        toast.success("File uploaded", { description: file.name });
+        setPhotos((prev) => [...prev, publicUrl]);
       }
     } finally {
       setUploading(false);
@@ -104,7 +177,15 @@ export function ProductForm({
     }
   }
 
-  function removePhoto(url: string) {
+  async function handleRemovePhoto(url: string) {
+    if (productId) {
+      const result = await removeProductPhoto(productId, url);
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success("File removed");
+    }
     setPhotos((prev) => prev.filter((p) => p !== url));
   }
 
@@ -260,26 +341,41 @@ export function ProductForm({
             <div>
               <h3 className="text-sm font-medium text-foreground">Media</h3>
               <p className="text-sm text-muted-foreground">
-                Upload product images.
+                Upload images and videos. Max {MAX_MEDIA_COUNT} files (images up to 5 MB, videos up to 20 MB).
               </p>
             </div>
 
-            <Field label="Photos" error={state.fieldErrors?.photos?.[0]}>
+            <Field label="Photos & Videos" error={state.fieldErrors?.photos?.[0]}>
               <input type="hidden" name="photos" value={photos.join("\n")} />
 
               {photos.length > 0 && (
                 <div className="flex flex-wrap gap-3">
                   {photos.map((url) => (
                     <div key={url} className="group relative">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={url}
-                        alt=""
-                        className="size-20 rounded-lg object-cover border border-input"
-                      />
+                      {isVideoUrl(url) ? (
+                        <div className="relative size-20 rounded-lg border border-input overflow-hidden bg-slate-900">
+                          <video
+                            src={url}
+                            preload="metadata"
+                            muted
+                            playsInline
+                            className="h-full w-full object-cover"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <Film className="size-5 text-white/80" />
+                          </div>
+                        </div>
+                      ) : (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          src={url}
+                          alt=""
+                          className="size-20 rounded-lg object-cover border border-input"
+                        />
+                      )}
                       <button
                         type="button"
-                        onClick={() => removePhoto(url)}
+                        onClick={() => handleRemovePhoto(url)}
                         className="absolute -right-1.5 -top-1.5 flex size-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground text-xs leading-none opacity-0 transition-opacity group-hover:opacity-100"
                       >
                         x
@@ -293,7 +389,7 @@ export function ProductForm({
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/*"
+                  accept={getAcceptString()}
                   multiple
                   className="hidden"
                   onChange={handleFileChange}
@@ -302,11 +398,14 @@ export function ProductForm({
                   type="button"
                   variant="outline"
                   size="sm"
-                  disabled={uploading}
+                  disabled={uploading || photos.length >= MAX_MEDIA_COUNT}
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  {uploading ? "Uploading\u2026" : "Upload image"}
+                  {uploading ? "Uploading\u2026" : "Upload media"}
                 </Button>
+                <span className="text-xs text-muted-foreground">
+                  {photos.length}/{MAX_MEDIA_COUNT}
+                </span>
               </div>
             </Field>
           </section>
@@ -378,8 +477,18 @@ export function ProductForm({
         <Button type="button" variant="outline" onClick={() => history.back()}>
           Cancel
         </Button>
+        {slug && (
+          <a
+            href={`/catalog/${slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
+          >
+            <ExternalLink data-icon="inline-start" />
+            View product
+          </a>
+        )}
       </div>
     </form>
   );
 }
-

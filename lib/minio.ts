@@ -7,7 +7,9 @@ export const s3Client = new S3Client({
     accessKeyId: process.env.S3_ACCESS_KEY_ID!,
     secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
   },
-  forcePathStyle: true, // requerido para MinIO (path-style vs virtual-hosted)
+  forcePathStyle: true,
+  requestChecksumCalculation: 'WHEN_REQUIRED',
+  responseChecksumValidation: 'WHEN_REQUIRED',
 })
 
 export const s3Bucket = process.env.S3_BUCKET!
