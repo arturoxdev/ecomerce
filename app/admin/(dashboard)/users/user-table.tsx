@@ -2,9 +2,8 @@
 
 import { Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
-import { toast } from "sonner";
+
+import { useDeleteDialog } from "@/hooks/use-delete-dialog";
 
 import {
   AlertDialog,
@@ -49,21 +48,10 @@ const roleBadgeStyles: Record<UserRole, string> = {
 };
 
 export function UserTable({ users, currentUserRole }: Props) {
-  const router = useRouter();
-  const [toggleId, setToggleId] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const { targetId: toggleId, isPending, openDialog: setToggleId, closeDialog, confirmDelete } = useDeleteDialog();
 
-  function handleToggle(id: string) {
-    startTransition(async () => {
-      const result = await toggleUserActive(id);
-      if (result.error) {
-        toast.error(result.error);
-      } else {
-        toast.success("User status updated");
-        router.refresh();
-      }
-      setToggleId(null);
-    });
+  function handleToggle() {
+    confirmDelete(toggleUserActive, "User status updated");
   }
 
   return (
@@ -147,7 +135,7 @@ export function UserTable({ users, currentUserRole }: Props) {
         </Table>
       </div>
 
-      <AlertDialog open={!!toggleId} onOpenChange={(o) => !o && setToggleId(null)}>
+      <AlertDialog open={!!toggleId} onOpenChange={(o) => !o && closeDialog()}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Toggle user status</AlertDialogTitle>
@@ -158,7 +146,7 @@ export function UserTable({ users, currentUserRole }: Props) {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => toggleId && handleToggle(toggleId)}
+              onClick={handleToggle}
             >
               Confirm
             </AlertDialogAction>

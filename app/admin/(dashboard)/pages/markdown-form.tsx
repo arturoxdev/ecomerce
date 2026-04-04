@@ -1,12 +1,12 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useActionState, useState } from "react";
 
+import { Field } from "@/components/admin/field";
 import { MarkdownEditor } from "@/components/admin/markdown-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useFormActionToast } from "@/hooks/use-form-action-toast";
 
 import type { StaticPageFormState } from "./actions";
 
@@ -23,22 +23,15 @@ type Props = {
 export function MarkdownForm({ action, defaultValues, canWrite }: Props) {
   const [state, formAction, pending] = useActionState(action, {});
   const [body, setBody] = useState(defaultValues.body);
-
-  useEffect(() => {
-    if (state.success) {
-      toast.success("Document updated");
-    } else if (state.error) {
-      toast.error(state.error);
-    }
-  }, [state]);
+  useFormActionToast(state, "Document updated");
 
   return (
     <form action={formAction} className="space-y-6">
       <div className="grid gap-5 md:grid-cols-2">
-        <Field label="Title" error={state.fieldErrors?.title?.[0]}>
+        <Field label="Title" error={state.fieldErrors?.title?.[0]} className="space-y-2">
           <Input name="title" defaultValue={defaultValues.title} disabled={!canWrite} />
         </Field>
-        <Field label="Subtitle" error={state.fieldErrors?.subtitle?.[0]}>
+        <Field label="Subtitle" error={state.fieldErrors?.subtitle?.[0]} className="space-y-2">
           <Input
             name="subtitle"
             defaultValue={defaultValues.subtitle}
@@ -47,7 +40,7 @@ export function MarkdownForm({ action, defaultValues, canWrite }: Props) {
         </Field>
       </div>
 
-      <Field label="Markdown content" error={state.fieldErrors?.body?.[0]}>
+      <Field label="Markdown content" error={state.fieldErrors?.body?.[0]} className="space-y-2">
         <MarkdownEditor
           value={body}
           onChange={setBody}
@@ -68,23 +61,5 @@ export function MarkdownForm({ action, defaultValues, canWrite }: Props) {
         </div>
       ) : null}
     </form>
-  );
-}
-
-function Field({
-  label,
-  error,
-  children,
-}: {
-  label: string;
-  error?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="space-y-2">
-      <Label className="text-sm font-semibold text-slate-700">{label}</Label>
-      {children}
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
-    </div>
   );
 }

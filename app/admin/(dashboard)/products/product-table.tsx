@@ -2,9 +2,10 @@
 
 import { CalendarX2, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
+
+import { useDeleteDialog } from "@/hooks/use-delete-dialog";
 
 import {
   AlertDialog,
@@ -65,22 +66,10 @@ function paginationHref(page: number, filters?: { status?: string; category?: st
 }
 
 export function ProductTable({ products, page, totalPages, status, category, search, canWrite = true }: Props) {
-  const router = useRouter();
-  const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const { targetId: deleteId, isPending, startTransition, openDialog: setDeleteId, closeDialog, confirmDelete } = useDeleteDialog();
 
   function handleDelete() {
-    if (!deleteId) return;
-    startTransition(async () => {
-      const result = await deleteProduct(deleteId);
-      setDeleteId(null);
-      if (result.error) {
-        toast.error(result.error);
-      } else {
-        toast.success("Product deleted");
-        router.refresh();
-      }
-    });
+    confirmDelete(deleteProduct, "Product deleted");
   }
 
   function handleToggle(productId: string) {
@@ -88,8 +77,6 @@ export function ProductTable({ products, page, totalPages, status, category, sea
       const result = await toggleProductActive(productId);
       if (result.error) {
         toast.error(result.error);
-      } else {
-        router.refresh();
       }
     });
   }
@@ -236,7 +223,7 @@ export function ProductTable({ products, page, totalPages, status, category, sea
         </div>
       )}
 
-      <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && setDeleteId(null)}>
+      <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && closeDialog()}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete product?</AlertDialogTitle>

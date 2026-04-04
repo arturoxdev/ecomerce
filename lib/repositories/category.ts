@@ -1,4 +1,4 @@
-import { asc, count, desc, eq, SQL } from "drizzle-orm";
+import { asc, eq, SQL } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import { categories, products } from "@/lib/db/schema";

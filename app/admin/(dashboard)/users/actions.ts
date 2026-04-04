@@ -26,11 +26,9 @@ const updateUserSchema = z.object({
   isActive: z.boolean().default(true),
 });
 
-export type UserFormState = {
-  success?: boolean;
-  error?: string;
-  fieldErrors?: Record<string, string[]>;
-};
+import type { FormState } from "@/lib/types/form-state";
+
+export type UserFormState = FormState;
 
 export async function createUser(
   _prev: UserFormState,

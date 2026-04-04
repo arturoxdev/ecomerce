@@ -1,11 +1,11 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 
+import { Field } from "@/components/admin/field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toSlug } from "@/lib/utils";
-import { Label } from "@/components/ui/label";
+import { useSlugField } from "@/hooks/use-slug-field";
 
 import type { CategoryFormState } from "./actions";
 
@@ -20,21 +20,10 @@ type Props = {
 
 export function CategoryForm({ action, defaultValues }: Props) {
   const [state, formAction, pending] = useActionState(action, {});
-
-  const [name, setName] = useState(defaultValues?.name ?? '');
-  const [slug, setSlug] = useState(defaultValues?.slug ?? '');
-  const [slugTouched, setSlugTouched] = useState(!!defaultValues?.slug);
-
-  function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const value = e.target.value;
-    setName(value);
-    if (!slugTouched) setSlug(toSlug(value));
-  }
-
-  function handleSlugChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setSlugTouched(true);
-    setSlug(e.target.value);
-  }
+  const { name, slug, handleNameChange, handleSlugChange } = useSlugField(
+    defaultValues?.name,
+    defaultValues?.slug,
+  );
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
@@ -72,23 +61,5 @@ export function CategoryForm({ action, defaultValues }: Props) {
         </Button>
       </div>
     </form>
-  );
-}
-
-function Field({
-  label,
-  children,
-  error,
-}: {
-  label: string;
-  children: React.ReactNode;
-  error?: string;
-}) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <Label>{label}</Label>
-      {children}
-      {error && <p className="text-xs text-red-600">{error}</p>}
-    </div>
   );
 }
