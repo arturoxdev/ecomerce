@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AvailabilityChecker } from "@/components/catalog/availability-checker";
+import { ProductGallery } from "@/components/catalog/product-gallery";
 import { VariantSelector } from "@/components/catalog/variant-selector";
 import { MarkdownContent } from "@/components/public/markdown-content";
 import { Badge } from "@/components/ui/badge";
@@ -73,26 +74,10 @@ export default async function ProductDetailPage({
           {/* Photo gallery */}
           <div className="space-y-4">
             {product.photos.length > 0 ? (
-              <div
-                className="flex gap-3 overflow-x-auto pb-2"
-                aria-label={m.catalog.product.gallery}
-              >
-                {product.photos.map((photo, index) => (
-                  <div
-                    key={index}
-                    className="aspect-[4/3] w-full min-w-[280px] flex-shrink-0 overflow-hidden rounded-xl bg-slate-100 first:min-w-full"
-                  >
-                    <Image
-                      src={photo}
-                      alt={`${product.name} — photo ${index + 1}`}
-                      width={800}
-                      height={600}
-                      className="h-full w-full object-cover"
-                      priority={index === 0}
-                    />
-                  </div>
-                ))}
-              </div>
+              <ProductGallery
+                photos={product.photos}
+                productName={product.name}
+              />
             ) : (
               <div className="flex aspect-[4/3] w-full items-center justify-center rounded-xl bg-slate-100 text-slate-400">
                 <ImageOff className="size-16" />

@@ -57,37 +57,47 @@ export const legalPageSlugEnum = pgEnum("legal_page_slug", [
 
 // ── Tables ─────────────────────────────────────────────────────
 
-export const categories = pgTable("categories", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name").notNull(),
-  slug: text("slug").notNull().unique(),
-  description: text("description"),
-  sortOrder: integer("sort_order").notNull().default(0),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at")
-    .notNull()
-    .$onUpdate(() => new Date()),
-});
+export const categories = pgTable(
+  "categories",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    storeId: text("store_id").notNull(),
+    name: text("name").notNull(),
+    slug: text("slug").notNull(),
+    description: text("description"),
+    sortOrder: integer("sort_order").notNull().default(0),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [unique("idx_categories_store_slug").on(t.storeId, t.slug)],
+);
 
-export const products = pgTable("products", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name").notNull(),
-  slug: text("slug").notNull().unique(),
-  description: text("description"),
-  about: text("about"),
-  basePrice: numeric("base_price", { precision: 10, scale: 2 }).notNull(),
-  priceType: priceTypeEnum("price_type").notNull(),
-  stock: integer("stock").notNull().default(1),
-  photos: text("photos").array().notNull().default([]),
-  isActive: boolean("is_active").notNull().default(true),
-  categoryId: uuid("category_id")
-    .notNull()
-    .references(() => categories.id, { onDelete: "restrict" }),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at")
-    .notNull()
-    .$onUpdate(() => new Date()),
-});
+export const products = pgTable(
+  "products",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    storeId: text("store_id").notNull(),
+    name: text("name").notNull(),
+    slug: text("slug").notNull(),
+    description: text("description"),
+    about: text("about"),
+    basePrice: numeric("base_price", { precision: 10, scale: 2 }).notNull(),
+    priceType: priceTypeEnum("price_type").notNull(),
+    stock: integer("stock").notNull().default(1),
+    photos: text("photos").array().notNull().default([]),
+    isActive: boolean("is_active").notNull().default(true),
+    categoryId: uuid("category_id")
+      .notNull()
+      .references(() => categories.id, { onDelete: "restrict" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [unique("idx_products_store_slug").on(t.storeId, t.slug)],
+);
 
 export const productVariants = pgTable("product_variants", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -107,6 +117,7 @@ export const productVariants = pgTable("product_variants", {
 
 export const orders = pgTable("orders", {
   id: uuid("id").primaryKey().defaultRandom(),
+  storeId: text("store_id").notNull(),
   customerName: text("customer_name").notNull(),
   customerEmail: text("customer_email").notNull(),
   customerPhone: text("customer_phone").notNull(),
@@ -173,7 +184,7 @@ export const availability = pgTable(
 );
 
 export const settings = pgTable("settings", {
-  id: text("id").primaryKey().default("global"),
+  storeId: text("store_id").primaryKey(),
   deliveryMode: deliveryModeEnum("delivery_mode").notNull().default("INCLUDED"),
   deliveryFee: numeric("delivery_fee", { precision: 10, scale: 2 }),
   depositPercent: numeric("deposit_percent", { precision: 5, scale: 4 })
@@ -184,16 +195,22 @@ export const settings = pgTable("settings", {
     .$onUpdate(() => new Date()),
 });
 
-export const zipDeliveryZones = pgTable("zip_delivery_zones", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  zipCode: text("zip_code").notNull().unique(),
-  fee: numeric("fee", { precision: 10, scale: 2 }).notNull(),
-});
+export const zipDeliveryZones = pgTable(
+  "zip_delivery_zones",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    storeId: text("store_id").notNull(),
+    zipCode: text("zip_code").notNull(),
+    fee: numeric("fee", { precision: 10, scale: 2 }).notNull(),
+  },
+  (t) => [unique("idx_zip_store_code").on(t.storeId, t.zipCode)],
+);
 
 export const aboutPageContents = pgTable(
   "about_page_contents",
   {
     id: uuid("id").primaryKey().defaultRandom(),
+    storeId: text("store_id").notNull(),
     slug: aboutPageSlugEnum("slug").notNull().default("about"),
     locale: contentLocaleEnum("locale").notNull(),
     eyebrow: text("eyebrow").notNull(),
@@ -208,13 +225,14 @@ export const aboutPageContents = pgTable(
       .notNull()
       .$onUpdate(() => new Date()),
   },
-  (t) => [unique("idx_about_page_locale").on(t.slug, t.locale)],
+  (t) => [unique("idx_about_page_locale").on(t.storeId, t.slug, t.locale)],
 );
 
 export const legalPageDocuments = pgTable(
   "legal_page_documents",
   {
     id: uuid("id").primaryKey().defaultRandom(),
+    storeId: text("store_id").notNull(),
     slug: legalPageSlugEnum("slug").notNull(),
     locale: contentLocaleEnum("locale").notNull(),
     title: text("title").notNull(),
@@ -225,13 +243,14 @@ export const legalPageDocuments = pgTable(
       .notNull()
       .$onUpdate(() => new Date()),
   },
-  (t) => [unique("idx_legal_page_locale").on(t.slug, t.locale)],
+  (t) => [unique("idx_legal_page_locale").on(t.storeId, t.slug, t.locale)],
 );
 
 export const contactPageContents = pgTable(
   "contact_page_contents",
   {
     id: uuid("id").primaryKey().defaultRandom(),
+    storeId: text("store_id").notNull(),
     slug: contactPageSlugEnum("slug").notNull().default("contact"),
     locale: contentLocaleEnum("locale").notNull(),
     title: text("title").notNull(),
@@ -245,13 +264,14 @@ export const contactPageContents = pgTable(
       .notNull()
       .$onUpdate(() => new Date()),
   },
-  (t) => [unique("idx_contact_page_locale").on(t.slug, t.locale)],
+  (t) => [unique("idx_contact_page_locale").on(t.storeId, t.slug, t.locale)],
 );
 
 export const faqEntries = pgTable(
   "faq_entries",
   {
     id: uuid("id").primaryKey().defaultRandom(),
+    storeId: text("store_id").notNull(),
     locale: contentLocaleEnum("locale").notNull(),
     question: text("question").notNull(),
     answer: text("answer").notNull(),
@@ -264,20 +284,25 @@ export const faqEntries = pgTable(
   (t) => [index("idx_faq_locale_order").on(t.locale, t.sortOrder)],
 );
 
-export const users = pgTable("users", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name"),
-  email: text("email").notNull().unique(),
-  emailVerified: timestamp("email_verified"),
-  image: text("image"),
-  passwordHash: text("password_hash"),
-  role: userRoleEnum("role").notNull().default("EMPLOYEE"),
-  isActive: boolean("is_active").notNull().default(true),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at")
-    .notNull()
-    .$onUpdate(() => new Date()),
-});
+export const users = pgTable(
+  "users",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    storeId: text("store_id").notNull(),
+    name: text("name"),
+    email: text("email").notNull(),
+    emailVerified: timestamp("email_verified"),
+    image: text("image"),
+    passwordHash: text("password_hash"),
+    role: userRoleEnum("role").notNull().default("EMPLOYEE"),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [unique("idx_users_store_email").on(t.storeId, t.email)],
+);
 
 export const accounts = pgTable(
   "accounts",

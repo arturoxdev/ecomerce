@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import "dotenv/config";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 
 import {
@@ -24,23 +24,35 @@ import {
 
 const db = drizzle({ connection: process.env.DATABASE_URL!, schema });
 
+function requireStoreId(): string {
+  const id = process.env.STORE_ID;
+  if (!id) {
+    console.error("STORE_ID env var is required for seeding");
+    process.exit(1);
+  }
+  return id;
+}
+
+const storeId: string = requireStoreId();
+
 async function main() {
   await db
     .insert(settings)
-    .values({ id: "global" })
-    .onConflictDoUpdate({ target: settings.id, set: { id: "global" } });
+    .values({ storeId })
+    .onConflictDoUpdate({ target: settings.storeId, set: { storeId } });
 
   const adminPassword = await bcrypt.hash("admin123", 10);
   await db
     .insert(users)
     .values({
+      storeId,
       name: process.env.NEXT_PUBLIC_ADMIN_TITLE ?? "Admin",
       email: process.env.ADMIN_EMAIL ?? "admin@example.com",
       passwordHash: adminPassword,
       role: "ROOT",
     })
     .onConflictDoUpdate({
-      target: users.email,
+      target: [users.storeId, users.email],
       set: { name: process.env.NEXT_PUBLIC_ADMIN_TITLE ?? "Admin", role: "ROOT", passwordHash: adminPassword },
     });
 
@@ -65,23 +77,23 @@ async function main() {
   for (const category of categoryData) {
     await db
       .insert(categories)
-      .values(category)
+      .values({ storeId, ...category })
       .onConflictDoUpdate({
-        target: categories.slug,
+        target: [categories.storeId, categories.slug],
         set: { name: category.name, description: category.description },
       });
   }
 
   const inflables = await db.query.categories.findFirst({
-    where: eq(categories.slug, "inflables"),
+    where: and(eq(categories.slug, "inflables"), eq(categories.storeId, storeId)),
     columns: { id: true },
   });
   const sillas = await db.query.categories.findFirst({
-    where: eq(categories.slug, "sillas"),
+    where: and(eq(categories.slug, "sillas"), eq(categories.storeId, storeId)),
     columns: { id: true },
   });
   const mesas = await db.query.categories.findFirst({
-    where: eq(categories.slug, "mesas"),
+    where: and(eq(categories.slug, "mesas"), eq(categories.storeId, storeId)),
     columns: { id: true },
   });
 
@@ -125,9 +137,9 @@ async function main() {
   for (const product of productData) {
     await db
       .insert(products)
-      .values(product)
+      .values({ storeId, ...product })
       .onConflictDoUpdate({
-        target: products.slug,
+        target: [products.storeId, products.slug],
         set: product,
       });
   }
@@ -137,12 +149,13 @@ async function main() {
     await db
       .insert(aboutPageContents)
       .values({
+        storeId,
         slug: "about",
         locale,
         ...aboutContent,
       })
       .onConflictDoUpdate({
-        target: [aboutPageContents.slug, aboutPageContents.locale],
+        target: [aboutPageContents.storeId, aboutPageContents.slug, aboutPageContents.locale],
         set: aboutContent,
       });
 
@@ -150,12 +163,13 @@ async function main() {
     await db
       .insert(contactPageContents)
       .values({
+        storeId,
         slug: "contact",
         locale,
         ...contactContent,
       })
       .onConflictDoUpdate({
-        target: [contactPageContents.slug, contactPageContents.locale],
+        target: [contactPageContents.storeId, contactPageContents.slug, contactPageContents.locale],
         set: contactContent,
       });
 
@@ -164,24 +178,25 @@ async function main() {
       await db
         .insert(legalPageDocuments)
         .values({
+          storeId,
           slug,
           locale,
           ...legalContent,
         })
         .onConflictDoUpdate({
-          target: [legalPageDocuments.slug, legalPageDocuments.locale],
+          target: [legalPageDocuments.storeId, legalPageDocuments.slug, legalPageDocuments.locale],
           set: legalContent,
         });
     }
   }
 
-  await db.delete(faqEntries);
+  await db.delete(faqEntries).where(eq(faqEntries.storeId, storeId));
   await db.insert(faqEntries).values([
-    ...faqFallbacks.en,
-    ...faqFallbacks.es,
+    ...faqFallbacks.en.map((f) => ({ ...f, storeId })),
+    ...faqFallbacks.es.map((f) => ({ ...f, storeId })),
   ]);
 
-  console.log("Seed completed successfully");
+  console.log(`Seed completed successfully for store: ${storeId}`);
 }
 
 main()

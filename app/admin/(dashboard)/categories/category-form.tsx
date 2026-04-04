@@ -25,6 +25,10 @@ export function CategoryForm({ action, defaultValues }: Props) {
     defaultValues?.slug,
   );
 
+  function handleSlugBlur() {
+    if (slug) setSlug(toSlug(slug));
+  }
+
   return (
     <form action={formAction} className="flex flex-col gap-5">
       {state.error && (
@@ -39,7 +43,7 @@ export function CategoryForm({ action, defaultValues }: Props) {
         </Field>
 
         <Field label="Slug" error={state.fieldErrors?.slug?.[0]}>
-          <Input name="slug" value={slug} onChange={handleSlugChange} required />
+          <Input name="slug" value={slug} onChange={handleSlugChange} onBlur={handleSlugBlur} required />
         </Field>
       </div>
 

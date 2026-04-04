@@ -1,13 +1,14 @@
 "use server";
 
 import bcrypt from "bcryptjs";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { getSessionUser } from "@/lib/auth/session";
 import { canCreateRole, canEditUser } from "@/lib/auth/permissions";
+import { getStoreId } from "@/lib/config/tenant";
 import { db } from "@/lib/db";
 import { users, sessions, userRoleEnum } from "@/lib/db/schema";
 
@@ -53,8 +54,9 @@ export async function createUser(
     return { error: "You cannot assign this role" };
   }
 
+  const storeId = getStoreId();
   const existing = await db.query.users.findFirst({
-    where: eq(users.email, parsed.data.email),
+    where: and(eq(users.email, parsed.data.email), eq(users.storeId, storeId)),
   });
   if (existing) {
     return { error: "This email is already registered" };
@@ -63,6 +65,7 @@ export async function createUser(
   const passwordHash = await bcrypt.hash(parsed.data.password, 12);
 
   await db.insert(users).values({
+    storeId,
     name: parsed.data.name,
     email: parsed.data.email,
     passwordHash,
@@ -81,8 +84,9 @@ export async function updateUser(
 ): Promise<UserFormState> {
   const currentUser = await getSessionUser();
 
+  const storeId = getStoreId();
   const targetUser = await db.query.users.findFirst({
-    where: eq(users.id, id),
+    where: and(eq(users.id, id), eq(users.storeId, storeId)),
   });
   if (!targetUser) {
     return { error: "User not found" };
@@ -114,7 +118,7 @@ export async function updateUser(
 
   if (parsed.data.email !== targetUser.email) {
     const existing = await db.query.users.findFirst({
-      where: eq(users.email, parsed.data.email),
+      where: and(eq(users.email, parsed.data.email), eq(users.storeId, storeId)),
     });
     if (existing) {
       return { error: "This email is already registered" };
@@ -129,7 +133,7 @@ export async function updateUser(
       role: parsed.data.role,
       isActive: parsed.data.isActive,
     })
-    .where(eq(users.id, id));
+    .where(and(eq(users.id, id), eq(users.storeId, storeId)));
 
   if (!parsed.data.isActive && targetUser.isActive) {
     await db.delete(sessions).where(eq(sessions.userId, id));
@@ -142,8 +146,9 @@ export async function updateUser(
 export async function toggleUserActive(id: string): Promise<UserFormState> {
   const currentUser = await getSessionUser();
 
+  const storeId = getStoreId();
   const targetUser = await db.query.users.findFirst({
-    where: eq(users.id, id),
+    where: and(eq(users.id, id), eq(users.storeId, storeId)),
   });
   if (!targetUser) {
     return { error: "User not found" };
@@ -162,7 +167,7 @@ export async function toggleUserActive(id: string): Promise<UserFormState> {
   await db
     .update(users)
     .set({ isActive: newActive })
-    .where(eq(users.id, id));
+    .where(and(eq(users.id, id), eq(users.storeId, storeId)));
 
   if (!newActive) {
     await db.delete(sessions).where(eq(sessions.userId, id));

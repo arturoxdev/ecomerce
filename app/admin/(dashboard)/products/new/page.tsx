@@ -1,9 +1,7 @@
 import { asc } from "drizzle-orm";
-import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
 
 import { categories } from "@/lib/db/schema";
-import { Separator } from "@/components/ui/separator";
+import { SiteHeader } from "@/components/admin/site-header";
 import * as categoryRepo from "@/lib/repositories/category";
 
 import { createProduct } from "../actions";
@@ -16,26 +14,13 @@ export default async function NewProductPage() {
   });
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <div className="flex flex-col gap-1">
-        <Link
-          href="/admin/products"
-          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors w-fit"
-        >
-          <ChevronLeft className="size-4" />
-          Products
-        </Link>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          New product
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Add a new product to your catalog.
-        </p>
+    <>
+      <SiteHeader title="New product" />
+      <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+        <div className="px-4 lg:px-6">
+          <ProductForm action={createProduct} categories={categoryList} />
+        </div>
       </div>
-
-      <Separator className="my-6" />
-
-      <ProductForm action={createProduct} categories={categoryList} />
-    </div>
+    </>
   );
 }

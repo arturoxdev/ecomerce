@@ -1,7 +1,8 @@
-import { asc, eq, SQL } from "drizzle-orm";
+import { and, asc, eq, SQL } from "drizzle-orm";
 
+import { getStoreId } from "@/lib/config/tenant";
 import { db } from "@/lib/db";
-import { categories, products } from "@/lib/db/schema";
+import { categories } from "@/lib/db/schema";
 
 export function findAll(opts?: {
   columns?: Record<string, boolean>;
@@ -9,6 +10,7 @@ export function findAll(opts?: {
   limit?: number;
 }) {
   return db.query.categories.findMany({
+    where: eq(categories.storeId, getStoreId()),
     columns: opts?.columns as undefined,
     orderBy: opts?.orderBy ? () => [opts.orderBy!] : undefined,
     limit: opts?.limit,
@@ -17,6 +19,7 @@ export function findAll(opts?: {
 
 export function findAllWithProductCount() {
   return db.query.categories.findMany({
+    where: eq(categories.storeId, getStoreId()),
     orderBy: [asc(categories.sortOrder)],
     with: { products: { columns: { id: true } } },
   });
@@ -24,20 +27,20 @@ export function findAllWithProductCount() {
 
 export function findById(id: string) {
   return db.query.categories.findFirst({
-    where: eq(categories.id, id),
+    where: and(eq(categories.id, id), eq(categories.storeId, getStoreId())),
   });
 }
 
 export function findBySlug(slug: string) {
   return db.query.categories.findFirst({
-    where: eq(categories.slug, slug),
+    where: and(eq(categories.slug, slug), eq(categories.storeId, getStoreId())),
   });
 }
 
 export function create(
-  data: typeof categories.$inferInsert,
+  data: Omit<typeof categories.$inferInsert, "storeId">,
 ) {
-  return db.insert(categories).values(data).returning().then((r) => r[0]);
+  return db.insert(categories).values({ ...data, storeId: getStoreId() }).returning().then((r) => r[0]);
 }
 
 export function update(
@@ -47,13 +50,13 @@ export function update(
   return db
     .update(categories)
     .set(data)
-    .where(eq(categories.id, id))
+    .where(and(eq(categories.id, id), eq(categories.storeId, getStoreId())))
     .returning()
     .then((r) => r[0]);
 }
 
 export function remove(id: string) {
-  return db.delete(categories).where(eq(categories.id, id));
+  return db.delete(categories).where(and(eq(categories.id, id), eq(categories.storeId, getStoreId())));
 }
 
 export function updateOrder(items: { id: string; sortOrder: number }[]) {
@@ -62,7 +65,7 @@ export function updateOrder(items: { id: string; sortOrder: number }[]) {
       await tx
         .update(categories)
         .set({ sortOrder: item.sortOrder })
-        .where(eq(categories.id, item.id));
+        .where(and(eq(categories.id, item.id), eq(categories.storeId, getStoreId())));
     }
   });
 }

@@ -1,11 +1,20 @@
 "use client";
 
-import { Menu, PartyPopper, X } from "lucide-react";
+import { ChevronDown, Menu, PartyPopper, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Suspense } from "react";
 
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
 import { siteConfig } from "@/lib/config/site";
 import type { Locale } from "@/lib/i18n/config";
 
@@ -14,20 +23,20 @@ type Messages = {
   language: { label: string };
 };
 
+type Category = { name: string; slug: string };
+
 type Props = {
   locale: Locale;
   messages: Messages;
+  categories: Category[];
 };
 
-export function PublicHeader({ locale, messages: m }: Props) {
-  const [mobileOpen, setMobileOpen] = useState(false);
+const linkClass =
+  "text-sm font-medium text-slate-600 transition-colors hover:text-primary";
 
-  const navLinks = [
-    { href: `/${locale}`, label: m.nav.home },
-    { href: `/${locale}/catalog`, label: m.nav.catalogue },
-    { href: `/${locale}/about`, label: m.nav.about },
-    { href: `/${locale}/contact`, label: m.nav.contact },
-  ];
+export function PublicHeader({ locale, messages: m, categories }: Props) {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [catalogOpen, setCatalogOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#fed7aa]/25 bg-[#f8f7f5]/95 backdrop-blur">
@@ -49,17 +58,56 @@ export function PublicHeader({ locale, messages: m }: Props) {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              className="text-sm font-medium text-slate-600 transition-colors hover:text-primary"
-              href={link.href}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+        {/* Desktop Navigation */}
+        <NavigationMenu className="hidden md:flex">
+          <NavigationMenuList className="gap-2">
+            <NavigationMenuItem>
+              <NavigationMenuLink href={`/${locale}`} className={linkClass}>
+                {m.nav.home}
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              <NavigationMenuTrigger className={linkClass}>
+                <Link href={`/${locale}/catalog`}>{m.nav.catalogue}</Link>
+              </NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <ul className="grid w-[240px] gap-1 p-2">
+                  <li>
+                    <NavigationMenuLink
+                      href={`/${locale}/catalog`}
+                      className="block rounded-md px-3 py-2 text-sm font-semibold text-slate-900 transition-colors hover:bg-orange-50 hover:text-primary"
+                    >
+                      {m.nav.catalogue}
+                    </NavigationMenuLink>
+                  </li>
+                  {categories.map((cat) => (
+                    <li key={cat.slug}>
+                      <NavigationMenuLink
+                        href={`/${locale}/${cat.slug}`}
+                        className="block rounded-md px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-orange-50 hover:text-primary"
+                      >
+                        {cat.name}
+                      </NavigationMenuLink>
+                    </li>
+                  ))}
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              <NavigationMenuLink href={`/${locale}/about`} className={linkClass}>
+                {m.nav.about}
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              <NavigationMenuLink href={`/${locale}/contact`} className={linkClass}>
+                {m.nav.contact}
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
 
         <div className="flex items-center gap-3">
           <Suspense fallback={<div className="h-8 w-[92px]" />}>
@@ -80,19 +128,64 @@ export function PublicHeader({ locale, messages: m }: Props) {
         </div>
       </div>
 
+      {/* Mobile Navigation */}
       {mobileOpen && (
         <div className="border-t border-[#fed7aa]/25 bg-[#f8f7f5] px-4 pb-4 pt-2 md:hidden">
           <nav className="flex flex-col gap-2">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className="rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-primary"
-              >
-                {link.label}
-              </Link>
-            ))}
+            <Link
+              href={`/${locale}`}
+              onClick={() => setMobileOpen(false)}
+              className="rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-primary"
+            >
+              {m.nav.home}
+            </Link>
+
+            {/* Catalogue with expandable categories */}
+            <button
+              onClick={() => setCatalogOpen(!catalogOpen)}
+              className="flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-primary"
+            >
+              {m.nav.catalogue}
+              <ChevronDown
+                className={`size-4 transition-transform ${catalogOpen ? "rotate-180" : ""}`}
+              />
+            </button>
+            {catalogOpen && (
+              <div className="flex flex-col gap-1 pl-4">
+                <Link
+                  href={`/${locale}/catalog`}
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-md px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 hover:text-primary"
+                >
+                  {m.nav.catalogue}
+                </Link>
+                {categories.map((cat) => (
+                  <Link
+                    key={cat.slug}
+                    href={`/${locale}/${cat.slug}`}
+                    onClick={() => setMobileOpen(false)}
+                    className="rounded-md px-3 py-2 text-sm text-slate-500 transition-colors hover:bg-slate-50 hover:text-primary"
+                  >
+                    {cat.name}
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            <Link
+              href={`/${locale}/about`}
+              onClick={() => setMobileOpen(false)}
+              className="rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-primary"
+            >
+              {m.nav.about}
+            </Link>
+            <Link
+              href={`/${locale}/contact`}
+              onClick={() => setMobileOpen(false)}
+              className="rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-primary"
+            >
+              {m.nav.contact}
+            </Link>
             <Link
               href={`/${locale}/catalog`}
               onClick={() => setMobileOpen(false)}

@@ -1,6 +1,12 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { SiteHeader } from "@/components/admin/site-header";
 import * as productRepo from "@/lib/repositories/product";
 
 import { getProductBlocks } from "../../actions";
@@ -20,34 +26,31 @@ export default async function ProductAvailabilityPage({ params }: Props) {
   const blocks = await getProductBlocks(id);
 
   return (
-    <div>
-      <div className="mb-6">
-        <Link
-          href="/admin/products"
-          className="text-sm text-gray-500 hover:text-gray-700"
-        >
-          &larr; Back to products
-        </Link>
-        <h1 className="mt-2 text-2xl font-bold text-gray-900">
-          Availability — {product.name}
-        </h1>
-      </div>
-
-      <div className="mb-8 rounded-lg border border-gray-200 bg-white p-6">
-        <h2 className="mb-4 text-lg font-semibold text-gray-900">
-          Create manual block
-        </h2>
-        <ManualBlockForm productId={id} />
-      </div>
-
-      <div className="rounded-lg border border-gray-200 bg-white">
-        <div className="border-b border-gray-200 px-6 py-4">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Blocks & reservations
-          </h2>
+    <>
+      <SiteHeader title={`Availability — ${product.name}`} />
+      <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+        <div className="px-4 lg:px-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Create manual block</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ManualBlockForm productId={id} />
+            </CardContent>
+          </Card>
         </div>
-        <AvailabilityBlockTable blocks={blocks} />
+
+        <div className="px-4 lg:px-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Blocks & reservations</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <AvailabilityBlockTable blocks={blocks} />
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
