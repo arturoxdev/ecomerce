@@ -5,10 +5,13 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { requireWriteAccess } from "@/lib/auth/session";
+import { isForeignKeyViolation, isUniqueViolation } from "@/lib/db/errors";
 import { priceTypeEnum } from "@/lib/db/schema";
+import { revalidateProductEdit, revalidateProductPages } from "@/lib/revalidation";
 import * as availabilityRepo from "@/lib/repositories/availability";
 import * as productRepo from "@/lib/repositories/product";
 import * as variantRepo from "@/lib/repositories/variant";
+import type { FormState } from "@/lib/types/form-state";
 import { toSlug } from "@/lib/utils";
 
 const productSchema = z.object({
@@ -24,11 +27,7 @@ const productSchema = z.object({
   isActive: z.boolean().default(true),
 });
 
-export type ProductFormState = {
-  success?: boolean;
-  error?: string;
-  fieldErrors?: Record<string, string[]>;
-};
+export type ProductFormState = FormState;
 
 export async function createProduct(
   _prev: ProductFormState,
@@ -64,15 +63,13 @@ export async function createProduct(
       photos: photos ? photos.split("\n").map((p) => p.trim()).filter(Boolean) : [],
     });
   } catch (e: unknown) {
-    if (hasCode(e, "23505")) {
+    if (isUniqueViolation(e)) {
       return { fieldErrors: { slug: ["Slug already exists"] } };
     }
     return { error: "Failed to create product" };
   }
 
-  revalidatePath("/admin/products");
-  revalidatePath("/[locale]", "page");
-  revalidatePath("/[locale]/catalog", "page");
+  revalidateProductPages();
   redirect("/admin/products");
 }
 
@@ -111,15 +108,13 @@ export async function updateProduct(
       photos: photos ? photos.split("\n").map((p) => p.trim()).filter(Boolean) : [],
     });
   } catch (e: unknown) {
-    if (hasCode(e, "23505")) {
+    if (isUniqueViolation(e)) {
       return { fieldErrors: { slug: ["Slug already exists"] } };
     }
     return { error: "Failed to update product" };
   }
 
-  revalidatePath("/admin/products");
-  revalidatePath("/[locale]", "page");
-  revalidatePath("/[locale]/catalog", "page");
+  revalidateProductPages();
   redirect("/admin/products");
 }
 
@@ -133,11 +128,7 @@ const manualBlockSchema = z.object({
   reason: z.string().max(255).optional(),
 });
 
-export type ManualBlockFormState = {
-  success?: boolean;
-  error?: string;
-  fieldErrors?: Record<string, string[]>;
-};
+export type ManualBlockFormState = FormState;
 
 export async function createManualBlock(
   productId: string,
@@ -219,9 +210,7 @@ export async function toggleProductActive(productId: string): Promise<ProductFor
     return { error: "Failed to toggle product status" };
   }
 
-  revalidatePath("/admin/products");
-  revalidatePath("/[locale]", "page");
-  revalidatePath("/[locale]/catalog", "page");
+  revalidateProductPages();
   return { success: true };
 }
 
@@ -232,15 +221,13 @@ export async function deleteProduct(id: string): Promise<ProductFormState> {
   try {
     await productRepo.remove(id);
   } catch (e: unknown) {
-    if (hasCode(e, "23503")) {
+    if (isForeignKeyViolation(e)) {
       return { error: "Cannot delete: product has associated orders" };
     }
     return { error: "Failed to delete product" };
   }
 
-  revalidatePath("/admin/products");
-  revalidatePath("/[locale]", "page");
-  revalidatePath("/[locale]/catalog", "page");
+  revalidateProductPages();
   return { success: true };
 }
 
@@ -252,11 +239,7 @@ const variantSchema = z.object({
   stock: z.coerce.number().int().min(0, "Stock must be 0 or more"),
 });
 
-export type VariantFormState = {
-  success?: boolean;
-  error?: string;
-  fieldErrors?: Record<string, string[]>;
-};
+export type VariantFormState = FormState;
 
 export async function createVariant(
   productId: string,
@@ -291,8 +274,7 @@ export async function createVariant(
     return { error: "Failed to create variant" };
   }
 
-  revalidatePath(`/admin/products/${productId}/edit`);
-  revalidatePath("/[locale]/catalog", "page");
+  revalidateProductEdit(productId);
   return { success: true };
 }
 
@@ -328,8 +310,7 @@ export async function updateVariant(
     return { error: "Failed to update variant" };
   }
 
-  revalidatePath(`/admin/products/${variant.productId}/edit`);
-  revalidatePath("/[locale]/catalog", "page");
+  revalidateProductEdit(variant.productId);
   return { success: true };
 }
 
@@ -346,17 +327,10 @@ export async function deleteVariant(variantId: string): Promise<VariantFormState
     return { error: "Failed to delete variant" };
   }
 
-  revalidatePath(`/admin/products/${variant.productId}/edit`);
-  revalidatePath("/[locale]/catalog", "page");
+  revalidateProductEdit(variant.productId);
   return { success: true };
 }
 
 export async function getProductVariants(productId: string) {
   return variantRepo.findAllByProductId(productId);
-}
-
-// --- Helpers ---
-
-function hasCode(e: unknown, code: string): boolean {
-  return typeof e === "object" && e !== null && "code" in e && (e as { code: string }).code === code;
 }

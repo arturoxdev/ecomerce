@@ -1,11 +1,11 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
-import { toast } from "sonner";
+import { useActionState } from "react";
 
+import { Field } from "@/components/admin/field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useFormActionToast } from "@/hooks/use-form-action-toast";
 
 import type { StaticPageFormState } from "./actions";
 
@@ -24,27 +24,20 @@ type Props = {
 
 export function ContactForm({ action, defaultValues, canWrite }: Props) {
   const [state, formAction, pending] = useActionState(action, {});
-
-  useEffect(() => {
-    if (state.success) {
-      toast.success("Contact page updated");
-    } else if (state.error) {
-      toast.error(state.error);
-    }
-  }, [state]);
+  useFormActionToast(state, "Contact page updated");
 
   return (
     <form action={formAction} className="space-y-6">
       <div className="grid gap-5 md:grid-cols-2">
-        <Field label="Title" error={state.fieldErrors?.title?.[0]}>
+        <Field label="Title" error={state.fieldErrors?.title?.[0]} className="space-y-2">
           <Input name="title" defaultValue={defaultValues.title} disabled={!canWrite} />
         </Field>
-        <Field label="Email" error={state.fieldErrors?.email?.[0]}>
+        <Field label="Email" error={state.fieldErrors?.email?.[0]} className="space-y-2">
           <Input name="email" defaultValue={defaultValues.email} disabled={!canWrite} />
         </Field>
       </div>
 
-      <Field label="Subtitle" error={state.fieldErrors?.subtitle?.[0]}>
+      <Field label="Subtitle" error={state.fieldErrors?.subtitle?.[0]} className="space-y-2">
         <textarea
           name="subtitle"
           defaultValue={defaultValues.subtitle}
@@ -55,12 +48,13 @@ export function ContactForm({ action, defaultValues, canWrite }: Props) {
       </Field>
 
       <div className="grid gap-5 md:grid-cols-2">
-        <Field label="Phone" error={state.fieldErrors?.phone?.[0]}>
+        <Field label="Phone" error={state.fieldErrors?.phone?.[0]} className="space-y-2">
           <Input name="phone" defaultValue={defaultValues.phone} disabled={!canWrite} />
         </Field>
         <Field
           label="Business hours"
           error={state.fieldErrors?.businessHours?.[0]}
+          className="space-y-2"
         >
           <Input
             name="businessHours"
@@ -70,7 +64,7 @@ export function ContactForm({ action, defaultValues, canWrite }: Props) {
         </Field>
       </div>
 
-      <Field label="Location" error={state.fieldErrors?.location?.[0]}>
+      <Field label="Location" error={state.fieldErrors?.location?.[0]} className="space-y-2">
         <textarea
           name="location"
           defaultValue={defaultValues.location}
@@ -92,23 +86,5 @@ export function ContactForm({ action, defaultValues, canWrite }: Props) {
         </div>
       ) : null}
     </form>
-  );
-}
-
-function Field({
-  label,
-  error,
-  children,
-}: {
-  label: string;
-  error?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="space-y-2">
-      <Label className="text-sm font-semibold text-slate-700">{label}</Label>
-      {children}
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
-    </div>
   );
 }

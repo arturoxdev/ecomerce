@@ -2,6 +2,8 @@
 
 import { useActionState, useRef, useState } from "react";
 
+import { Field } from "@/components/admin/field";
+import { MarkdownEditor } from "@/components/admin/markdown-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,8 +16,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MarkdownEditor } from "@/components/admin/markdown-editor";
-import { cn, toSlug } from "@/lib/utils";
+import { useSlugField } from "@/hooks/use-slug-field";
+import { cn } from "@/lib/utils";
 
 import type { ProductFormState, VariantFormState } from "./actions";
 import { VariantManager } from "./variant-manager";
@@ -68,10 +70,10 @@ export function ProductForm({
   updateVariantAction,
 }: Props) {
   const [state, formAction, pending] = useActionState(action, {});
-
-  const [name, setName] = useState(defaultValues?.name ?? "");
-  const [slug, setSlug] = useState(defaultValues?.slug ?? "");
-  const [slugTouched, setSlugTouched] = useState(!!defaultValues?.slug);
+  const { name, slug, handleNameChange, handleSlugChange } = useSlugField(
+    defaultValues?.name,
+    defaultValues?.slug,
+  );
 
   const [description, setDescription] = useState(defaultValues?.description ?? "");
   const [about, setAbout] = useState(defaultValues?.about ?? "");
@@ -81,19 +83,6 @@ export function ProductForm({
   );
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const value = e.target.value;
-    setName(value);
-    if (!slugTouched) {
-      setSlug(toSlug(value));
-    }
-  }
-
-  function handleSlugChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setSlugTouched(true);
-    setSlug(e.target.value);
-  }
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
@@ -394,20 +383,3 @@ export function ProductForm({
   );
 }
 
-function Field({
-  label,
-  children,
-  error,
-}: {
-  label: string;
-  children: React.ReactNode;
-  error?: string;
-}) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <Label>{label}</Label>
-      {children}
-      {error && <p className="text-xs text-destructive">{error}</p>}
-    </div>
-  );
-}

@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { Pencil, Plus, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -113,8 +114,16 @@ export function VariantManager({
 
   async function handleDelete(variantId: string) {
     setDeleting(variantId);
-    await deleteVariant(variantId);
-    setDeleting(null);
+    try {
+      const result = await deleteVariant(variantId);
+      if (result.error) {
+        toast.error(result.error);
+      }
+    } catch {
+      toast.error("Failed to delete variant");
+    } finally {
+      setDeleting(null);
+    }
   }
 
   return (

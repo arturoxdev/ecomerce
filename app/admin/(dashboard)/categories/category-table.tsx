@@ -2,9 +2,9 @@
 
 import { ChevronDown, ChevronUp, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
 import { toast } from "sonner";
+
+import { useDeleteDialog } from "@/hooks/use-delete-dialog";
 
 import {
   AlertDialog,
@@ -42,9 +42,7 @@ type Props = {
 };
 
 export function CategoryTable({ categories, canWrite = true }: Props) {
-  const router = useRouter();
-  const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const { targetId: deleteId, isPending, startTransition, openDialog: setDeleteId, closeDialog, confirmDelete } = useDeleteDialog();
 
   function handleReorder(index: number, direction: "up" | "down") {
     const newCategories = [...categories];
@@ -61,24 +59,12 @@ export function CategoryTable({ categories, canWrite = true }: Props) {
       const result = await updateCategoryOrder(items);
       if (result.error) {
         toast.error(result.error);
-      } else {
-        router.refresh();
       }
     });
   }
 
   function handleDelete() {
-    if (!deleteId) return;
-    startTransition(async () => {
-      const result = await deleteCategory(deleteId);
-      setDeleteId(null);
-      if (result.error) {
-        toast.error(result.error);
-      } else {
-        toast.success("Category deleted");
-        router.refresh();
-      }
-    });
+    confirmDelete(deleteCategory, "Category deleted");
   }
 
   if (categories.length === 0) {
@@ -166,7 +152,7 @@ export function CategoryTable({ categories, canWrite = true }: Props) {
         </Table>
       </div>
 
-      <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && setDeleteId(null)}>
+      <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && closeDialog()}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete category?</AlertDialogTitle>

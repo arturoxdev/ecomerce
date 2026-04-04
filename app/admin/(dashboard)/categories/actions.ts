@@ -6,8 +6,10 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { requireWriteAccess } from "@/lib/auth/session";
+import { isForeignKeyViolation, isUniqueViolation } from "@/lib/db/errors";
 import { categories } from "@/lib/db/schema";
 import * as categoryRepo from "@/lib/repositories/category";
+import type { FormState } from "@/lib/types/form-state";
 import { toSlug } from "@/lib/utils";
 
 const categorySchema = z.object({
@@ -16,11 +18,7 @@ const categorySchema = z.object({
   description: z.string().optional(),
 });
 
-export type CategoryFormState = {
-  success?: boolean;
-  error?: string;
-  fieldErrors?: Record<string, string[]>;
-};
+export type CategoryFormState = FormState;
 
 export async function createCategory(
   _prev: CategoryFormState,
@@ -47,7 +45,7 @@ export async function createCategory(
     const nextOrder = (existing[0]?.sortOrder ?? -1) + 1;
     await categoryRepo.create({ ...parsed.data, slug: toSlug(parsed.data.slug), sortOrder: nextOrder });
   } catch (e: unknown) {
-    if (hasCode(e, "23505")) {
+    if (isUniqueViolation(e)) {
       return { fieldErrors: { slug: ["Slug already exists"] } };
     }
     return { error: "Failed to create category" };
@@ -77,7 +75,7 @@ export async function updateCategory(
   try {
     await categoryRepo.update(id, { ...parsed.data, slug: toSlug(parsed.data.slug) });
   } catch (e: unknown) {
-    if (hasCode(e, "23505")) {
+    if (isUniqueViolation(e)) {
       return { fieldErrors: { slug: ["Slug already exists"] } };
     }
     return { error: "Failed to update category" };
@@ -122,7 +120,7 @@ export async function deleteCategory(id: string): Promise<CategoryFormState> {
   try {
     await categoryRepo.remove(id);
   } catch (e: unknown) {
-    if (hasCode(e, "23503")) {
+    if (isForeignKeyViolation(e)) {
       return { error: "Cannot delete: category has associated products" };
     }
     return { error: "Failed to delete category" };
@@ -130,10 +128,4 @@ export async function deleteCategory(id: string): Promise<CategoryFormState> {
 
   revalidatePath("/admin/categories");
   return { success: true };
-}
-
-// --- Helpers ---
-
-function hasCode(e: unknown, code: string): boolean {
-  return typeof e === "object" && e !== null && "code" in e && (e as { code: string }).code === code;
 }

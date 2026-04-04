@@ -44,11 +44,9 @@ const faqSchema = z.object({
   sortOrder: z.coerce.number().int().min(0, "Sort order must be 0 or more"),
 });
 
-export type StaticPageFormState = {
-  success?: boolean;
-  error?: string;
-  fieldErrors?: Record<string, string[]>;
-};
+import type { FormState } from "@/lib/types/form-state";
+
+export type StaticPageFormState = FormState;
 
 function revalidateStaticPage(slug: string) {
   revalidatePath("/admin/pages");
