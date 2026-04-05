@@ -20,5 +20,9 @@ export function useSlugField(defaultName?: string, defaultSlug?: string) {
     setSlug(e.target.value);
   }
 
-  return { name, slug, handleNameChange, handleSlugChange };
+  function handleSlugBlur() {
+    if (slug) setSlug(toSlug(slug));
+  }
+
+  return { name, slug, handleNameChange, handleSlugChange, handleSlugBlur };
 }

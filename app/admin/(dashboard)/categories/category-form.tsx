@@ -20,14 +20,10 @@ type Props = {
 
 export function CategoryForm({ action, defaultValues }: Props) {
   const [state, formAction, pending] = useActionState(action, {});
-  const { name, slug, handleNameChange, handleSlugChange } = useSlugField(
+  const { name, slug, handleNameChange, handleSlugChange, handleSlugBlur } = useSlugField(
     defaultValues?.name,
     defaultValues?.slug,
   );
-
-  function handleSlugBlur() {
-    if (slug) setSlug(toSlug(slug));
-  }
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
