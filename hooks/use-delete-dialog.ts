@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
-import type { FormState } from "@/lib/types/form-state";
+import { isFormError, type FormState } from "@/lib/types/form-state";
 
 export function useDeleteDialog() {
   const router = useRouter();
@@ -27,8 +27,8 @@ export function useDeleteDialog() {
     startTransition(async () => {
       const result = await action(targetId);
       setTargetId(null);
-      if (result.error) {
-        toast.error(result.error);
+      if (isFormError(result)) {
+        toast.error(result.detail ?? result.title);
       } else {
         toast.success(successMessage);
         router.refresh();

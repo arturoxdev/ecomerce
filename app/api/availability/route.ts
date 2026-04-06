@@ -1,12 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import * as availabilityRepo from "@/lib/repositories/availability";
-import * as productRepo from "@/lib/repositories/product";
-import * as variantRepo from "@/lib/repositories/variant";
+import {
+  findProductById,
+  findVariantById,
+  findByDateRange,
+} from "@/lib/data/products";
+import { problemResponse } from "@/lib/api/problem-response";
+import { notFoundProblem, internalProblem } from "@/lib/problems";
+import { ProblemType } from "@/lib/types/problem-detail";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+function badRequest(detail: string) {
+  return problemResponse({
+    type: ProblemType.VALIDATION_ERROR,
+    status: 400,
+    title: "Bad request",
+    detail,
+  });
+}
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -16,70 +30,46 @@ export async function GET(request: NextRequest) {
   const end = searchParams.get("end");
 
   // Presence checks
-  if (!productId)
-    return NextResponse.json(
-      { error: "productId is required" },
-      { status: 400 }
-    );
-  if (!start)
-    return NextResponse.json({ error: "start is required" }, { status: 400 });
-  if (!end)
-    return NextResponse.json({ error: "end is required" }, { status: 400 });
+  if (!productId) return badRequest("productId is required");
+  if (!start) return badRequest("start is required");
+  if (!end) return badRequest("end is required");
 
   // UUID format check
   if (!UUID_RE.test(productId))
-    return NextResponse.json(
-      { error: "productId must be a valid UUID" },
-      { status: 400 }
-    );
+    return badRequest("productId must be a valid UUID");
   if (variantId && !UUID_RE.test(variantId))
-    return NextResponse.json(
-      { error: "variantId must be a valid UUID" },
-      { status: 400 }
-    );
+    return badRequest("variantId must be a valid UUID");
 
   // Date format check
   if (!DATE_RE.test(start))
-    return NextResponse.json(
-      { error: "Invalid date format for start. Use YYYY-MM-DD" },
-      { status: 400 }
-    );
+    return badRequest("Invalid date format for start. Use YYYY-MM-DD");
   if (!DATE_RE.test(end))
-    return NextResponse.json(
-      { error: "Invalid date format for end. Use YYYY-MM-DD" },
-      { status: 400 }
-    );
+    return badRequest("Invalid date format for end. Use YYYY-MM-DD");
 
   const startDate = new Date(start);
   const endDate = new Date(end);
 
-  if (isNaN(startDate.getTime()))
-    return NextResponse.json({ error: "Invalid start date" }, { status: 400 });
-  if (isNaN(endDate.getTime()))
-    return NextResponse.json({ error: "Invalid end date" }, { status: 400 });
-  if (endDate <= startDate)
-    return NextResponse.json(
-      { error: "end must be after start" },
-      { status: 400 }
-    );
+  if (isNaN(startDate.getTime())) return badRequest("Invalid start date");
+  if (isNaN(endDate.getTime())) return badRequest("Invalid end date");
+  if (endDate <= startDate) return badRequest("end must be after start");
 
   // Product lookup
-  const product = await productRepo.findById(productId);
+  const product = await findProductById(productId);
   if (!product || !product.isActive)
-    return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    return problemResponse(notFoundProblem("Product not found"));
 
   // If variantId provided, validate it belongs to the product
   let stock = product.stock ?? 0;
   if (variantId) {
-    const variant = await variantRepo.findById(variantId);
+    const variant = await findVariantById(variantId);
     if (!variant || variant.productId !== productId || !variant.isActive)
-      return NextResponse.json({ error: "Variant not found" }, { status: 404 });
+      return problemResponse(notFoundProblem("Variant not found"));
     stock = variant.stock;
   }
 
   // Availability aggregate query + business logic
   try {
-    const result = await availabilityRepo.findByDateRange(
+    const result = await findByDateRange(
       productId,
       startDate,
       endDate,
@@ -103,9 +93,6 @@ export async function GET(request: NextRequest) {
       pricingModel: product.priceType,
     });
   } catch {
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return problemResponse(internalProblem("Internal server error"));
   }
 }

@@ -97,8 +97,8 @@ export function FaqManager({ locale, items, canWrite }: Props) {
         sortOrder: Number(createDraft.sortOrder),
       });
 
-      if (result.error) {
-        toast.error(result.error);
+      if ("type" in result) {
+        toast.error(result.detail ?? result.title);
         return;
       }
 
@@ -119,8 +119,8 @@ export function FaqManager({ locale, items, canWrite }: Props) {
         sortOrder: Number(editDraft.sortOrder),
       });
 
-      if (result.error) {
-        toast.error(result.error);
+      if ("type" in result) {
+        toast.error(result.detail ?? result.title);
         return;
       }
 
@@ -136,8 +136,8 @@ export function FaqManager({ locale, items, canWrite }: Props) {
     startTransition(async () => {
       const result = await deleteFaqEntry(deleteId);
       setDeleteId(null);
-      if (result.error) {
-        toast.error(result.error);
+      if ("type" in result) {
+        toast.error(result.detail ?? result.title);
         return;
       }
 

@@ -8,7 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import { createManualBlock, type ManualBlockFormState } from "../../actions";
+import { isFormError, getFieldErrors, type FormState } from "@/lib/types/form-state";
+import { createManualBlock } from "../../actions";
+
+type ManualBlockFormState = FormState;
 
 type Props = {
   productId: string;
@@ -18,18 +21,19 @@ export function ManualBlockForm({ productId }: Props) {
   const boundAction = createManualBlock.bind(null, productId);
   const [state, formAction, isPending] = useActionState<ManualBlockFormState, FormData>(
     boundAction,
-    {},
+    {} as ManualBlockFormState,
   );
+  const fieldErrors = getFieldErrors(state);
 
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    if (state.success) {
+    if ("success" in state && state.success) {
       toast.success("Block created successfully");
       formRef.current?.reset();
     }
-    if (state.error) {
-      toast.error(state.error);
+    if (isFormError(state)) {
+      toast.error(state.detail ?? state.title);
     }
   }, [state]);
 
@@ -38,24 +42,24 @@ export function ManualBlockForm({ productId }: Props) {
       <div className="space-y-1.5">
         <Label htmlFor="startDate">Start date</Label>
         <Input id="startDate" name="startDate" type="date" required />
-        {state.fieldErrors?.startDate && (
-          <p className="text-sm text-red-600">{state.fieldErrors.startDate[0]}</p>
+        {fieldErrors?.startDate && (
+          <p className="text-sm text-red-600">{fieldErrors.startDate[0]}</p>
         )}
       </div>
 
       <div className="space-y-1.5">
         <Label htmlFor="endDate">End date</Label>
         <Input id="endDate" name="endDate" type="date" required />
-        {state.fieldErrors?.endDate && (
-          <p className="text-sm text-red-600">{state.fieldErrors.endDate[0]}</p>
+        {fieldErrors?.endDate && (
+          <p className="text-sm text-red-600">{fieldErrors.endDate[0]}</p>
         )}
       </div>
 
       <div className="space-y-1.5">
         <Label htmlFor="reason">Reason (optional)</Label>
         <Input id="reason" name="reason" type="text" maxLength={255} />
-        {state.fieldErrors?.reason && (
-          <p className="text-sm text-red-600">{state.fieldErrors.reason[0]}</p>
+        {fieldErrors?.reason && (
+          <p className="text-sm text-red-600">{fieldErrors.reason[0]}</p>
         )}
       </div>
 

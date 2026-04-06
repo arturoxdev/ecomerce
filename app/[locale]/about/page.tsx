@@ -5,7 +5,7 @@ import {
   StaticPageHero,
 } from "@/components/public/static-pages";
 import { isLocale, type Locale } from "@/lib/i18n/config";
-import { getAboutPage } from "@/lib/static-pages/service";
+import { getAboutPage } from "@/lib/data/pages";
 
 type Props = {
   params: Promise<{ locale: string }>;

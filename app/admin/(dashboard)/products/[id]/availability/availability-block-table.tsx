@@ -58,8 +58,8 @@ export function AvailabilityBlockTable({ blocks }: Props) {
     startTransition(async () => {
       const result = await deleteManualBlock(deleteId);
       setDeleteId(null);
-      if (result.error) {
-        toast.error(result.error);
+      if ("type" in result) {
+        toast.error(result.detail ?? result.title);
       } else {
         toast.success("Block deleted");
         router.refresh();

@@ -11,9 +11,9 @@ import { asc } from "drizzle-orm";
 
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
-import * as categoryRepo from "@/lib/repositories/category";
+import { findAll as findAllCategories } from "@/lib/data/categories";
 import { findThumbnail } from "@/lib/media";
-import * as productRepo from "@/lib/repositories/product";
+import { findAllWithCategory } from "@/lib/data/products";
 import { categories as categoriesTable } from "@/lib/db/schema";
 
 type HomeProps = {
@@ -30,8 +30,8 @@ export default async function Home({ params }: HomeProps) {
   const m = getMessages(typedLocale);
 
   const [dbCategories, dbProducts] = await Promise.all([
-    categoryRepo.findAll({ orderBy: asc(categoriesTable.sortOrder), limit: 6 }),
-    productRepo.findAllWithCategory({
+    findAllCategories({ orderBy: asc(categoriesTable.sortOrder), limit: 6 }),
+    findAllWithCategory({
       where: { isActive: true },
       limit: 6,
     }),

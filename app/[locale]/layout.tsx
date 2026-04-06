@@ -8,7 +8,7 @@ import { siteConfig } from "@/lib/config/site";
 import { categories as categoriesTable } from "@/lib/db/schema";
 import { isLocale, locales, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
-import * as categoryRepo from "@/lib/repositories/category";
+import { findAll as findAllCategories } from "@/lib/data/categories";
 
 function interpolate(text: string): string {
   return text
@@ -67,7 +67,7 @@ export default async function LocaleLayout({
 
   const typedLocale = locale as Locale;
   const messages = getMessages(typedLocale);
-  const cats = await categoryRepo.findAll({
+  const cats = await findAllCategories({
     columns: { name: true, slug: true },
     orderBy: asc(categoriesTable.sortOrder),
   });

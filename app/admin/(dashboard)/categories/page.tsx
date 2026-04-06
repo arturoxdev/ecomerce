@@ -4,14 +4,14 @@ import { canWriteData } from "@/lib/auth/permissions";
 import { getSessionUser } from "@/lib/auth/session";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/admin/site-header";
-import * as categoryRepo from "@/lib/repositories/category";
+import { findAllWithProductCount } from "@/lib/data/categories";
 
 import { CategoryTable } from "./category-table";
 
 export default async function AdminCategoriesPage() {
   const user = await getSessionUser();
   const canWrite = canWriteData(user.role);
-  const categoriesWithProducts = await categoryRepo.findAllWithProductCount();
+  const categoriesWithProducts = await findAllWithProductCount();
 
   const categories = categoriesWithProducts.map((c) => ({
     ...c,

@@ -60,8 +60,8 @@ export function CategoryTable({ categories, canWrite = true }: Props) {
 
     startTransition(async () => {
       const result = await updateCategoryOrder(items);
-      if (result.error) {
-        toast.error(result.error);
+      if ("type" in result) {
+        toast.error(result.detail ?? result.title);
       }
     });
   }

@@ -61,8 +61,8 @@ export default function AdminLoginPage() {
             </div>
           </div>
 
-          {state?.error && (
-            <p className="text-sm text-red-600">{state.error}</p>
+          {state?.detail && (
+            <p className="text-sm text-red-600">{state.detail}</p>
           )}
 
           <button

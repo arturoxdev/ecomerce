@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useFormActionToast } from "@/hooks/use-form-action-toast";
 
-import type { StaticPageFormState } from "./actions";
+import { getFieldErrors, type FormState as StaticPageFormState } from "@/lib/types/form-state";
 
 type Props = {
   action: (prev: StaticPageFormState, formData: FormData) => Promise<StaticPageFormState>;
@@ -23,21 +23,22 @@ type Props = {
 };
 
 export function ContactForm({ action, defaultValues, canWrite }: Props) {
-  const [state, formAction, pending] = useActionState(action, {});
+  const [state, formAction, pending] = useActionState(action, {} as StaticPageFormState);
+  const fieldErrors = getFieldErrors(state);
   useFormActionToast(state, "Contact page updated");
 
   return (
     <form action={formAction} className="space-y-6">
       <div className="grid gap-5 md:grid-cols-2">
-        <Field label="Title" error={state.fieldErrors?.title?.[0]} className="space-y-2">
+        <Field label="Title" error={fieldErrors?.title?.[0]} className="space-y-2">
           <Input name="title" defaultValue={defaultValues.title} disabled={!canWrite} />
         </Field>
-        <Field label="Email" error={state.fieldErrors?.email?.[0]} className="space-y-2">
+        <Field label="Email" error={fieldErrors?.email?.[0]} className="space-y-2">
           <Input name="email" defaultValue={defaultValues.email} disabled={!canWrite} />
         </Field>
       </div>
 
-      <Field label="Subtitle" error={state.fieldErrors?.subtitle?.[0]} className="space-y-2">
+      <Field label="Subtitle" error={fieldErrors?.subtitle?.[0]} className="space-y-2">
         <textarea
           name="subtitle"
           defaultValue={defaultValues.subtitle}
@@ -48,12 +49,12 @@ export function ContactForm({ action, defaultValues, canWrite }: Props) {
       </Field>
 
       <div className="grid gap-5 md:grid-cols-2">
-        <Field label="Phone" error={state.fieldErrors?.phone?.[0]} className="space-y-2">
+        <Field label="Phone" error={fieldErrors?.phone?.[0]} className="space-y-2">
           <Input name="phone" defaultValue={defaultValues.phone} disabled={!canWrite} />
         </Field>
         <Field
           label="Business hours"
-          error={state.fieldErrors?.businessHours?.[0]}
+          error={fieldErrors?.businessHours?.[0]}
           className="space-y-2"
         >
           <Input
@@ -64,7 +65,7 @@ export function ContactForm({ action, defaultValues, canWrite }: Props) {
         </Field>
       </div>
 
-      <Field label="Location" error={state.fieldErrors?.location?.[0]} className="space-y-2">
+      <Field label="Location" error={fieldErrors?.location?.[0]} className="space-y-2">
         <textarea
           name="location"
           defaultValue={defaultValues.location}

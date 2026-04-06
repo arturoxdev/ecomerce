@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import type { VariantFormState } from "./actions";
+import { isFormError, getFieldErrors, type FormState as VariantFormState } from "@/lib/types/form-state";
 import { deleteVariant } from "./actions";
 
 type Variant = {
@@ -42,12 +42,13 @@ function VariantInlineForm({
   onCancel: () => void;
   submitLabel: string;
 }) {
-  const [state, formAction, pending] = useActionState(action, {});
+  const [state, formAction, pending] = useActionState(action, {} as VariantFormState);
+  const fieldErrors = getFieldErrors(state);
 
   return (
     <form action={formAction} className="flex flex-col gap-3 rounded-md border border-gray-200 bg-gray-50 p-4">
-      {state.error && (
-        <p className="text-xs text-red-600">{state.error}</p>
+      {isFormError(state) && (
+        <p className="text-xs text-red-600">{state.detail ?? state.title}</p>
       )}
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="flex flex-col gap-1">
@@ -58,8 +59,8 @@ function VariantInlineForm({
             placeholder="e.g. Rosa"
             required
           />
-          {state.fieldErrors?.name && (
-            <p className="text-xs text-red-600">{state.fieldErrors.name[0]}</p>
+          {fieldErrors?.name && (
+            <p className="text-xs text-red-600">{fieldErrors.name[0]}</p>
           )}
         </div>
         <div className="flex flex-col gap-1">
@@ -73,8 +74,8 @@ function VariantInlineForm({
             placeholder="0.00"
             required
           />
-          {state.fieldErrors?.price && (
-            <p className="text-xs text-red-600">{state.fieldErrors.price[0]}</p>
+          {fieldErrors?.price && (
+            <p className="text-xs text-red-600">{fieldErrors.price[0]}</p>
           )}
         </div>
         <div className="flex flex-col gap-1">
@@ -86,8 +87,8 @@ function VariantInlineForm({
             defaultValue={defaultValues?.stock ?? "1"}
             required
           />
-          {state.fieldErrors?.stock && (
-            <p className="text-xs text-red-600">{state.fieldErrors.stock[0]}</p>
+          {fieldErrors?.stock && (
+            <p className="text-xs text-red-600">{fieldErrors.stock[0]}</p>
           )}
         </div>
       </div>
@@ -116,8 +117,8 @@ export function VariantManager({
     setDeleting(variantId);
     try {
       const result = await deleteVariant(variantId);
-      if (result.error) {
-        toast.error(result.error);
+      if (isFormError(result)) {
+        toast.error(result.detail ?? result.title);
       }
     } catch {
       toast.error("Failed to delete variant");

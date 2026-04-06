@@ -4,8 +4,8 @@ import { notFound } from "next/navigation";
 import { CategoryFilter } from "@/components/catalog/category-filter";
 import { ProductCard } from "@/components/catalog/product-card";
 import { categories, products } from "@/lib/db/schema";
-import * as categoryRepo from "@/lib/repositories/category";
-import * as productRepo from "@/lib/repositories/product";
+import { findAll as findAllCategories } from "@/lib/data/categories";
+import { findAllByCategorySlug, findAllWithCategory } from "@/lib/data/products";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
 
@@ -28,17 +28,17 @@ export default async function CatalogPage({
 
   const { category: categorySlug } = await searchParams;
 
-  const categoryList = await categoryRepo.findAll({
+  const categoryList = await findAllCategories({
     orderBy: asc(categories.sortOrder),
     columns: { id: true, name: true, slug: true },
   });
 
   const productList =
     categorySlug && categorySlug !== "all"
-      ? await productRepo.findAllByCategorySlug(categorySlug, {
+      ? await findAllByCategorySlug(categorySlug, {
           orderBy: asc(products.name),
         })
-      : await productRepo.findAllWithCategory({
+      : await findAllWithCategory({
           where: { isActive: true },
           orderBy: asc(products.name),
         });

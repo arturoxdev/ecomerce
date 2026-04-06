@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { SiteHeader } from "@/components/admin/site-header";
-import * as categoryRepo from "@/lib/repositories/category";
+import { findById } from "@/lib/data/categories";
 
 import { updateCategory } from "../../actions";
 import { CategoryForm } from "../../category-form";
@@ -20,7 +20,7 @@ type Props = {
 export default async function EditCategoryPage({ params }: Props) {
   const { id } = await params;
 
-  const category = await categoryRepo.findById(id);
+  const category = await findById(id);
   if (!category) notFound();
 
   const boundAction = updateCategory.bind(null, id);

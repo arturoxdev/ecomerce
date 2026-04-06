@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { UserRole } from "@/lib/db/schema";
 
-import type { UserFormState } from "./actions";
+import { isFormError, getFieldErrors, type FormState as UserFormState } from "@/lib/types/form-state";
 
 type User = {
   id: string;
@@ -25,14 +25,15 @@ type Props = {
 };
 
 export function UserForm({ action, assignableRoles, user }: Props) {
-  const [state, formAction, pending] = useActionState(action, {});
+  const [state, formAction, pending] = useActionState(action, {} as UserFormState);
+  const fieldErrors = getFieldErrors(state);
   const router = useRouter();
 
   return (
     <form action={formAction} className="space-y-6">
-      {state?.error && (
+      {isFormError(state) && (
         <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">
-          {state.error}
+          {state.detail ?? state.title}
         </div>
       )}
 
@@ -44,8 +45,8 @@ export function UserForm({ action, assignableRoles, user }: Props) {
           defaultValue={user?.name ?? ""}
           required
         />
-        {state?.fieldErrors?.name && (
-          <p className="text-sm text-red-600">{state.fieldErrors.name[0]}</p>
+        {fieldErrors?.name && (
+          <p className="text-sm text-red-600">{fieldErrors.name[0]}</p>
         )}
       </div>
 
@@ -58,8 +59,8 @@ export function UserForm({ action, assignableRoles, user }: Props) {
           defaultValue={user?.email ?? ""}
           required
         />
-        {state?.fieldErrors?.email && (
-          <p className="text-sm text-red-600">{state.fieldErrors.email[0]}</p>
+        {fieldErrors?.email && (
+          <p className="text-sm text-red-600">{fieldErrors.email[0]}</p>
         )}
       </div>
 
@@ -73,8 +74,8 @@ export function UserForm({ action, assignableRoles, user }: Props) {
             placeholder="Minimum 8 characters"
             required
           />
-          {state?.fieldErrors?.password && (
-            <p className="text-sm text-red-600">{state.fieldErrors.password[0]}</p>
+          {fieldErrors?.password && (
+            <p className="text-sm text-red-600">{fieldErrors.password[0]}</p>
           )}
         </div>
       )}

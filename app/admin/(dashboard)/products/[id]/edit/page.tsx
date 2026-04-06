@@ -5,9 +5,8 @@ import { ChevronLeft } from "lucide-react";
 
 import { categories } from "@/lib/db/schema";
 import { Separator } from "@/components/ui/separator";
-import * as categoryRepo from "@/lib/repositories/category";
-import * as productRepo from "@/lib/repositories/product";
-import * as variantRepo from "@/lib/repositories/variant";
+import { findAll as findAllCategories } from "@/lib/data/categories";
+import { findProductById, findAllVariantsByProductId } from "@/lib/data/products";
 
 import { createVariant, updateProduct, updateVariant } from "../../actions";
 import { ProductForm } from "../../product-form";
@@ -20,12 +19,12 @@ export default async function EditProductPage({ params }: Props) {
   const { id } = await params;
 
   const [product, categoryList, variants] = await Promise.all([
-    productRepo.findById(id),
-    categoryRepo.findAll({
+    findProductById(id),
+    findAllCategories({
       columns: { id: true, name: true },
       orderBy: asc(categories.sortOrder),
     }),
-    variantRepo.findAllByProductId(id),
+    findAllVariantsByProductId(id),
   ]);
 
   if (!product) notFound();

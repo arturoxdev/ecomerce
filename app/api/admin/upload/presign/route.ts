@@ -5,6 +5,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 import { getStoreId } from "@/lib/config/tenant";
+import { problemResponse } from "@/lib/api/problem-response";
+import { validationProblem } from "@/lib/problems";
+import { ProblemType } from "@/lib/types/problem-detail";
 import {
   ALL_MEDIA_MIME_TYPES,
   getMaxSizeForMime,
@@ -26,10 +29,7 @@ export async function POST(request: NextRequest) {
   const parsed = presignSchema.safeParse(body);
 
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.flatten().fieldErrors },
-      { status: 400 },
-    );
+    return problemResponse(validationProblem(parsed.error));
   }
 
   const { filename, contentType, fileSize } = parsed.data;
@@ -38,10 +38,12 @@ export async function POST(request: NextRequest) {
   if (fileSize > maxSize) {
     const limitMB = maxSize / (1024 * 1024);
     const typeLabel = isVideoMime(contentType) ? "Videos" : "Images";
-    return NextResponse.json(
-      { error: `${typeLabel} must be under ${limitMB}MB` },
-      { status: 400 },
-    );
+    return problemResponse({
+      type: ProblemType.VALIDATION_ERROR,
+      status: 400,
+      title: "File too large",
+      detail: `${typeLabel} must be under ${limitMB}MB`,
+    });
   }
 
   const ext = filename.split(".").pop()?.toLowerCase() ?? "bin";

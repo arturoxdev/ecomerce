@@ -3,9 +3,11 @@
 import { AuthError } from "next-auth";
 
 import { signIn } from "@/auth";
+import { unauthorizedProblem } from "@/lib/problems";
+import type { ProblemDetail } from "@/lib/types/problem-detail";
 
 export async function loginAction(
-  _prev: { error: string } | undefined,
+  _prev: ProblemDetail | undefined,
   formData: FormData,
 ) {
   try {
@@ -16,7 +18,7 @@ export async function loginAction(
     });
   } catch (error) {
     if (error instanceof AuthError) {
-      return { error: "Invalid credentials" };
+      return unauthorizedProblem("Invalid credentials");
     }
     throw error;
   }

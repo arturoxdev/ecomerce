@@ -6,8 +6,8 @@ import { canWriteData } from "@/lib/auth/permissions";
 import { categories, products } from "@/lib/db/schema";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/admin/site-header";
-import * as categoryRepo from "@/lib/repositories/category";
-import * as productRepo from "@/lib/repositories/product";
+import { findAll as findAllCategories } from "@/lib/data/categories";
+import { findAllWithCategory, countProducts } from "@/lib/data/products";
 
 import { ProductFilters } from "./product-status-filter";
 import { ProductTable } from "./product-table";
@@ -37,14 +37,14 @@ export default async function AdminProductsPage({ searchParams }: Props) {
   if (search) where.search = search;
 
   const [productList, total, categoryList] = await Promise.all([
-    productRepo.findAllWithCategory({
+    findAllWithCategory({
       offset: skip,
       limit: PAGE_SIZE,
       where,
       orderBy: desc(products.createdAt),
     }),
-    productRepo.count(where),
-    categoryRepo.findAll({ orderBy: asc(categories.name) }),
+    countProducts(where),
+    findAllCategories({ orderBy: asc(categories.name) }),
   ]);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);

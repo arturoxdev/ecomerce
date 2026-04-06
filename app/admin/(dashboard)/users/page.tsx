@@ -1,10 +1,7 @@
-import { asc, eq } from "drizzle-orm";
 import Link from "next/link";
 
 import { getSessionUser } from "@/lib/auth/session";
-import { getStoreId } from "@/lib/config/tenant";
-import { db } from "@/lib/db";
-import { users } from "@/lib/db/schema";
+import { findAllByStore } from "@/lib/data/users";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/admin/site-header";
 
@@ -27,10 +24,7 @@ export default async function AdminUsersPage() {
     );
   }
 
-  const userList = await db.query.users.findMany({
-    where: eq(users.storeId, getStoreId()),
-    orderBy: asc(users.createdAt),
-  });
+  const userList = await findAllByStore();
 
   return (
     <>

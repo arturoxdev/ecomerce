@@ -1,8 +1,14 @@
+import "server-only";
+
 import { and, asc, eq, gt, lt, SQL } from "drizzle-orm";
 
 import { getStoreId } from "@/lib/config/tenant";
 import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
+
+// ---------------------------------------------------------------------------
+// Reads
+// ---------------------------------------------------------------------------
 
 export function findAll(opts?: {
   orderBy?: SQL;
@@ -25,6 +31,21 @@ export function findById(id: string) {
   });
 }
 
+export function findByDateRange(startDate: Date, endDate: Date) {
+  return db.query.orders.findMany({
+    where: and(
+      eq(orders.storeId, getStoreId()),
+      lt(orders.rentStartDate, endDate),
+      gt(orders.rentEndDate, startDate),
+    ),
+    orderBy: [asc(orders.rentStartDate)],
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Mutations
+// ---------------------------------------------------------------------------
+
 export function create(data: Omit<typeof orders.$inferInsert, "storeId">) {
   return db
     .insert(orders)
@@ -43,15 +64,4 @@ export function update(
     .where(and(eq(orders.id, id), eq(orders.storeId, getStoreId())))
     .returning()
     .then((r) => r[0]);
-}
-
-export function findByDateRange(startDate: Date, endDate: Date) {
-  return db.query.orders.findMany({
-    where: and(
-      eq(orders.storeId, getStoreId()),
-      lt(orders.rentStartDate, endDate),
-      gt(orders.rentEndDate, startDate),
-    ),
-    orderBy: [asc(orders.rentStartDate)],
-  });
 }

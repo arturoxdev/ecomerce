@@ -78,8 +78,8 @@ export function ProductTable({ products, page, totalPages, status, category, sea
   function handleToggle(productId: string) {
     startTransition(async () => {
       const result = await toggleProductActive(productId);
-      if (result.error) {
-        toast.error(result.error);
+      if ("type" in result) {
+        toast.error(result.detail ?? result.title);
       }
     });
   }

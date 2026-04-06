@@ -28,7 +28,8 @@ import {
   MAX_MEDIA_COUNT,
 } from "@/lib/media";
 
-import type { ProductFormState, VariantFormState } from "./actions";
+import { isFormError, getFieldErrors, type FormState as ProductFormState } from "@/lib/types/form-state";
+type VariantFormState = ProductFormState;
 import { appendProductPhoto, removeProductPhoto } from "./actions";
 import { VariantManager } from "./variant-manager";
 
@@ -82,14 +83,15 @@ export function ProductForm({
   createVariantAction,
   updateVariantAction,
 }: Props) {
-  const [state, formAction, pending] = useActionState(action, {});
+  const [state, formAction, pending] = useActionState(action, {} as ProductFormState);
+  const fieldErrors = getFieldErrors(state);
   const { name, slug, handleNameChange, handleSlugChange } = useSlugField(
     defaultValues?.name,
     defaultValues?.slug,
   );
 
   useEffect(() => {
-    if (state.success) {
+    if ("success" in state && state.success) {
       toast.success("Product saved");
     }
   }, [state]);
@@ -137,7 +139,7 @@ export function ProductForm({
 
         if (!presignRes.ok) {
           const err = await presignRes.json();
-          toast.error(typeof err.error === "string" ? err.error : "Upload failed", {
+          toast.error(err.detail ?? err.title ?? "Upload failed", {
             description: file.name,
           });
           continue;
@@ -162,8 +164,8 @@ export function ProductForm({
         // Persist to DB immediately if editing an existing product
         if (productId) {
           const result = await appendProductPhoto(productId, publicUrl);
-          if (result.error) {
-            toast.error(result.error);
+          if ("type" in result) {
+            toast.error(result.detail ?? result.title);
             continue;
           }
         }
@@ -180,8 +182,8 @@ export function ProductForm({
   async function handleRemovePhoto(url: string) {
     if (productId) {
       const result = await removeProductPhoto(productId, url);
-      if (result.error) {
-        toast.error(result.error);
+      if ("type" in result) {
+        toast.error(result.detail ?? result.title);
         return;
       }
       toast.success("File removed");
@@ -189,14 +191,14 @@ export function ProductForm({
     setPhotos((prev) => prev.filter((p) => p !== url));
   }
 
-  const hasBasicErrors = state.fieldErrors && BASIC_FIELDS.some((f) => state.fieldErrors?.[f]);
-  const hasAboutErrors = state.fieldErrors && ABOUT_FIELDS.some((f) => state.fieldErrors?.[f]);
+  const hasBasicErrors = fieldErrors && BASIC_FIELDS.some((f) => fieldErrors?.[f]);
+  const hasAboutErrors = fieldErrors && ABOUT_FIELDS.some((f) => fieldErrors?.[f]);
 
   return (
     <form action={formAction} className="flex flex-col gap-6">
-      {state.error && (
+      {isFormError(state) && (
         <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-          {state.error}
+          {state.detail ?? state.title}
         </div>
       )}
 
@@ -226,7 +228,7 @@ export function ProductForm({
               </p>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Name" error={state.fieldErrors?.name?.[0]}>
+              <Field label="Name" error={fieldErrors?.name?.[0]}>
                 <Input
                   name="name"
                   value={name}
@@ -236,7 +238,7 @@ export function ProductForm({
                 />
               </Field>
 
-              <Field label="Slug" error={state.fieldErrors?.slug?.[0]}>
+              <Field label="Slug" error={fieldErrors?.slug?.[0]}>
                 <Input
                   name="slug"
                   value={slug}
@@ -247,7 +249,7 @@ export function ProductForm({
               </Field>
             </div>
 
-            <Field label="Description" error={state.fieldErrors?.description?.[0]}>
+            <Field label="Description" error={fieldErrors?.description?.[0]}>
               <textarea
                 name="description"
                 value={description}
@@ -278,7 +280,7 @@ export function ProductForm({
               </p>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Category" error={state.fieldErrors?.categoryId?.[0]}>
+              <Field label="Category" error={fieldErrors?.categoryId?.[0]}>
                 <Select
                   name="categoryId"
                   defaultValue={defaultValues?.categoryId}
@@ -297,7 +299,7 @@ export function ProductForm({
                 </Select>
               </Field>
 
-              <Field label="Price type" error={state.fieldErrors?.priceType?.[0]}>
+              <Field label="Price type" error={fieldErrors?.priceType?.[0]}>
                 <Select name="priceType" defaultValue={defaultValues?.priceType ?? "FIXED"}>
                   <SelectTrigger>
                     <SelectValue />
@@ -311,7 +313,7 @@ export function ProductForm({
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Base price" error={state.fieldErrors?.basePrice?.[0]}>
+              <Field label="Base price" error={fieldErrors?.basePrice?.[0]}>
                 <Input
                   name="basePrice"
                   type="number"
@@ -323,7 +325,7 @@ export function ProductForm({
                 />
               </Field>
 
-              <Field label="Stock" error={state.fieldErrors?.stock?.[0]}>
+              <Field label="Stock" error={fieldErrors?.stock?.[0]}>
                 <Input
                   name="stock"
                   type="number"
@@ -345,7 +347,7 @@ export function ProductForm({
               </p>
             </div>
 
-            <Field label="Photos & Videos" error={state.fieldErrors?.photos?.[0]}>
+            <Field label="Photos & Videos" error={fieldErrors?.photos?.[0]}>
               <input type="hidden" name="photos" value={photos.join("\n")} />
 
               {photos.length > 0 && (
@@ -439,7 +441,7 @@ export function ProductForm({
               Rich text description displayed on the product page.
             </p>
           </div>
-          <Field label="Content" error={state.fieldErrors?.about?.[0]}>
+          <Field label="Content" error={fieldErrors?.about?.[0]}>
             <MarkdownEditor
               value={about}
               onChange={setAbout}

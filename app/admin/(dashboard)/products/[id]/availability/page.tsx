@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { SiteHeader } from "@/components/admin/site-header";
-import * as productRepo from "@/lib/repositories/product";
+import { findProductById } from "@/lib/data/products";
 
 import { getProductBlocks } from "../../actions";
 import { AvailabilityBlockTable } from "./availability-block-table";
@@ -20,7 +20,7 @@ type Props = {
 export default async function ProductAvailabilityPage({ params }: Props) {
   const { id } = await params;
 
-  const product = await productRepo.findById(id);
+  const product = await findProductById(id);
   if (!product) notFound();
 
   const blocks = await getProductBlocks(id);

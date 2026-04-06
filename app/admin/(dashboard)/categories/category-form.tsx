@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSlugField } from "@/hooks/use-slug-field";
 
-import type { CategoryFormState } from "./actions";
+import { isFormError, getFieldErrors, type FormState } from "@/lib/types/form-state";
 
 type Props = {
-  action: (prev: CategoryFormState, formData: FormData) => Promise<CategoryFormState>;
+  action: (prev: FormState, formData: FormData) => Promise<FormState>;
   defaultValues?: {
     name?: string;
     slug?: string;
@@ -19,7 +19,8 @@ type Props = {
 };
 
 export function CategoryForm({ action, defaultValues }: Props) {
-  const [state, formAction, pending] = useActionState(action, {});
+  const [state, formAction, pending] = useActionState(action, {} as FormState);
+  const fieldErrors = getFieldErrors(state);
   const { name, slug, handleNameChange, handleSlugChange, handleSlugBlur } = useSlugField(
     defaultValues?.name,
     defaultValues?.slug,
@@ -27,23 +28,23 @@ export function CategoryForm({ action, defaultValues }: Props) {
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
-      {state.error && (
+      {isFormError(state) && (
         <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
-          {state.error}
+          {state.detail ?? state.title}
         </p>
       )}
 
       <div className="grid gap-5 sm:grid-cols-2">
-        <Field label="Name" error={state.fieldErrors?.name?.[0]}>
+        <Field label="Name" error={fieldErrors?.name?.[0]}>
           <Input name="name" value={name} onChange={handleNameChange} required />
         </Field>
 
-        <Field label="Slug" error={state.fieldErrors?.slug?.[0]}>
+        <Field label="Slug" error={fieldErrors?.slug?.[0]}>
           <Input name="slug" value={slug} onChange={handleSlugChange} onBlur={handleSlugBlur} required />
         </Field>
       </div>
 
-      <Field label="Description" error={state.fieldErrors?.description?.[0]}>
+      <Field label="Description" error={fieldErrors?.description?.[0]}>
         <textarea
           name="description"
           defaultValue={defaultValues?.description}

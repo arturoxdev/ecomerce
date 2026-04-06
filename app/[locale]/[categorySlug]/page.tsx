@@ -5,8 +5,8 @@ import { notFound } from "next/navigation";
 
 import { ProductCard } from "@/components/catalog/product-card";
 import { products } from "@/lib/db/schema";
-import * as categoryRepo from "@/lib/repositories/category";
-import * as productRepo from "@/lib/repositories/product";
+import { findBySlug } from "@/lib/data/categories";
+import { findAllByCategorySlug } from "@/lib/data/products";
 import { siteConfig } from "@/lib/config/site";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
@@ -19,7 +19,7 @@ export async function generateMetadata({
   params,
 }: CategoryLandingProps): Promise<Metadata> {
   const { categorySlug } = await params;
-  const category = await categoryRepo.findBySlug(categorySlug);
+  const category = await findBySlug(categorySlug);
   if (!category) return {};
   return {
     title: `${category.name} | ${siteConfig.name}`,
@@ -38,12 +38,12 @@ export default async function CategoryLandingPage({
   const typedLocale = locale as Locale;
   const m = getMessages(typedLocale);
 
-  const category = await categoryRepo.findBySlug(categorySlug);
+  const category = await findBySlug(categorySlug);
   if (!category) {
     notFound();
   }
 
-  const productList = await productRepo.findAllByCategorySlug(categorySlug, {
+  const productList = await findAllByCategorySlug(categorySlug, {
     orderBy: asc(products.name),
   });
 
