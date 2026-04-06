@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 
-import { FaqSection, StaticPageHero } from "@/components/public/static-pages";
+import { FaqSection, StaticPageHero } from "@/features/static-pages";
 import { siteConfig } from "@/lib/config/site";
 import { isLocale, type Locale } from "@/lib/i18n/config";
-import { getFaqEntries } from "@/lib/data/pages";
+import { getFaqEntries } from "@/features/static-pages";
 
 type Props = {
   params: Promise<{ locale: string }>;

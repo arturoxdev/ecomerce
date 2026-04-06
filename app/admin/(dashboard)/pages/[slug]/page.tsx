@@ -1,31 +1,33 @@
 import { notFound } from "next/navigation";
 
-import { canWriteData } from "@/lib/auth/permissions";
-import { getSessionUser } from "@/lib/auth/session";
 import {
+  AboutForm,
+  ContactForm,
+  MarkdownForm,
+  FaqManager,
+  EditorCard,
+  PagesEditorShell,
+  saveAboutPage,
+  saveContactPage,
+  saveLegalDocument,
   findAboutByLocale,
   findContactByLocale,
   findLegalBySlugAndLocale,
-  getFaqEntries,
-} from "@/lib/data/pages";
+} from "@/features/admin-pages";
+import { canWriteData } from "@/features/auth";
+import { getSessionUser } from "@/features/auth";
+import { getFaqEntries } from "@/features/static-pages";
 import {
   getStaticPageDefinition,
   isLegalPageSlug,
   isStaticPageSlug,
-} from "@/lib/static-pages/catalog";
+} from "@/features/static-pages";
 import {
   aboutPageFallbacks,
   contactPageFallbacks,
   legalPageFallbacks,
-} from "@/lib/static-pages/fallbacks";
+} from "@/features/static-pages";
 import { isLocale, type Locale } from "@/lib/i18n/config";
-
-import { AboutForm } from "../about-form";
-import { saveAboutPage, saveContactPage, saveLegalDocument } from "../actions";
-import { ContactForm } from "../contact-form";
-import { EditorCard, PagesEditorShell } from "../editor-shell";
-import { FaqManager } from "../faq-manager";
-import { MarkdownForm } from "../markdown-form";
 
 type Props = {
   params: Promise<{ slug: string }>;

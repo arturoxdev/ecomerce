@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 
-import { getSessionUser } from "@/lib/auth/session";
-import { getAssignableRoles } from "@/lib/auth/permissions";
-import { findById } from "@/lib/data/users";
+import { updateUser, UserForm, findUserById as findById } from "@/features/admin-users";
+import { getSessionUser } from "@/features/auth";
+import { getAssignableRoles } from "@/features/auth";
 import {
   Card,
   CardContent,
@@ -11,9 +11,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { SiteHeader } from "@/components/admin/site-header";
-
-import { updateUser } from "../../actions";
-import { UserForm } from "../../user-form";
 
 type Props = {
   params: Promise<{ id: string }>;

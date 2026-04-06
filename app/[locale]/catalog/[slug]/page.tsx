@@ -4,12 +4,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { AvailabilityChecker } from "@/components/catalog/availability-checker";
-import { ProductGallery } from "@/components/catalog/product-gallery";
-import { VariantSelector } from "@/components/catalog/variant-selector";
-import { MarkdownContent } from "@/components/public/markdown-content";
+import {
+  AvailabilityChecker,
+  ProductGallery,
+  VariantSelector,
+  findProductBySlug as findBySlug,
+  findBySlugMeta,
+} from "@/features/catalog";
+import { MarkdownContent } from "@/features/static-pages";
 import { Badge } from "@/components/ui/badge";
-import { findBySlug, findBySlugMeta } from "@/lib/data/products";
 import { siteConfig } from "@/lib/config/site";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";

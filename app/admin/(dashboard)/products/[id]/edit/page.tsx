@@ -3,13 +3,10 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 
+import { createVariant, updateProduct, updateVariant, ProductForm } from "@/features/admin-products";
+import { findAllCategories, findProductById, findAllVariantsByProductId } from "@/features/catalog";
 import { categories } from "@/lib/db/schema";
 import { Separator } from "@/components/ui/separator";
-import { findAll as findAllCategories } from "@/lib/data/categories";
-import { findProductById, findAllVariantsByProductId } from "@/lib/data/products";
-
-import { createVariant, updateProduct, updateVariant } from "../../actions";
-import { ProductForm } from "../../product-form";
 
 type Props = {
   params: Promise<{ id: string }>;

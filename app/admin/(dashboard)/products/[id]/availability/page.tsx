@@ -6,12 +6,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getProductBlocks, AvailabilityBlockTable, ManualBlockForm } from "@/features/admin-products";
+import { findProductById } from "@/features/catalog";
 import { SiteHeader } from "@/components/admin/site-header";
-import { findProductById } from "@/lib/data/products";
-
-import { getProductBlocks } from "../../actions";
-import { AvailabilityBlockTable } from "./availability-block-table";
-import { ManualBlockForm } from "./manual-block-form";
 
 type Props = {
   params: Promise<{ id: string }>;

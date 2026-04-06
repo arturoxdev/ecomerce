@@ -5,7 +5,7 @@ import { z } from "zod";
 import { problemResponse } from "@/lib/api/problem-response";
 import { validationProblem, internalProblem } from "@/lib/problems";
 import { ProblemType } from "@/lib/types/problem-detail";
-import { s3Bucket, s3Client, s3PublicUrl } from "@/lib/minio";
+import { s3Bucket, s3Client, s3PublicUrl } from "@/features/media";
 
 const deleteSchema = z.object({
   url: z.string().url(),

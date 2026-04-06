@@ -8,7 +8,7 @@ import { siteConfig } from "@/lib/config/site";
 import { categories as categoriesTable } from "@/lib/db/schema";
 import { isLocale, locales, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
-import { findAll as findAllCategories } from "@/lib/data/categories";
+import { findAllCategories } from "@/features/catalog";
 
 function interpolate(text: string): string {
   return text

@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
 
-import { MarkdownContent } from "@/components/public/markdown-content";
+import { MarkdownContent } from "@/features/static-pages";
 import {
   DocumentShell,
   StaticPageHero,
-} from "@/components/public/static-pages";
+} from "@/features/static-pages";
 import { isLocale, type Locale } from "@/lib/i18n/config";
-import { getLegalDocument } from "@/lib/data/pages";
+import { getLegalDocument } from "@/features/static-pages";
 
 type Props = {
   params: Promise<{ locale: string }>;

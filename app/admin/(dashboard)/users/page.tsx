@@ -1,11 +1,9 @@
 import Link from "next/link";
 
-import { getSessionUser } from "@/lib/auth/session";
-import { findAllByStore } from "@/lib/data/users";
+import { findAllByStore, UserTable } from "@/features/admin-users";
+import { getSessionUser } from "@/features/auth";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/admin/site-header";
-
-import { UserTable } from "./user-table";
 
 export default async function AdminUsersPage() {
   const currentUser = await getSessionUser();

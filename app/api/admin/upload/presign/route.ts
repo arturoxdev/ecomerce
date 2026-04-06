@@ -12,8 +12,8 @@ import {
   ALL_MEDIA_MIME_TYPES,
   getMaxSizeForMime,
   isVideoMime,
-} from "@/lib/media";
-import { s3Bucket, s3Client, s3PublicUrl } from "@/lib/minio";
+} from "@/features/media";
+import { s3Bucket, s3Client, s3PublicUrl } from "@/features/media";
 
 const presignSchema = z.object({
   filename: z.string().min(1),

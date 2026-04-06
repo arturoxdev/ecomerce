@@ -1,11 +1,9 @@
 import { asc } from "drizzle-orm";
 
+import { createProduct, ProductForm } from "@/features/admin-products";
+import { findAllCategories } from "@/features/catalog";
 import { categories } from "@/lib/db/schema";
 import { SiteHeader } from "@/components/admin/site-header";
-import { findAll as findAllCategories } from "@/lib/data/categories";
-
-import { createProduct } from "../actions";
-import { ProductForm } from "../product-form";
 
 export default async function NewProductPage() {
   const categoryList = await findAllCategories({

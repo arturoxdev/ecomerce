@@ -4,7 +4,7 @@ import {
   findProductById,
   findVariantById,
   findByDateRange,
-} from "@/lib/data/products";
+} from "@/features/catalog";
 import { problemResponse } from "@/lib/api/problem-response";
 import { notFoundProblem, internalProblem } from "@/lib/problems";
 import { ProblemType } from "@/lib/types/problem-detail";

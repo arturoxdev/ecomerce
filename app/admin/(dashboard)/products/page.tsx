@@ -1,16 +1,13 @@
 import { asc, desc } from "drizzle-orm";
 import Link from "next/link";
 
-import { getSessionUser } from "@/lib/auth/session";
-import { canWriteData } from "@/lib/auth/permissions";
+import { ProductFilters, ProductTable } from "@/features/admin-products";
+import { findAllCategories, findAllWithCategory, countProducts } from "@/features/catalog";
+import { getSessionUser } from "@/features/auth";
+import { canWriteData } from "@/features/auth";
 import { categories, products } from "@/lib/db/schema";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/admin/site-header";
-import { findAll as findAllCategories } from "@/lib/data/categories";
-import { findAllWithCategory, countProducts } from "@/lib/data/products";
-
-import { ProductFilters } from "./product-status-filter";
-import { ProductTable } from "./product-table";
 
 const PAGE_SIZE = 20;
 

@@ -7,11 +7,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { updateCategory, CategoryForm } from "@/features/admin-categories";
+import { findCategoryById as findById } from "@/features/catalog";
 import { SiteHeader } from "@/components/admin/site-header";
-import { findById } from "@/lib/data/categories";
-
-import { updateCategory } from "../../actions";
-import { CategoryForm } from "../../category-form";
 
 type Props = {
   params: Promise<{ id: string }>;

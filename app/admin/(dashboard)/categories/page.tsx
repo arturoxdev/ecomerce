@@ -1,12 +1,11 @@
 import Link from "next/link";
 
-import { canWriteData } from "@/lib/auth/permissions";
-import { getSessionUser } from "@/lib/auth/session";
+import { CategoryTable } from "@/features/admin-categories";
+import { findAllWithProductCount } from "@/features/catalog";
+import { canWriteData } from "@/features/auth";
+import { getSessionUser } from "@/features/auth";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/admin/site-header";
-import { findAllWithProductCount } from "@/lib/data/categories";
-
-import { CategoryTable } from "./category-table";
 
 export default async function AdminCategoriesPage() {
   const user = await getSessionUser();
