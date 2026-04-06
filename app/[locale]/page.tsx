@@ -167,7 +167,7 @@ export default async function Home({ params }: HomeProps) {
 
                     return (
                       <Link
-                        href={`/${typedLocale}/catalog/${product.category.slug}/${product.slug}`}
+                        href={`/${typedLocale}/catalog/${product.slug}`}
                         className="group rounded-xl border border-[#f1f5f9] bg-[#f8f7f5] p-4 transition-all duration-300 hover:shadow-lg"
                         key={product.id}
                       >
