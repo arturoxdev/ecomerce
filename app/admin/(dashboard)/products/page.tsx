@@ -1,16 +1,13 @@
 import { asc, desc } from "drizzle-orm";
 import Link from "next/link";
 
-import { getSessionUser } from "@/lib/auth/session";
-import { canWriteData } from "@/lib/auth/permissions";
+import { ProductFilters, ProductTable } from "@/features/admin-products";
+import { findAllCategories, findAllWithCategory, countProducts } from "@/features/catalog";
+import { getSessionUser } from "@/features/auth";
+import { canWriteData } from "@/features/auth";
 import { categories, products } from "@/lib/db/schema";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/admin/site-header";
-import * as categoryRepo from "@/lib/repositories/category";
-import * as productRepo from "@/lib/repositories/product";
-
-import { ProductFilters } from "./product-status-filter";
-import { ProductTable } from "./product-table";
 
 const PAGE_SIZE = 20;
 
@@ -37,14 +34,14 @@ export default async function AdminProductsPage({ searchParams }: Props) {
   if (search) where.search = search;
 
   const [productList, total, categoryList] = await Promise.all([
-    productRepo.findAllWithCategory({
+    findAllWithCategory({
       offset: skip,
       limit: PAGE_SIZE,
       where,
       orderBy: desc(products.createdAt),
     }),
-    productRepo.count(where),
-    categoryRepo.findAll({ orderBy: asc(categories.name) }),
+    countProducts(where),
+    findAllCategories({ orderBy: asc(categories.name) }),
   ]);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);

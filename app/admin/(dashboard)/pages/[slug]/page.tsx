@@ -1,29 +1,33 @@
 import { notFound } from "next/navigation";
 
-import { canWriteData } from "@/lib/auth/permissions";
-import { getSessionUser } from "@/lib/auth/session";
-import { getFaqEntries } from "@/lib/static-pages/service";
+import {
+  AboutForm,
+  ContactForm,
+  MarkdownForm,
+  FaqManager,
+  EditorCard,
+  PagesEditorShell,
+  saveAboutPage,
+  saveContactPage,
+  saveLegalDocument,
+  findAboutByLocale,
+  findContactByLocale,
+  findLegalBySlugAndLocale,
+} from "@/features/admin-pages";
+import { canWriteData } from "@/features/auth";
+import { getSessionUser } from "@/features/auth";
+import { getFaqEntries } from "@/features/static-pages";
 import {
   getStaticPageDefinition,
   isLegalPageSlug,
   isStaticPageSlug,
-} from "@/lib/static-pages/catalog";
+} from "@/features/static-pages";
 import {
   aboutPageFallbacks,
   contactPageFallbacks,
   legalPageFallbacks,
-} from "@/lib/static-pages/fallbacks";
-import * as aboutPageRepo from "@/lib/repositories/about-page";
-import * as contactPageRepo from "@/lib/repositories/contact-page";
-import * as legalDocumentRepo from "@/lib/repositories/legal-document";
+} from "@/features/static-pages";
 import { isLocale, type Locale } from "@/lib/i18n/config";
-
-import { AboutForm } from "../about-form";
-import { saveAboutPage, saveContactPage, saveLegalDocument } from "../actions";
-import { ContactForm } from "../contact-form";
-import { EditorCard, PagesEditorShell } from "../editor-shell";
-import { FaqManager } from "../faq-manager";
-import { MarkdownForm } from "../markdown-form";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -57,7 +61,7 @@ export default async function AdminStaticPagePage({ params, searchParams }: Prop
         ...aboutPageFallbacks[locale],
       };
     try {
-      content = (await aboutPageRepo.findByLocale(locale)) ?? content;
+      content = (await findAboutByLocale(locale)) ?? content;
     } catch {}
 
     const boundAction = saveAboutPage.bind(null, locale);
@@ -78,7 +82,7 @@ export default async function AdminStaticPagePage({ params, searchParams }: Prop
         ...contactPageFallbacks[locale],
       };
     try {
-      content = (await contactPageRepo.findByLocale(locale)) ?? content;
+      content = (await findContactByLocale(locale)) ?? content;
     } catch {}
 
     const boundAction = saveContactPage.bind(null, locale);
@@ -103,7 +107,7 @@ export default async function AdminStaticPagePage({ params, searchParams }: Prop
         ...legalPageFallbacks[slug][locale],
       };
     try {
-      content = (await legalDocumentRepo.findBySlugAndLocale(slug, locale)) ?? content;
+      content = (await findLegalBySlugAndLocale(slug, locale)) ?? content;
     } catch {}
 
     const boundAction = saveLegalDocument.bind(null, slug, locale);

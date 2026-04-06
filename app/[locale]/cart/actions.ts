@@ -5,8 +5,8 @@ import { z } from "zod";
 import { getStoreId } from "@/lib/config/tenant";
 import { db } from "@/lib/db";
 import { availability, orderItems, orders } from "@/lib/db/schema";
-import * as productRepo from "@/lib/repositories/product";
-import * as settingRepo from "@/lib/repositories/setting";
+import { findByIdWithVariants } from "@/features/catalog";
+import * as settingRepo from "@/lib/data/settings";
 import { sql } from "drizzle-orm";
 
 export async function getStoreSettings() {
@@ -71,7 +71,7 @@ export async function placeOrder(
     }> = [];
 
     for (const item of data.items) {
-      const product = await productRepo.findByIdWithVariants(item.productId);
+      const product = await findByIdWithVariants(item.productId);
       if (!product || !product.isActive) {
         unavailableItems.push(item.productId);
         continue;

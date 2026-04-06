@@ -3,9 +3,9 @@ import { notFound } from "next/navigation";
 import {
   ContactInfoSection,
   StaticPageHero,
-} from "@/components/public/static-pages";
+} from "@/features/static-pages";
 import { isLocale, type Locale } from "@/lib/i18n/config";
-import { getContactPage } from "@/lib/static-pages/service";
+import { getContactPage } from "@/features/static-pages";
 
 type Props = {
   params: Promise<{ locale: string }>;

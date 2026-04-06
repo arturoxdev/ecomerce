@@ -3,7 +3,7 @@
 import { Lock } from "lucide-react";
 import { useActionState } from "react";
 
-import { loginAction } from "@/app/admin/login/actions";
+import { loginAction } from "@/features/auth/actions";
 import { siteConfig } from "@/lib/config/site";
 
 export default function AdminLoginPage() {
@@ -61,8 +61,8 @@ export default function AdminLoginPage() {
             </div>
           </div>
 
-          {state?.error && (
-            <p className="text-sm text-red-600">{state.error}</p>
+          {state?.detail && (
+            <p className="text-sm text-red-600">{state.detail}</p>
           )}
 
           <button

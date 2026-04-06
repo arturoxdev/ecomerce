@@ -5,7 +5,7 @@ import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar";
-import { getSessionUser } from "@/lib/auth/session";
+import { getSessionUser } from "@/features/auth";
 
 export default async function AdminLayout({
   children,

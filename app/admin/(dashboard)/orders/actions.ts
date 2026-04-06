@@ -3,7 +3,7 @@
 import { desc } from "drizzle-orm";
 
 import { orders } from "@/lib/db/schema";
-import * as orderRepo from "@/lib/repositories/order";
+import * as orderRepo from "@/features/admin-orders";
 
 const PAGE_SIZE = 20;
 

@@ -2,11 +2,23 @@ import { PutObjectCommand } from '@aws-sdk/client-s3'
 import { randomUUID } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 
-import { requireWriteAccess } from '@/lib/auth/session'
+import { requireWriteAccess } from '@/features/auth'
 import { getStoreId } from '@/lib/config/tenant'
-import { s3Bucket, s3Client, s3PublicUrl } from '@/lib/minio'
+import { problemResponse } from '@/lib/api/problem-response'
+import { internalProblem } from '@/lib/problems'
+import { ProblemType } from '@/lib/types/problem-detail'
+import { s3Bucket, s3Client, s3PublicUrl } from '@/features/media'
 
 const ALLOWED_EXTENSIONS = new Set(['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'avif'])
+
+function badRequest(detail: string) {
+  return problemResponse({
+    type: ProblemType.VALIDATION_ERROR,
+    status: 400,
+    title: "Bad request",
+    detail,
+  });
+}
 
 export async function POST(request: NextRequest) {
   await requireWriteAccess()
@@ -15,16 +27,16 @@ export async function POST(request: NextRequest) {
   const file = formData.get('file') as File | null
 
   if (!file) {
-    return NextResponse.json({ error: 'No file provided' }, { status: 400 })
+    return badRequest('No file provided')
   }
 
   const ext = file.name.split('.').pop()?.toLowerCase() ?? ''
   if (!ALLOWED_EXTENSIONS.has(ext)) {
-    return NextResponse.json({ error: 'File type not allowed' }, { status: 400 })
+    return badRequest('File type not allowed')
   }
 
   if (!file.type.startsWith('image/')) {
-    return NextResponse.json({ error: 'Only image files are allowed' }, { status: 400 })
+    return badRequest('Only image files are allowed')
   }
 
   const storeId = getStoreId()
@@ -39,8 +51,8 @@ export async function POST(request: NextRequest) {
       Body: buffer,
       ContentType: file.type,
     }))
-  } catch (err) {
-    return NextResponse.json({ error: 'Upload failed', detail: String(err) }, { status: 500 })
+  } catch {
+    return problemResponse(internalProblem('Upload failed'))
   }
 
   const url = `${s3PublicUrl}/${s3Bucket}/${objectName}`

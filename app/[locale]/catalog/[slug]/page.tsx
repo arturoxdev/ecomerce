@@ -4,11 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { ProductDetailActions } from "@/components/catalog/product-detail-actions";
-import { ProductGallery } from "@/components/catalog/product-gallery";
-import { MarkdownContent } from "@/components/public/markdown-content";
+import { ProductDetailActions, ProductGallery } from "@/features/catalog/components";
+import { findProductBySlug as findBySlug, findBySlugMeta } from "@/features/catalog";
+import { MarkdownContent } from "@/features/static-pages";
 import { Badge } from "@/components/ui/badge";
-import * as productRepo from "@/lib/repositories/product";
 import { siteConfig } from "@/lib/config/site";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
@@ -21,7 +20,7 @@ export async function generateMetadata({
   params,
 }: ProductDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = await productRepo.findBySlugMeta(slug);
+  const product = await findBySlugMeta(slug);
   if (!product) return {};
   return {
     title: `${product.name} | ${siteConfig.name}`,
@@ -40,7 +39,7 @@ export default async function ProductDetailPage({
   const typedLocale = locale as Locale;
   const m = getMessages(typedLocale);
 
-  const product = await productRepo.findBySlug(slug);
+  const product = await findBySlug(slug);
 
   if (!product || !product.isActive) {
     notFound();

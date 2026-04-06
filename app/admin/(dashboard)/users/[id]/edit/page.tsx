@@ -1,10 +1,8 @@
-import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
-import { getSessionUser } from "@/lib/auth/session";
-import { getAssignableRoles } from "@/lib/auth/permissions";
-import { db } from "@/lib/db";
-import { users } from "@/lib/db/schema";
+import { updateUser, UserForm, findUserById as findById } from "@/features/admin-users";
+import { getSessionUser } from "@/features/auth";
+import { getAssignableRoles } from "@/features/auth";
 import {
   Card,
   CardContent,
@@ -13,9 +11,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { SiteHeader } from "@/components/admin/site-header";
-
-import { updateUser } from "../../actions";
-import { UserForm } from "../../user-form";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -26,9 +21,7 @@ export default async function EditUserPage({ params }: Props) {
   const currentUser = await getSessionUser();
   const assignableRoles = getAssignableRoles(currentUser.role);
 
-  const user = await db.query.users.findFirst({
-    where: eq(users.id, id),
-  });
+  const user = await findById(id);
 
   if (!user) notFound();
 

@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
-import * as orderRepo from "@/lib/repositories/order";
+import * as orderRepo from "@/features/admin-orders";
 
 type Props = {
   params: Promise<{ locale: string; orderId: string }>;

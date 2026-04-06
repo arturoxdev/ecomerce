@@ -7,8 +7,7 @@ import {
 } from "@/components/ui/card";
 import { SiteHeader } from "@/components/admin/site-header";
 
-import { createCategory } from "../actions";
-import { CategoryForm } from "../category-form";
+import { createCategory, CategoryForm } from "@/features/admin-categories";
 
 export default function NewCategoryPage() {
   return (

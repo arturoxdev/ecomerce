@@ -7,11 +7,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { updateCategory, CategoryForm } from "@/features/admin-categories";
+import { findCategoryById as findById } from "@/features/catalog";
 import { SiteHeader } from "@/components/admin/site-header";
-import * as categoryRepo from "@/lib/repositories/category";
-
-import { updateCategory } from "../../actions";
-import { CategoryForm } from "../../category-form";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -20,7 +18,7 @@ type Props = {
 export default async function EditCategoryPage({ params }: Props) {
   const { id } = await params;
 
-  const category = await categoryRepo.findById(id);
+  const category = await findById(id);
   if (!category) notFound();
 
   const boundAction = updateCategory.bind(null, id);

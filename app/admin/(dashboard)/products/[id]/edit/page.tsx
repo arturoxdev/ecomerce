@@ -3,14 +3,10 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 
+import { createVariant, updateProduct, updateVariant, ProductForm } from "@/features/admin-products";
+import { findAllCategories, findProductById, findAllVariantsByProductId } from "@/features/catalog";
 import { categories } from "@/lib/db/schema";
 import { Separator } from "@/components/ui/separator";
-import * as categoryRepo from "@/lib/repositories/category";
-import * as productRepo from "@/lib/repositories/product";
-import * as variantRepo from "@/lib/repositories/variant";
-
-import { createVariant, updateProduct, updateVariant } from "../../actions";
-import { ProductForm } from "../../product-form";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -20,12 +16,12 @@ export default async function EditProductPage({ params }: Props) {
   const { id } = await params;
 
   const [product, categoryList, variants] = await Promise.all([
-    productRepo.findById(id),
-    categoryRepo.findAll({
+    findProductById(id),
+    findAllCategories({
       columns: { id: true, name: true },
       orderBy: asc(categories.sortOrder),
     }),
-    variantRepo.findAllByProductId(id),
+    findAllVariantsByProductId(id),
   ]);
 
   if (!product) notFound();

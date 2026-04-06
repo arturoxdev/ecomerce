@@ -4,7 +4,7 @@ import { CalendarDays, Trash2 } from "lucide-react";
 import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
-import { QuantitySelector } from "@/components/catalog/quantity-selector";
+import { QuantitySelector } from "@/features/catalog/components";
 import type { CartItem as CartItemType } from "@/lib/stores/cart-store";
 
 type Props = {

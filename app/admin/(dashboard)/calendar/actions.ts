@@ -1,7 +1,7 @@
 "use server";
 
 import { getStoreId } from "@/lib/config/tenant";
-import * as orderItemRepo from "@/lib/repositories/order-item";
+import { findOrderItemsByDate } from "@/features/admin-orders";
 
 export type ScheduleEntry = {
   type: "delivery" | "pickup";
@@ -20,7 +20,7 @@ export async function getScheduleForDate(
   const date = new Date(dateStr + "T00:00:00");
   const storeId = getStoreId();
 
-  const items = await orderItemRepo.findByDate(date);
+  const items = await findOrderItemsByDate(date);
 
   // Filter by storeId (since order-item query doesn't filter by store)
   const storeItems = items.filter((item) => item.order.storeId === storeId);

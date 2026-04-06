@@ -3,14 +3,14 @@
 import { useEffect } from "react";
 import { toast } from "sonner";
 
-import type { FormState } from "@/lib/types/form-state";
+import { isFormError, type FormState } from "@/lib/types/form-state";
 
 export function useFormActionToast(state: FormState, successMessage: string) {
   useEffect(() => {
-    if (state.success) {
+    if ("success" in state && state.success) {
       toast.success(successMessage);
-    } else if (state.error) {
-      toast.error(state.error);
+    } else if (isFormError(state)) {
+      toast.error(state.detail ?? state.title);
     }
   }, [state, successMessage]);
 }
