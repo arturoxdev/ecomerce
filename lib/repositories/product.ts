@@ -1,5 +1,6 @@
 import { and, count as countFn, eq, ilike, sql, SQL } from "drizzle-orm";
 
+import { getStoreId } from "@/lib/config/tenant";
 import { db } from "@/lib/db";
 import { categories, products } from "@/lib/db/schema";
 
@@ -9,13 +10,13 @@ export function findAll(opts?: {
   limit?: number;
   offset?: number;
 }) {
-  const conditions: SQL[] = [];
+  const conditions: SQL[] = [eq(products.storeId, getStoreId())];
   if (opts?.where?.isActive !== undefined) {
     conditions.push(eq(products.isActive, opts.where.isActive));
   }
 
   return db.query.products.findMany({
-    where: conditions.length > 0 ? and(...conditions) : undefined,
+    where: and(...conditions),
     orderBy: opts?.orderBy ? () => [opts.orderBy!] : undefined,
     limit: opts?.limit,
     offset: opts?.offset,
@@ -28,7 +29,7 @@ export function findAllWithCategory(opts?: {
   limit?: number;
   offset?: number;
 }) {
-  const conditions: SQL[] = [];
+  const conditions: SQL[] = [eq(products.storeId, getStoreId())];
   if (opts?.where?.isActive !== undefined) {
     conditions.push(eq(products.isActive, opts.where.isActive));
   }
@@ -40,7 +41,7 @@ export function findAllWithCategory(opts?: {
   }
 
   return db.query.products.findMany({
-    where: conditions.length > 0 ? and(...conditions) : undefined,
+    where: and(...conditions),
     orderBy: opts?.orderBy ? () => [opts.orderBy!] : undefined,
     limit: opts?.limit,
     offset: opts?.offset,
@@ -52,14 +53,16 @@ export async function findAllByCategorySlug(
   categorySlug: string,
   opts?: { orderBy?: SQL },
 ) {
+  const storeId = getStoreId();
   const category = await db.query.categories.findFirst({
-    where: eq(categories.slug, categorySlug),
+    where: and(eq(categories.slug, categorySlug), eq(categories.storeId, storeId)),
     columns: { id: true },
   });
   if (!category) return [];
 
   return db.query.products.findMany({
     where: and(
+      eq(products.storeId, storeId),
       eq(products.isActive, true),
       eq(products.categoryId, category.id),
     ),
@@ -70,35 +73,35 @@ export async function findAllByCategorySlug(
 
 export function findById(id: string) {
   return db.query.products.findFirst({
-    where: eq(products.id, id),
+    where: and(eq(products.id, id), eq(products.storeId, getStoreId())),
   });
 }
 
 export function findBySlug(slug: string) {
   return db.query.products.findFirst({
-    where: eq(products.slug, slug),
+    where: and(eq(products.slug, slug), eq(products.storeId, getStoreId())),
     with: { category: true, variants: true },
   });
 }
 
 export function findByIdWithVariants(id: string) {
   return db.query.products.findFirst({
-    where: eq(products.id, id),
+    where: and(eq(products.id, id), eq(products.storeId, getStoreId())),
     with: { variants: true },
   });
 }
 
 export function findBySlugMeta(slug: string) {
   return db.query.products.findFirst({
-    where: eq(products.slug, slug),
+    where: and(eq(products.slug, slug), eq(products.storeId, getStoreId())),
     columns: { name: true, description: true },
   });
 }
 
-export function create(data: typeof products.$inferInsert) {
+export function create(data: Omit<typeof products.$inferInsert, "storeId">) {
   return db
     .insert(products)
-    .values(data)
+    .values({ ...data, storeId: getStoreId() })
     .returning()
     .then((r) => r[0]);
 }
@@ -110,7 +113,7 @@ export function update(
   return db
     .update(products)
     .set(data)
-    .where(eq(products.id, id))
+    .where(and(eq(products.id, id), eq(products.storeId, getStoreId())))
     .returning()
     .then((r) => r[0]);
 }
@@ -119,7 +122,7 @@ export function appendPhoto(id: string, url: string) {
   return db
     .update(products)
     .set({ photos: sql`array_append(${products.photos}, ${url})` })
-    .where(eq(products.id, id))
+    .where(and(eq(products.id, id), eq(products.storeId, getStoreId())))
     .returning({ photos: products.photos })
     .then((r) => r[0]);
 }
@@ -128,24 +131,24 @@ export function removePhoto(id: string, url: string) {
   return db
     .update(products)
     .set({ photos: sql`array_remove(${products.photos}, ${url})` })
-    .where(eq(products.id, id))
+    .where(and(eq(products.id, id), eq(products.storeId, getStoreId())))
     .returning({ photos: products.photos })
     .then((r) => r[0]);
 }
 
 export function remove(id: string) {
-  return db.delete(products).where(eq(products.id, id));
+  return db.delete(products).where(and(eq(products.id, id), eq(products.storeId, getStoreId())));
 }
 
 export function toggleActive(id: string, currentIsActive: boolean) {
   return db
     .update(products)
     .set({ isActive: !currentIsActive })
-    .where(eq(products.id, id));
+    .where(and(eq(products.id, id), eq(products.storeId, getStoreId())));
 }
 
 export function count(where?: { isActive?: boolean; categoryId?: string; search?: string }) {
-  const conditions: SQL[] = [];
+  const conditions: SQL[] = [eq(products.storeId, getStoreId())];
   if (where?.isActive !== undefined) {
     conditions.push(eq(products.isActive, where.isActive));
   }
@@ -158,6 +161,6 @@ export function count(where?: { isActive?: boolean; categoryId?: string; search?
   return db
     .select({ count: countFn() })
     .from(products)
-    .where(conditions.length > 0 ? and(...conditions) : undefined)
+    .where(and(...conditions))
     .then((r) => r[0].count);
 }

@@ -1,11 +1,10 @@
-# Festejos Aurora
+# E-commerce Template (Multi-Tenant)
 
-> E-commerce de renta de equipo de fiestas en Estados Unidos — usuarios navegan catálogo, reservan con fechas y pagan el 50% de anticipo online.
+> Template reutilizable de e-commerce para renta de equipo — multiples tiendas comparten una sola base de datos, aisladas por `STORE_ID`.
 
 **Estado:** 🟡 En desarrollo
-**Tipo:** E-commerce
-**Cliente:** Externo
-**Deadline:** 26 de marzo de 2026
+**Tipo:** E-commerce Template
+**Arquitectura:** Multi-tenant (DB compartida, ver [ADR-005](decisions/adr-005-multi-tenant-shared-db.md))
 
 ---
 
@@ -31,6 +30,7 @@
 | ADR-002 | Authorize & Capture para resolver race condition en disponibilidad | Aceptado |
 | ADR-003 | Arquitectura repetible — repo multi-tenant con config por instancia | Aceptado |
 | ADR-004 | Migrar de Prisma a Drizzle ORM | Aceptado |
+| ADR-005 | Multi-tenant con base de datos compartida | Aceptado |
 
 → Ver índice completo en [decisions/README.md](decisions/README.md)
 
