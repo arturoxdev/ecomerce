@@ -8,7 +8,8 @@
     "catalogue": "Catalogue",
     "about": "About Us",
     "contact": "Contact",
-    "bookNow": "Book Now"
+    "bookNow": "Book Now",
+    "cart": "Cart"
   },
   "language": {
     "label": "Language",
@@ -117,5 +118,44 @@
       "invalidRange": "End date must be after start date",
       "errorFetch": "Could not check availability. Please try again."
     }
+  },
+  "cart": {
+    "title": "Your Cart",
+    "empty": "Your cart is empty",
+    "emptyDescription": "Browse our catalog to find items for your event.",
+    "browseCatalog": "Browse Catalog",
+    "product": "Product",
+    "dates": "Dates",
+    "quantity": "Qty",
+    "price": "Price",
+    "subtotal": "Subtotal",
+    "remove": "Remove",
+    "summary": "Order Summary",
+    "deliveryFee": "Delivery Fee",
+    "deposit": "Deposit",
+    "total": "Total",
+    "included": "Included",
+    "customerInfo": "Your Information",
+    "name": "Full Name",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Delivery Address",
+    "addressPlaceholder": "Enter your delivery address",
+    "confirmOrder": "Confirm Order",
+    "processing": "Processing...",
+    "addToCart": "Add to Cart",
+    "addedToCart": "Added to cart!",
+    "itemUnavailable": "Some items are no longer available",
+    "selectDatesFirst": "Select dates and check availability first",
+    "perUnit": "per unit"
+  },
+  "order": {
+    "confirmed": "Order Confirmed!",
+    "confirmedDescription": "Your order has been received. We'll contact you to confirm delivery details.",
+    "orderNumber": "Order Number",
+    "backToCatalog": "Back to Catalog",
+    "details": "Order Details",
+    "items": "Items",
+    "customerInfo": "Customer Information"
   }
 }

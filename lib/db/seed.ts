@@ -34,28 +34,75 @@ function requireStoreId(): string {
 }
 
 const storeId: string = requireStoreId();
+const isDemo = process.argv.includes("--demo");
 
-async function main() {
+// ── Bootstrap: minimal data every new store needs ─────────────
+
+async function bootstrap() {
+  // Settings
   await db
     .insert(settings)
     .values({ storeId })
     .onConflictDoUpdate({ target: settings.storeId, set: { storeId } });
 
+  // Admin user
   const adminPassword = await bcrypt.hash("admin123", 10);
   await db
     .insert(users)
     .values({
       storeId,
-      name: process.env.NEXT_PUBLIC_ADMIN_TITLE ?? "Admin",
-      email: process.env.ADMIN_EMAIL ?? "admin@example.com",
+      name: "Admin",
+      email: "admin@admin.com",
       passwordHash: adminPassword,
       role: "ROOT",
     })
     .onConflictDoUpdate({
       target: [users.storeId, users.email],
-      set: { name: process.env.NEXT_PUBLIC_ADMIN_TITLE ?? "Admin", role: "ROOT", passwordHash: adminPassword },
+      set: { name: "Admin", role: "ROOT", passwordHash: adminPassword },
     });
 
+  // Static pages (about, contact, legal, FAQ)
+  for (const locale of ["en", "es"] as const) {
+    const aboutContent = aboutPageFallbacks[locale];
+    await db
+      .insert(aboutPageContents)
+      .values({ storeId, slug: "about", locale, ...aboutContent })
+      .onConflictDoUpdate({
+        target: [aboutPageContents.storeId, aboutPageContents.slug, aboutPageContents.locale],
+        set: aboutContent,
+      });
+
+    const contactContent = contactPageFallbacks[locale];
+    await db
+      .insert(contactPageContents)
+      .values({ storeId, slug: "contact", locale, ...contactContent })
+      .onConflictDoUpdate({
+        target: [contactPageContents.storeId, contactPageContents.slug, contactPageContents.locale],
+        set: contactContent,
+      });
+
+    for (const slug of ["terms", "privacy", "refund-policy"] as const) {
+      const legalContent = legalPageFallbacks[slug][locale];
+      await db
+        .insert(legalPageDocuments)
+        .values({ storeId, slug, locale, ...legalContent })
+        .onConflictDoUpdate({
+          target: [legalPageDocuments.storeId, legalPageDocuments.slug, legalPageDocuments.locale],
+          set: legalContent,
+        });
+    }
+  }
+
+  await db.delete(faqEntries).where(eq(faqEntries.storeId, storeId));
+  await db.insert(faqEntries).values([
+    ...faqFallbacks.en.map((f) => ({ ...f, storeId })),
+    ...faqFallbacks.es.map((f) => ({ ...f, storeId })),
+  ]);
+}
+
+// ── Demo: sample categories & products for development ────────
+
+async function demo() {
   const categoryData = [
     {
       slug: "inflables",
@@ -143,60 +190,19 @@ async function main() {
         set: product,
       });
   }
+}
 
-  for (const locale of ["en", "es"] as const) {
-    const aboutContent = aboutPageFallbacks[locale];
-    await db
-      .insert(aboutPageContents)
-      .values({
-        storeId,
-        slug: "about",
-        locale,
-        ...aboutContent,
-      })
-      .onConflictDoUpdate({
-        target: [aboutPageContents.storeId, aboutPageContents.slug, aboutPageContents.locale],
-        set: aboutContent,
-      });
+// ── Main ──────────────────────────────────────────────────────
 
-    const contactContent = contactPageFallbacks[locale];
-    await db
-      .insert(contactPageContents)
-      .values({
-        storeId,
-        slug: "contact",
-        locale,
-        ...contactContent,
-      })
-      .onConflictDoUpdate({
-        target: [contactPageContents.storeId, contactPageContents.slug, contactPageContents.locale],
-        set: contactContent,
-      });
+async function main() {
+  await bootstrap();
 
-    for (const slug of ["terms", "privacy", "refund-policy"] as const) {
-      const legalContent = legalPageFallbacks[slug][locale];
-      await db
-        .insert(legalPageDocuments)
-        .values({
-          storeId,
-          slug,
-          locale,
-          ...legalContent,
-        })
-        .onConflictDoUpdate({
-          target: [legalPageDocuments.storeId, legalPageDocuments.slug, legalPageDocuments.locale],
-          set: legalContent,
-        });
-    }
+  if (isDemo) {
+    await demo();
+    console.log(`Seed (bootstrap + demo) completed for store: ${storeId}`);
+  } else {
+    console.log(`Seed (bootstrap) completed for store: ${storeId}`);
   }
-
-  await db.delete(faqEntries).where(eq(faqEntries.storeId, storeId));
-  await db.insert(faqEntries).values([
-    ...faqFallbacks.en.map((f) => ({ ...f, storeId })),
-    ...faqFallbacks.es.map((f) => ({ ...f, storeId })),
-  ]);
-
-  console.log(`Seed completed successfully for store: ${storeId}`);
 }
 
 main()

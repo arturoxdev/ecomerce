@@ -1,4 +1,4 @@
-// Data — Products
+// Data — Products (server-only)
 export {
   findAll as findAllProducts,
   findAllWithCategory,
@@ -16,23 +16,10 @@ export {
   findBlockById,
 } from "./data/products";
 
-// Data — Categories
+// Data — Categories (server-only)
 export {
   findAll as findAllCategories,
   findAllWithProductCount,
   findById as findCategoryById,
   findBySlug as findCategoryBySlug,
 } from "./data/categories";
-
-// Components
-export { ProductCard } from "./components/product-card";
-export type {
-  ProductCardProduct,
-  ProductCardLabels,
-} from "./components/product-card";
-export { CategoryFilter } from "./components/category-filter";
-export type { FilterCategory } from "./components/category-filter";
-export { AvailabilityChecker } from "./components/availability-checker";
-export type { AvailabilityLabels } from "./components/availability-checker";
-export { ProductGallery } from "./components/product-gallery";
-export { VariantSelector } from "./components/variant-selector";

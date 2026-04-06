@@ -440,7 +440,7 @@ export function checkOverlapAndCreate(
   endDate: Date,
   quantity: number,
   stock: number,
-  extra?: { reason?: string; variantId?: string | null },
+  extra?: { reason?: string; variantId?: string | null; orderId?: string | null },
 ) {
   const variantId = extra?.variantId ?? null;
 
@@ -475,7 +475,7 @@ export function checkOverlapAndCreate(
         startDate,
         endDate,
         quantity,
-        orderId: null,
+        orderId: extra?.orderId ?? null,
         ...(variantId ? { variantId } : {}),
         ...(extra?.reason ? { reason: extra.reason } : {}),
       })

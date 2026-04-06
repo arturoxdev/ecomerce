@@ -1,9 +1,8 @@
 import { asc } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
+import { CategoryFilter, ProductCard } from "@/features/catalog/components";
 import {
-  CategoryFilter,
-  ProductCard,
   findAllCategories,
   findAllByCategorySlug,
   findAllWithCategory,

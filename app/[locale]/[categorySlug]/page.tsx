@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ProductCard } from "@/features/catalog/components";
 import {
-  ProductCard,
   findCategoryBySlug as findBySlug,
   findAllByCategorySlug,
 } from "@/features/catalog";

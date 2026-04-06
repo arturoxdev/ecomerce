@@ -22,12 +22,19 @@ export type AvailabilityLabels = {
   errorFetch: string;
 };
 
+export type AvailabilityResult = {
+  startDate: Date;
+  endDate: Date;
+  available: number;
+};
+
 export type AvailabilityCheckerProps = {
   productId: string;
   variantId?: string | null;
   pricingModel: "FIXED" | "PER_UNIT";
   stock: number;
   labels: AvailabilityLabels;
+  onAvailabilityConfirmed?: (result: AvailabilityResult) => void;
 };
 
 type AvailabilityStatus =
@@ -57,6 +64,7 @@ export function AvailabilityChecker({
   variantId,
   pricingModel,
   labels,
+  onAvailabilityConfirmed,
 }: AvailabilityCheckerProps) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -136,6 +144,9 @@ export function AvailabilityChecker({
         const avail = Math.max(0, data.available);
         setAvailable(avail);
         setStatus(avail > 0 ? "available" : "unavailable");
+        if (avail > 0 && onAvailabilityConfirmed) {
+          onAvailabilityConfirmed({ startDate, endDate, available: avail });
+        }
       } catch {
         setStatus("error");
       }

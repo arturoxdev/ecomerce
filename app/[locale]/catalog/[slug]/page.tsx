@@ -4,13 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import {
-  AvailabilityChecker,
-  ProductGallery,
-  VariantSelector,
-  findProductBySlug as findBySlug,
-  findBySlugMeta,
-} from "@/features/catalog";
+import { ProductDetailActions, ProductGallery } from "@/features/catalog/components";
+import { findProductBySlug as findBySlug, findBySlugMeta } from "@/features/catalog";
 import { MarkdownContent } from "@/features/static-pages";
 import { Badge } from "@/components/ui/badge";
 import { siteConfig } from "@/lib/config/site";
@@ -104,83 +99,44 @@ export default async function ProductDetailPage({
               </p>
             )}
 
-            {hasVariants ? (
-              <VariantSelector
-                productId={product.id}
-                basePrice={basePrice}
-                baseStock={product.stock ?? 0}
-                pricingModel={product.priceType}
-                variants={activeVariants.map((v) => ({
-                  id: v.id,
-                  name: v.name,
-                  price: parseFloat(v.price),
-                  stock: v.stock,
-                }))}
-                labels={{
-                  price: m.catalog.product.price,
-                  pricePerUnit: m.catalog.product.pricePerUnit,
-                  stock: m.catalog.product.stock,
-                  selectVariant:
-                    m.catalog.product.selectVariant ?? "Select an option",
-                  availability: {
-                    checkDates: m.catalog.availability.title,
-                    startDate: m.catalog.availability.startDate,
-                    endDate: m.catalog.availability.endDate,
-                    loading: m.catalog.availability.loading,
-                    available: m.catalog.availability.available,
-                    notAvailable: m.catalog.availability.notAvailable,
-                    unitsAvailable: m.catalog.availability.unitsAvailable,
-                    invalidRange: m.catalog.availability.invalidRange,
-                    errorFetch: m.catalog.availability.errorFetch,
-                  },
-                }}
-              />
-            ) : (
-              <>
-                {/* Price */}
-                <div>
-                  <p className="text-sm font-medium text-slate-500">
-                    {m.catalog.product.price}
-                  </p>
-                  <p className="text-2xl font-bold text-primary">
-                    ${basePrice.toFixed(2)}
-                    {product.priceType === "PER_UNIT" && (
-                      <span className="ml-1 text-base font-normal text-slate-500">
-                        / {m.catalog.product.pricePerUnit}
-                      </span>
-                    )}
-                  </p>
-                </div>
-
-                {/* Stock (PER_UNIT only) */}
-                {product.priceType === "PER_UNIT" && (
-                  <p className="text-sm text-slate-500">
-                    <span className="font-medium">
-                      {m.catalog.product.stock}:
-                    </span>{" "}
-                    {product.stock ?? 0}
-                  </p>
-                )}
-
-                {/* Availability checker (client island) */}
-                <AvailabilityChecker
-                  productId={product.id}
-                  pricingModel={product.priceType}
-                  stock={product.stock ?? 0}
-                  labels={{
-                    checkDates: m.catalog.availability.title,
-                    startDate: m.catalog.availability.startDate,
-                    endDate: m.catalog.availability.endDate,
-                    loading: m.catalog.availability.loading,
-                    available: m.catalog.availability.available,
-                    notAvailable: m.catalog.availability.notAvailable,
-                    unitsAvailable: m.catalog.availability.unitsAvailable,
-                    invalidRange: m.catalog.availability.invalidRange,
-                    errorFetch: m.catalog.availability.errorFetch,
-                  }}
-                />
-              </>
-            )}
+            <ProductDetailActions
+              productId={product.id}
+              productName={product.name}
+              productSlug={product.slug}
+              productPhoto={product.photos[0] ?? null}
+              basePrice={basePrice}
+              baseStock={product.stock ?? 0}
+              priceType={product.priceType}
+              variants={activeVariants.map((v) => ({
+                id: v.id,
+                name: v.name,
+                price: parseFloat(v.price),
+                stock: v.stock,
+              }))}
+              labels={{
+                price: m.catalog.product.price,
+                pricePerUnit: m.catalog.product.pricePerUnit,
+                stock: m.catalog.product.stock,
+                selectVariant:
+                  m.catalog.product.selectVariant ?? "Select an option",
+                availability: {
+                  checkDates: m.catalog.availability.title,
+                  startDate: m.catalog.availability.startDate,
+                  endDate: m.catalog.availability.endDate,
+                  loading: m.catalog.availability.loading,
+                  available: m.catalog.availability.available,
+                  notAvailable: m.catalog.availability.notAvailable,
+                  unitsAvailable: m.catalog.availability.unitsAvailable,
+                  invalidRange: m.catalog.availability.invalidRange,
+                  errorFetch: m.catalog.availability.errorFetch,
+                },
+                addToCart: m.cart.addToCart,
+                addedToCart: m.cart.addedToCart,
+                selectDatesFirst: m.cart.selectDatesFirst,
+                quantity: m.cart.quantity,
+                perUnit: m.cart.perUnit,
+              }}
+            />
           </div>
         </div>
 

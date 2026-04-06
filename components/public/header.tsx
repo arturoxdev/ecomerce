@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Menu, PartyPopper, X } from "lucide-react";
+import { ChevronDown, Menu, PartyPopper, ShoppingCart, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Suspense } from "react";
@@ -15,11 +15,12 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
+import { useCartCount } from "@/hooks/use-cart";
 import { siteConfig } from "@/lib/config/site";
 import type { Locale } from "@/lib/i18n/config";
 
 type Messages = {
-  nav: { home: string; catalogue: string; about: string; contact: string; bookNow: string };
+  nav: { home: string; catalogue: string; about: string; contact: string; bookNow: string; cart: string };
   language: { label: string };
 };
 
@@ -37,6 +38,7 @@ const linkClass =
 export function PublicHeader({ locale, messages: m, categories }: Props) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [catalogOpen, setCatalogOpen] = useState(false);
+  const cartCount = useCartCount();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#fed7aa]/25 bg-[#f8f7f5]/95 backdrop-blur">
@@ -110,6 +112,18 @@ export function PublicHeader({ locale, messages: m, categories }: Props) {
         </NavigationMenu>
 
         <div className="flex items-center gap-3">
+          <Link
+            href={`/${locale}/cart`}
+            className="relative p-2 text-slate-600 transition-colors hover:text-primary"
+            aria-label={m.nav.cart}
+          >
+            <ShoppingCart className="size-5" />
+            {cartCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex size-4.5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+                {cartCount > 99 ? "99+" : cartCount}
+              </span>
+            )}
+          </Link>
           <Suspense fallback={<div className="h-8 w-[92px]" />}>
             <LocaleSwitcher currentLocale={locale} label={m.language.label} />
           </Suspense>
@@ -185,6 +199,19 @@ export function PublicHeader({ locale, messages: m, categories }: Props) {
               className="rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-primary"
             >
               {m.nav.contact}
+            </Link>
+            <Link
+              href={`/${locale}/cart`}
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-primary"
+            >
+              <ShoppingCart className="size-4" />
+              {m.nav.cart}
+              {cartCount > 0 && (
+                <span className="ml-auto rounded-full bg-primary px-2 py-0.5 text-xs font-bold text-white">
+                  {cartCount}
+                </span>
+              )}
             </Link>
             <Link
               href={`/${locale}/catalog`}
