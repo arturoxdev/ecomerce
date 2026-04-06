@@ -1,9 +1,11 @@
 import Markdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
 
 export function MarkdownContent({ markdown }: { markdown: string }) {
   return (
     <div className="space-y-6 text-base leading-8 text-slate-600">
     <Markdown
+      rehypePlugins={[rehypeRaw]}
       components={{
         h1: ({ children }) => (
           <h1 className="text-3xl font-extrabold text-slate-900">{children}</h1>
