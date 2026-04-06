@@ -3,7 +3,11 @@
 import { useState } from "react";
 
 import { cn } from "@/lib/utils";
-import { AvailabilityChecker, type AvailabilityLabels } from "./availability-checker";
+import {
+  AvailabilityChecker,
+  type AvailabilityLabels,
+  type AvailabilityResult,
+} from "./availability-checker";
 
 export type Variant = {
   id: string;
@@ -25,6 +29,8 @@ type Props = {
     selectVariant: string;
     availability: AvailabilityLabels;
   };
+  onVariantChange?: (variant: Variant | null) => void;
+  onAvailabilityConfirmed?: (result: AvailabilityResult) => void;
 };
 
 export function VariantSelector({
@@ -34,12 +40,21 @@ export function VariantSelector({
   pricingModel,
   variants,
   labels,
+  onVariantChange,
+  onAvailabilityConfirmed,
 }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const selected = variants.find((v) => v.id === selectedId);
   const displayPrice = selected ? selected.price : basePrice;
   const displayStock = selected ? selected.stock : baseStock;
+
+  function handleVariantClick(variantId: string) {
+    const newId = selectedId === variantId ? null : variantId;
+    setSelectedId(newId);
+    const newVariant = variants.find((v) => v.id === newId) ?? null;
+    onVariantChange?.(newVariant);
+  }
 
   return (
     <div className="space-y-6">
@@ -66,9 +81,7 @@ export function VariantSelector({
             <button
               key={variant.id}
               type="button"
-              onClick={() =>
-                setSelectedId(selectedId === variant.id ? null : variant.id)
-              }
+              onClick={() => handleVariantClick(variant.id)}
               className={cn(
                 "rounded-lg border px-4 py-2 text-sm font-medium transition-all",
                 selectedId === variant.id
@@ -96,6 +109,7 @@ export function VariantSelector({
         pricingModel={pricingModel}
         stock={displayStock}
         labels={labels.availability}
+        onAvailabilityConfirmed={onAvailabilityConfirmed}
       />
     </div>
   );

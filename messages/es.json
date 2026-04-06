@@ -8,7 +8,8 @@
     "catalogue": "Catálogo",
     "about": "Nosotros",
     "contact": "Contacto",
-    "bookNow": "Reservar ahora"
+    "bookNow": "Reservar ahora",
+    "cart": "Carrito"
   },
   "language": {
     "label": "Idioma",
@@ -117,5 +118,44 @@
       "invalidRange": "La fecha de fin debe ser posterior a la de inicio",
       "errorFetch": "No se pudo verificar la disponibilidad. Intenta de nuevo."
     }
+  },
+  "cart": {
+    "title": "Tu Carrito",
+    "empty": "Tu carrito está vacío",
+    "emptyDescription": "Explora nuestro catálogo para encontrar artículos para tu evento.",
+    "browseCatalog": "Ver Catálogo",
+    "product": "Producto",
+    "dates": "Fechas",
+    "quantity": "Cant.",
+    "price": "Precio",
+    "subtotal": "Subtotal",
+    "remove": "Eliminar",
+    "summary": "Resumen del Pedido",
+    "deliveryFee": "Envío",
+    "deposit": "Anticipo",
+    "total": "Total",
+    "included": "Incluido",
+    "customerInfo": "Tu Información",
+    "name": "Nombre completo",
+    "email": "Correo electrónico",
+    "phone": "Teléfono",
+    "address": "Dirección de entrega",
+    "addressPlaceholder": "Ingresa tu dirección de entrega",
+    "confirmOrder": "Confirmar Pedido",
+    "processing": "Procesando...",
+    "addToCart": "Agregar al Carrito",
+    "addedToCart": "¡Agregado al carrito!",
+    "itemUnavailable": "Algunos artículos ya no están disponibles",
+    "selectDatesFirst": "Selecciona fechas y verifica disponibilidad primero",
+    "perUnit": "por unidad"
+  },
+  "order": {
+    "confirmed": "¡Pedido Confirmado!",
+    "confirmedDescription": "Tu pedido ha sido recibido. Te contactaremos para confirmar los detalles de entrega.",
+    "orderNumber": "Número de Pedido",
+    "backToCatalog": "Volver al Catálogo",
+    "details": "Detalles del Pedido",
+    "items": "Artículos",
+    "customerInfo": "Información del Cliente"
   }
 }

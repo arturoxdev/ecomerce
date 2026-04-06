@@ -1,4 +1,4 @@
-import { and, asc, eq, gt, lt, SQL } from "drizzle-orm";
+import { and, desc, eq, SQL } from "drizzle-orm";
 
 import { getStoreId } from "@/lib/config/tenant";
 import { db } from "@/lib/db";
@@ -8,20 +8,46 @@ export function findAll(opts?: {
   orderBy?: SQL;
   limit?: number;
   offset?: number;
-  with?: Record<string, boolean>;
 }) {
   return db.query.orders.findMany({
     where: eq(orders.storeId, getStoreId()),
-    orderBy: opts?.orderBy ? () => [opts.orderBy!] : undefined,
+    orderBy: opts?.orderBy ? () => [opts.orderBy!] : [desc(orders.createdAt)],
     limit: opts?.limit,
     offset: opts?.offset,
-    with: opts?.with as undefined,
+  });
+}
+
+export function findAllWithItems(opts?: {
+  orderBy?: SQL;
+  limit?: number;
+  offset?: number;
+}) {
+  return db.query.orders.findMany({
+    where: eq(orders.storeId, getStoreId()),
+    orderBy: opts?.orderBy ? () => [opts.orderBy!] : [desc(orders.createdAt)],
+    limit: opts?.limit,
+    offset: opts?.offset,
+    with: { orderItems: true },
   });
 }
 
 export function findById(id: string) {
   return db.query.orders.findFirst({
     where: and(eq(orders.id, id), eq(orders.storeId, getStoreId())),
+  });
+}
+
+export function findByIdWithItems(id: string) {
+  return db.query.orders.findFirst({
+    where: and(eq(orders.id, id), eq(orders.storeId, getStoreId())),
+    with: {
+      orderItems: {
+        with: {
+          product: { columns: { id: true, name: true, slug: true, photos: true, priceType: true } },
+          variant: { columns: { id: true, name: true } },
+        },
+      },
+    },
   });
 }
 
@@ -45,13 +71,8 @@ export function update(
     .then((r) => r[0]);
 }
 
-export function findByDateRange(startDate: Date, endDate: Date) {
-  return db.query.orders.findMany({
-    where: and(
-      eq(orders.storeId, getStoreId()),
-      lt(orders.rentStartDate, endDate),
-      gt(orders.rentEndDate, startDate),
-    ),
-    orderBy: [asc(orders.rentStartDate)],
-  });
+export function count() {
+  return db.query.orders
+    .findMany({ where: eq(orders.storeId, getStoreId()) })
+    .then((r) => r.length);
 }
