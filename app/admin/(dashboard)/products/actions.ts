@@ -71,7 +71,6 @@ export async function createProduct(
   try {
     await productRepo.create({
       ...data,
-      storeId: user.storeId,
       slug: toSlug(data.slug),
       about: about || null,
       basePrice: basePrice.toString(),

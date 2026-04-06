@@ -64,7 +64,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       if (token.id) {
         const dbUser = await db.query.users.findFirst({
-          where: eq(schema.users.id, token.id as string),
+          where: and(eq(schema.users.id, token.id as string), eq(schema.users.storeId, getStoreId())),
         });
         if (!dbUser || !dbUser.isActive) {
           throw new Error("User is deactivated");
