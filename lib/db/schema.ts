@@ -122,8 +122,6 @@ export const orders = pgTable("orders", {
   customerEmail: text("customer_email").notNull(),
   customerPhone: text("customer_phone").notNull(),
   deliveryAddress: text("delivery_address"),
-  rentStartDate: timestamp("rent_start_date", { precision: 6 }).notNull(),
-  rentEndDate: timestamp("rent_end_date", { precision: 6 }).notNull(),
   subtotal: numeric("subtotal", { precision: 10, scale: 2 }).notNull(),
   depositAmount: numeric("deposit_amount", {
     precision: 10,
@@ -159,6 +157,8 @@ export const orderItems = pgTable("order_items", {
   quantity: integer("quantity").notNull(),
   unitPrice: numeric("unit_price", { precision: 10, scale: 2 }).notNull(),
   subtotal: numeric("subtotal", { precision: 10, scale: 2 }).notNull(),
+  rentStartDate: timestamp("rent_start_date", { precision: 6 }).notNull(),
+  rentEndDate: timestamp("rent_end_date", { precision: 6 }).notNull(),
 });
 
 export const availability = pgTable(
