@@ -30,7 +30,7 @@ export default async function EditProductPage({ params }: Props) {
   const boundCreateVariant = createVariant.bind(null, id);
 
   return (
-    <div className="mx-auto">
+    <div className="w-full px-6 py-6">
       <div className="flex flex-col gap-1">
         <Link
           href="/admin/products"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useRef, useState, useTransition } from "react";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -42,11 +42,29 @@ function VariantInlineForm({
   onCancel: () => void;
   submitLabel: string;
 }) {
-  const [state, formAction, pending] = useActionState(action, {} as VariantFormState);
+  const [state, setState] = useState<VariantFormState>({} as VariantFormState);
+  const [pending, startTransition] = useTransition();
+  const containerRef = useRef<HTMLDivElement>(null);
   const fieldErrors = getFieldErrors(state);
 
+  const handleSubmit = () => {
+    const container = containerRef.current;
+    if (!container) return;
+    const formData = new FormData();
+    container.querySelectorAll<HTMLInputElement>("input[name]").forEach((input) => {
+      formData.append(input.name, input.value);
+    });
+    startTransition(async () => {
+      const result = await action(state, formData);
+      setState(result);
+    });
+  };
+
   return (
-    <form action={formAction} className="flex flex-col gap-3 rounded-md border border-gray-200 bg-gray-50 p-4">
+    <div
+      ref={containerRef}
+      className="flex flex-col gap-3 rounded-md border border-gray-200 bg-gray-50 p-4"
+    >
       {isFormError(state) && (
         <p className="text-xs text-red-600">{state.detail ?? state.title}</p>
       )}
@@ -93,14 +111,14 @@ function VariantInlineForm({
         </div>
       </div>
       <div className="flex gap-2">
-        <Button type="submit" size="sm" disabled={pending}>
+        <Button type="button" size="sm" disabled={pending} onClick={handleSubmit}>
           {pending ? "Saving..." : submitLabel}
         </Button>
         <Button type="button" size="sm" variant="outline" onClick={onCancel}>
           Cancel
         </Button>
       </div>
-    </form>
+    </div>
   );
 }
 
