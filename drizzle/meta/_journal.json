@@ -15,6 +15,13 @@
       "when": 1775453993996,
       "tag": "0001_zippy_daredevil",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1775845398937,
+      "tag": "0002_overrated_ares",
+      "breakpoints": true
     }
   ]
 }

@@ -7,6 +7,7 @@ import {
 } from "@/features/catalog";
 import { problemResponse } from "@/lib/api/problem-response";
 import { notFoundProblem, internalProblem } from "@/lib/problems";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { ProblemType } from "@/lib/types/problem-detail";
 
 const UUID_RE =
@@ -23,6 +24,20 @@ function badRequest(detail: string) {
 }
 
 export async function GET(request: NextRequest) {
+  const rate = await checkRateLimit(
+    `avail:ip:${getClientIp(request.headers)}`,
+    60,
+    60,
+  );
+  if (!rate.allowed) {
+    return problemResponse({
+      type: ProblemType.VALIDATION_ERROR,
+      status: 429,
+      title: "Too many requests",
+      detail: "Rate limit exceeded",
+    });
+  }
+
   const { searchParams } = new URL(request.url);
   const productId = searchParams.get("productId");
   const variantId = searchParams.get("variantId");

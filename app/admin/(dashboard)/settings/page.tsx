@@ -1,19 +1,33 @@
-import { Settings } from "lucide-react";
-
 import { SiteHeader } from "@/components/admin/site-header";
+import {
+  SettingsForm,
+  getSettings,
+  updateSettingsAction,
+} from "@/features/admin-settings";
 
-export default function AdminSettingsPage() {
+export default async function AdminSettingsPage() {
+  const current = await getSettings();
+
   return (
     <>
       <SiteHeader title="Settings" />
-      <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4 py-24">
-        <div className="rounded-full bg-muted p-4">
-          <Settings className="size-8 text-muted-foreground" />
+      <div className="flex flex-1 flex-col gap-6 px-4 py-8">
+        <div>
+          <h1 className="text-xl font-semibold">Store settings</h1>
+          <p className="text-sm text-muted-foreground">
+            Payment mode, delivery, and deposit configuration.
+          </p>
         </div>
-        <h2 className="text-lg font-medium">Coming soon</h2>
-        <p className="text-sm text-muted-foreground">
-          This feature is under development.
-        </p>
+        <SettingsForm
+          action={updateSettingsAction}
+          defaultValues={{
+            paymentMode: current?.paymentMode ?? "SPLIT_50_50",
+            deliveryMode:
+              current?.deliveryMode === "FIXED_FEE" ? "FIXED_FEE" : "INCLUDED",
+            deliveryFee: current?.deliveryFee ?? null,
+            depositPercent: current?.depositPercent ?? "0.10",
+          }}
+        />
       </div>
     </>
   );
