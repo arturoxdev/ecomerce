@@ -1,0 +1,1 @@
+ALTER TABLE "settings" ADD COLUMN "theme_id" text DEFAULT 'default' NOT NULL;

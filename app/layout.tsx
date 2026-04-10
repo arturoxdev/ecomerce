@@ -1,11 +1,21 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Geist } from "next/font/google";
+import { Poppins, Fira_Code } from "next/font/google";
 import { siteConfig } from "@/lib/config/site";
 import { cn } from "@/lib/utils";
 import { Agentation } from "agentation";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-sans",
+});
+
+const firaCode = Fira_Code({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-mono",
+});
 
 export const metadata: Metadata = {
   title: siteConfig.name,
@@ -20,13 +30,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("font-sans", geist.variable)}
-      style={{
-        "--color-primary": process.env.NEXT_PUBLIC_COLOR_PRIMARY || "#f28b0d",
-        "--color-secondary": process.env.NEXT_PUBLIC_COLOR_SECONDARY || "#2d6a4f",
-        "--color-background-light": process.env.NEXT_PUBLIC_COLOR_BG_LIGHT || "#f8f7f5",
-        "--color-background-dark": process.env.NEXT_PUBLIC_COLOR_BG_DARK || "#221a10",
-      } as React.CSSProperties}
+      className={cn("font-sans", poppins.variable, firaCode.variable)}
     >
       <body className="antialiased">
         {children}

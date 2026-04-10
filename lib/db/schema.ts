@@ -190,6 +190,7 @@ export const settings = pgTable("settings", {
   depositPercent: numeric("deposit_percent", { precision: 5, scale: 4 })
     .notNull()
     .default("0.1"),
+  themeId: text("theme_id").notNull().default("default"),
   updatedAt: timestamp("updated_at")
     .notNull()
     .$onUpdate(() => new Date()),
