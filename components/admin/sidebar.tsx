@@ -83,7 +83,7 @@ export function AdminSidebar({ userRole = "EMPLOYEE", userName, userEmail }: Pro
     : "U";
 
   return (
-    <Sidebar collapsible="offcanvas" variant="inset">
+    <Sidebar collapsible="offcanvas">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
