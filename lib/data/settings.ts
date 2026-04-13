@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { getStoreId } from "@/lib/config/tenant";
 import { db } from "@/lib/db";
 import { settings } from "@/lib/db/schema";
+import { DEFAULT_THEME_ID } from "@/lib/themes";
 
 // ---------------------------------------------------------------------------
 // Reads
@@ -37,4 +38,20 @@ export function upsert(data: Partial<typeof settings.$inferInsert>) {
       target: settings.storeId,
       set: data,
     });
+}
+
+// ---------------------------------------------------------------------------
+// Theme helpers
+// ---------------------------------------------------------------------------
+
+export async function getThemeId(): Promise<string> {
+  const row = await db.query.settings.findFirst({
+    where: eq(settings.storeId, getStoreId()),
+    columns: { themeId: true },
+  });
+  return row?.themeId ?? DEFAULT_THEME_ID;
+}
+
+export function setThemeId(themeId: string) {
+  return upsert({ themeId });
 }
