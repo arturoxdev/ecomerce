@@ -232,11 +232,19 @@ export function CartPageClient({ locale, labels }: Props) {
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-slate-600">{labels.subtotal}</span>
-                <span className="font-medium">${subtotal.toFixed(2)}</span>
+                <span
+                  className="font-medium"
+                  data-testid="cart-summary-subtotal"
+                >
+                  ${subtotal.toFixed(2)}
+                </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-slate-600">{labels.deliveryFee}</span>
-                <span className="font-medium">
+                <span
+                  className="font-medium"
+                  data-testid="cart-summary-delivery"
+                >
                   {deliveryFee === 0
                     ? labels.included
                     : `$${deliveryFee.toFixed(2)}`}
@@ -246,12 +254,22 @@ export function CartPageClient({ locale, labels }: Props) {
                 <span className="text-slate-600">
                   {labels.deposit} ({(depositPercent * 100).toFixed(0)}%)
                 </span>
-                <span className="font-medium">${deposit.toFixed(2)}</span>
+                <span
+                  className="font-medium"
+                  data-testid="cart-summary-deposit"
+                >
+                  ${deposit.toFixed(2)}
+                </span>
               </div>
               <Separator />
               <div className="flex justify-between text-base font-bold">
                 <span>{labels.total}</span>
-                <span className="text-primary">${total.toFixed(2)}</span>
+                <span
+                  className="text-primary"
+                  data-testid="cart-summary-total"
+                >
+                  ${total.toFixed(2)}
+                </span>
               </div>
             </div>
             <Button

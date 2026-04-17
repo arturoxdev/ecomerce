@@ -264,7 +264,11 @@ export function AvailabilityChecker({
               <span className="text-sm font-medium text-muted-foreground">
                 {dayCount} {dayCount === 1 ? "day" : "days"}
               </span>
-              <div role="status" aria-live="polite">
+              <div
+                role="status"
+                aria-live="polite"
+                data-testid="availability-status"
+              >
                 {renderStatus()}
               </div>
             </div>
@@ -272,7 +276,11 @@ export function AvailabilityChecker({
         )}
 
         {dayCount === null && (
-          <div role="status" aria-live="polite">
+          <div
+            role="status"
+            aria-live="polite"
+            data-testid="availability-status"
+          >
             {renderStatus()}
           </div>
         )}

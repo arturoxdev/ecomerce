@@ -173,6 +173,7 @@ export function AdminSidebar({ userRole = "EMPLOYEE", userName, userEmail }: Pro
                 sideOffset={4}
               >
                 <DropdownMenuItem
+                  data-testid="logout-button"
                   onSelect={() => logoutFormRef.current?.requestSubmit()}
                 >
                   <LogOut />

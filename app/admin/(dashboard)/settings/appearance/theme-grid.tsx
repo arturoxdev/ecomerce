@@ -55,6 +55,7 @@ export function ThemeGrid({ themes, current }: Props) {
               key={theme.id}
               htmlFor={`theme-${theme.id}`}
               className="cursor-pointer"
+              data-testid={`theme-option-${theme.id}`}
             >
               <Card
                 className={cn(

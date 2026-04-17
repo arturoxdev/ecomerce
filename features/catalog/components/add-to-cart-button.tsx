@@ -36,6 +36,7 @@ export function AddToCartButton({
       onClick={handleClick}
       disabled={disabled}
       title={disabled ? disabledMessage : undefined}
+      data-testid="add-to-cart-button"
     >
       <ShoppingCart className="size-4" />
       {label}
