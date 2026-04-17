@@ -76,7 +76,11 @@ export function OrderTable({ orders, total, page, pageSize }: Props) {
           </TableHeader>
           <TableBody>
             {orders.map((order) => (
-              <TableRow key={order.id}>
+              <TableRow
+                key={order.id}
+                data-testid="admin-order-row"
+                data-order-id={order.id}
+              >
                 <TableCell>
                   <Link
                     href={`/admin/orders/${order.id}`}

@@ -3,6 +3,7 @@ import "./globals.css";
 import { Poppins, Fira_Code } from "next/font/google";
 import { siteConfig } from "@/lib/config/site";
 import { cn } from "@/lib/utils";
+import { Toaster } from "@/components/ui/sonner";
 import { Agentation } from "agentation";
 
 const poppins = Poppins({
@@ -34,6 +35,7 @@ export default function RootLayout({
     >
       <body className="antialiased">
         {children}
+        <Toaster />
         {process.env.NODE_ENV === "development" && <Agentation />}
       </body>
     </html>

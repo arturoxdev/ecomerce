@@ -1,4 +1,3 @@
-import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AdminSidebar } from "@/components/admin/sidebar";
 import {
@@ -40,7 +39,6 @@ export default async function AdminLayout({
             </div>
           </div>
         </SidebarInset>
-        <Toaster />
       </SidebarProvider>
     </TooltipProvider>
   );

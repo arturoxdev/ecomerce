@@ -35,7 +35,10 @@ export default async function OrderConfirmationPage({ params }: Props) {
           {m.order.confirmedDescription}
         </p>
         <p className="text-xs text-slate-400">
-          {m.order.orderNumber}: {order.id.slice(0, 8).toUpperCase()}
+          {m.order.orderNumber}:{" "}
+          <span data-testid="order-confirmation-number">
+            {order.id.slice(0, 8).toUpperCase()}
+          </span>
         </p>
       </div>
 
