@@ -1,7 +1,8 @@
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
-import { schema, testDb } from "@/tests/integration/setup";
+import * as schema from "@/lib/db/schema";
+import { testDb } from "@/tests/integration/setup";
 
 // Direct DB assertions — exercises the real cascade from the users service
 // when a user is deactivated.
