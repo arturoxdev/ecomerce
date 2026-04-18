@@ -1,5 +1,4 @@
-import { getSessionUser } from "@/features/auth";
-import { getAssignableRoles } from "@/features/auth";
+import { getAssignableRoles, getSessionUser } from "@/lib/services/auth";
 import {
   Card,
   CardContent,
@@ -9,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { SiteHeader } from "@/components/admin/site-header";
 
-import { createUser, UserForm } from "@/features/admin-users";
+import { createUser, UserForm } from "@/features/users";
 
 export default async function NewUserPage() {
   const currentUser = await getSessionUser();

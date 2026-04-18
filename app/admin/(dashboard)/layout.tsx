@@ -4,7 +4,7 @@ import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar";
-import { getSessionUser } from "@/features/auth";
+import { getSessionUser } from "@/lib/services/auth";
 import { getThemeId } from "@/lib/data/settings";
 import { getThemeById, serializeTheme } from "@/lib/themes";
 

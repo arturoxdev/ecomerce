@@ -4,12 +4,23 @@ import { and, eq } from "drizzle-orm";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
+import { authenticateCredentials } from "@/features/auth/services/credentials.service";
 import { getStoreId } from "@/lib/config/tenant";
 import { db } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
 import type { UserRole } from "@/lib/db/schema";
 
 import { authConfig } from "./auth.config";
+
+async function findUserByEmailForCredentials(email: string) {
+  const user = await db.query.users.findFirst({
+    where: and(
+      eq(schema.users.email, email),
+      eq(schema.users.storeId, getStoreId()),
+    ),
+  });
+  return user ?? null;
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -28,31 +39,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
-        const email = credentials?.email as string;
-        const password = credentials?.password as string;
-
-        if (!email || !password) return null;
-
-        const user = await db.query.users.findFirst({
-          where: and(
-            eq(schema.users.email, email),
-            eq(schema.users.storeId, getStoreId()),
-          ),
+      authorize(credentials) {
+        return authenticateCredentials(credentials ?? {}, {
+          findUserByEmail: findUserByEmailForCredentials,
+          comparePassword: bcrypt.compare,
         });
-
-        if (!user || !user.passwordHash) return null;
-        if (!user.isActive) return null;
-
-        const isValid = await bcrypt.compare(password, user.passwordHash);
-        if (!isValid) return null;
-
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        };
       },
     }),
   ],

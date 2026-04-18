@@ -7,8 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { updateCategory, CategoryForm } from "@/features/admin-categories";
-import { findCategoryById as findById } from "@/features/catalog";
+import { updateCategory, CategoryForm } from "@/features/categories";
+import { findById as findById } from "@/features/categories/services/categories.service";
 import { SiteHeader } from "@/components/admin/site-header";
 
 type Props = {

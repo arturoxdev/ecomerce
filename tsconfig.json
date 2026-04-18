@@ -34,7 +34,6 @@
     "node_modules",
     "vitest.config.ts",
     "vitest.integration.config.ts",
-    "vitest.setup.ts",
-    "tests/**"
+    "vitest.setup.ts"
   ]
 }

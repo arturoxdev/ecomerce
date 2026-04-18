@@ -3,8 +3,12 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 
-import { createVariant, updateProduct, updateVariant, ProductForm } from "@/features/admin-products";
-import { findAllCategories, findProductById, findAllVariantsByProductId } from "@/features/catalog";
+import { createVariant, updateProduct, updateVariant, ProductForm } from "@/features/products";
+import {
+  findAllVariantsByProductId,
+  findProductById,
+} from "@/features/products/services/products.service";
+import { findAll as findAllCategories } from "@/features/categories/services/categories.service";
 import { categories } from "@/lib/db/schema";
 import { Separator } from "@/components/ui/separator";
 

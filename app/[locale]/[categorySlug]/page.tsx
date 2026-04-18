@@ -3,11 +3,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { ProductCard } from "@/features/catalog/components";
+import { ProductCard } from "@/features/products";
 import {
-  findCategoryBySlug as findBySlug,
   findAllByCategorySlug,
-} from "@/features/catalog";
+} from "@/features/products/services/products.service";
+import { findBySlug as findBySlug } from "@/features/categories/services/categories.service";
 import { products } from "@/lib/db/schema";
 import { siteConfig } from "@/lib/config/site";
 import { isLocale, type Locale } from "@/lib/i18n/config";

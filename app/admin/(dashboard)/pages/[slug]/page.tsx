@@ -13,20 +13,19 @@ import {
   findAboutByLocale,
   findContactByLocale,
   findLegalBySlugAndLocale,
-} from "@/features/admin-pages";
-import { canWriteData } from "@/features/auth";
-import { getSessionUser } from "@/features/auth";
-import { getFaqEntries } from "@/features/static-pages";
+} from "@/features/pages";
+import { canWriteData, getSessionUser } from "@/lib/services/auth";
+import { getFaqEntries } from "@/features/pages";
 import {
   getStaticPageDefinition,
   isLegalPageSlug,
   isStaticPageSlug,
-} from "@/features/static-pages";
+} from "@/features/pages";
 import {
   aboutPageFallbacks,
   contactPageFallbacks,
   legalPageFallbacks,
-} from "@/features/static-pages";
+} from "@/features/pages";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 
 type Props = {
@@ -126,7 +125,7 @@ export default async function AdminStaticPagePage({ params, searchParams }: Prop
   }
 
   if (definition.editorType === "faq") {
-    const items = await getFaqEntries(locale);
+    const { data: items } = await getFaqEntries(locale);
 
     return (
       <PagesEditorShell title={definition.title} locale={locale}>

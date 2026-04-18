@@ -14,6 +14,7 @@ export default defineConfig({
     exclude: [
       "node_modules/**",
       ".next/**",
+      "**/*.integration.test.ts",
       "e2e/**",
       "tests/integration/**",
       "dist/**",

@@ -10,7 +10,7 @@ import { categories as categoriesTable } from "@/lib/db/schema";
 import { isLocale, locales, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
 import { getThemeById, serializeTheme } from "@/lib/themes";
-import { findAllCategories } from "@/features/catalog";
+import { findAll as findAllCategories } from "@/features/categories/services/categories.service";
 
 function interpolate(text: string): string {
   return text

@@ -3,9 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 import { problemResponse } from "@/lib/api/problem-response";
+import { s3Bucket, s3Client, s3PublicUrl } from "@/lib/services/s3-client";
 import { validationProblem, internalProblem } from "@/lib/problems";
+import { getObjectKeyFromPublicMediaUrl } from "@/lib/services/media-url.service";
 import { ProblemType } from "@/lib/types/problem-detail";
-import { s3Bucket, s3Client, s3PublicUrl } from "@/features/media";
 
 const deleteSchema = z.object({
   url: z.string().url(),
@@ -21,8 +22,8 @@ export async function POST(request: NextRequest) {
 
   const { url } = parsed.data;
 
-  const prefix = s3PublicUrl.endsWith("/") ? s3PublicUrl : `${s3PublicUrl}/`;
-  if (!url.startsWith(prefix)) {
+  const key = getObjectKeyFromPublicMediaUrl(url, s3PublicUrl);
+  if (!key) {
     return problemResponse({
       type: ProblemType.VALIDATION_ERROR,
       status: 400,
@@ -30,8 +31,6 @@ export async function POST(request: NextRequest) {
       detail: "URL does not belong to this bucket",
     });
   }
-
-  const key = url.slice(prefix.length);
 
   try {
     await s3Client.send(
