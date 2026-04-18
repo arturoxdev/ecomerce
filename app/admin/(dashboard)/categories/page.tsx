@@ -1,9 +1,8 @@
 import Link from "next/link";
 
-import { CategoryTable } from "@/features/admin-categories";
-import { findAllWithProductCount } from "@/features/catalog";
-import { canWriteData } from "@/features/auth";
-import { getSessionUser } from "@/features/auth";
+import { CategoryTable } from "@/features/categories";
+import { findAllWithProductCount } from "@/features/categories/services/categories.service";
+import { canWriteData, getSessionUser } from "@/lib/services/auth";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/admin/site-header";
 

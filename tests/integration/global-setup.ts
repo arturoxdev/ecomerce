@@ -4,16 +4,21 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { Pool } from "pg";
 
+import { sanitizePostgresUrl } from "./sanitize-url";
+
 /**
  * Runs once before the integration suite. Reads the Neon ephemeral branch URL
  * from TEST_DATABASE_URL and applies all Drizzle migrations against it so the
  * schema is ready for the tests. Does not seed data.
  */
 export default async function globalSetup() {
-  dotenv.config({ path: path.resolve(process.cwd(), ".env.test.local") });
+  dotenv.config({
+    path: path.resolve(process.cwd(), ".env.test.local"),
+    quiet: true,
+  });
 
-  const url = process.env.TEST_DATABASE_URL;
-  if (!url) {
+  const rawUrl = process.env.TEST_DATABASE_URL;
+  if (!rawUrl) {
     throw new Error(
       "TEST_DATABASE_URL is required for integration tests. " +
         "Create a Neon ephemeral branch and put its connection string in .env.test.local. " +
@@ -21,6 +26,7 @@ export default async function globalSetup() {
     );
   }
 
+  const url = sanitizePostgresUrl(rawUrl);
   const pool = new Pool({ connectionString: url });
   const db = drizzle(pool);
 

@@ -6,14 +6,14 @@ import { z } from "zod";
 
 import { getStoreId } from "@/lib/config/tenant";
 import { problemResponse } from "@/lib/api/problem-response";
-import { validationProblem } from "@/lib/problems";
-import { ProblemType } from "@/lib/types/problem-detail";
 import {
   ALL_MEDIA_MIME_TYPES,
   getMaxSizeForMime,
   isVideoMime,
-} from "@/features/media";
-import { s3Bucket, s3Client, s3PublicUrl } from "@/features/media";
+} from "@/lib/services/media";
+import { s3Bucket, s3Client, s3PublicUrl } from "@/lib/services/s3-client";
+import { validationProblem } from "@/lib/problems";
+import { ProblemType } from "@/lib/types/problem-detail";
 
 const presignSchema = z.object({
   filename: z.string().min(1),

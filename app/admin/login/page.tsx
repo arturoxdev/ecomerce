@@ -3,7 +3,7 @@
 import { Lock } from "lucide-react";
 import { useActionState } from "react";
 
-import { loginAction } from "@/features/auth/actions";
+import { loginAction } from "@/features/auth";
 import { siteConfig } from "@/lib/config/site";
 
 export default function AdminLoginPage() {

@@ -6,8 +6,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getProductBlocks, AvailabilityBlockTable, ManualBlockForm } from "@/features/admin-products";
-import { findProductById } from "@/features/catalog";
+import { getProductBlocks, AvailabilityBlockTable, ManualBlockForm } from "@/features/products";
+import { findProductById } from "@/features/products/services/products.service";
 import { SiteHeader } from "@/components/admin/site-header";
 
 type Props = {

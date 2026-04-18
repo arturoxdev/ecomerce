@@ -1,7 +1,6 @@
 import { getThemeId } from "@/lib/data/settings";
 import { THEMES } from "@/lib/themes";
-
-import { ThemeGrid } from "./theme-grid";
+import { ThemeGrid } from "@/features/settings";
 
 export const metadata = {
   title: "Appearance",

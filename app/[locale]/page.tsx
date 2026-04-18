@@ -9,10 +9,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { asc } from "drizzle-orm";
 
-import { findAllCategories, findAllWithCategory } from "@/features/catalog";
+import { findAllWithCategory } from "@/features/products/services/products.service";
+import { findAll as findAllCategories } from "@/features/categories/services/categories.service";
+import { findThumbnail } from "@/lib/services/media";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
-import { findThumbnail } from "@/features/media";
 import { categories as categoriesTable } from "@/lib/db/schema";
 
 type HomeProps = {

@@ -1,7 +1,6 @@
 import Link from "next/link";
 
-import { getSessionUser } from "@/features/auth";
-import { canWriteData } from "@/features/auth";
+import { canWriteData, getSessionUser } from "@/lib/services/auth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { staticPageCatalog } from "@/features/static-pages";
+import { staticPageCatalog } from "@/features/pages";
 
 export default async function AdminPagesIndexPage() {
   const user = await getSessionUser();

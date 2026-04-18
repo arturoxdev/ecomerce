@@ -15,7 +15,7 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import { useCartCount } from "@/hooks/use-cart";
+import { useCartCount } from "@/hooks/use-cart-count";
 import { siteConfig } from "@/lib/config/site";
 import type { Locale } from "@/lib/i18n/config";
 

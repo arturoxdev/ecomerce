@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 
-import { FaqSection, StaticPageHero } from "@/features/static-pages";
+import { FaqSection, StaticPageHero } from "@/features/pages";
 import { siteConfig } from "@/lib/config/site";
 import { isLocale, type Locale } from "@/lib/i18n/config";
-import { getFaqEntries } from "@/features/static-pages";
+import { getFaqEntries } from "@/features/pages";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -15,7 +15,7 @@ export default async function FaqPage({ params }: Props) {
     notFound();
   }
 
-  const items = await getFaqEntries(locale as Locale);
+  const { data: items } = await getFaqEntries(locale as Locale);
   const copy =
     locale === "es"
       ? {

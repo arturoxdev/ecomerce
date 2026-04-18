@@ -2,12 +2,12 @@ import { PutObjectCommand } from '@aws-sdk/client-s3'
 import { randomUUID } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 
-import { requireWriteAccess } from '@/features/auth'
+import { requireWriteAccess } from '@/lib/services/auth'
 import { getStoreId } from '@/lib/config/tenant'
 import { problemResponse } from '@/lib/api/problem-response'
+import { s3Bucket, s3Client, s3PublicUrl } from '@/lib/services/s3-client'
 import { internalProblem } from '@/lib/problems'
 import { ProblemType } from '@/lib/types/problem-detail'
-import { s3Bucket, s3Client, s3PublicUrl } from '@/features/media'
 
 const ALLOWED_EXTENSIONS = new Set(['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'avif'])
 

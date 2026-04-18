@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { CartPageClient } from "@/components/cart/cart-page-client";
+import { CartPageClient } from "@/features/cart";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
 
