@@ -7,7 +7,11 @@ if (!secret) {
   throw new Error("STRIPE_SECRET_KEY is required");
 }
 
-if (process.env.NODE_ENV === "production") {
+const isRealProduction =
+  process.env.VERCEL_ENV === "production" ||
+  (process.env.NODE_ENV === "production" && !process.env.VERCEL_ENV);
+
+if (isRealProduction) {
   if (!secret.startsWith("sk_live_")) {
     throw new Error("Production requires sk_live_ Stripe key");
   }
