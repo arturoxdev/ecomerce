@@ -2,14 +2,9 @@
 
 import { useCallback, useState } from "react";
 
-import {
-  AvailabilityChecker,
-  type AvailabilityLabels,
-  type AvailabilityResult,
-} from "./availability-checker";
+import { AddToCartDialog } from "./add-to-cart-dialog";
+import type { AvailabilityLabels } from "./availability-checker";
 import { VariantSelector, type Variant } from "./variant-selector";
-import { QuantitySelector } from "@/components/quantity-selector";
-import { AddToCartButton } from "./add-to-cart-button";
 
 type Props = {
   productId: string;
@@ -48,31 +43,18 @@ export function ProductDetailActions({
   const hasVariants = variants.length > 0;
 
   const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
-  const [availabilityResult, setAvailabilityResult] = useState<AvailabilityResult | null>(null);
-  const [quantity, setQuantity] = useState(1);
 
   const currentPrice = selectedVariant ? selectedVariant.price : basePrice;
   const currentStock = selectedVariant ? selectedVariant.stock : baseStock;
-  const maxQty = availabilityResult ? Math.min(availabilityResult.available, currentStock) : currentStock;
-
-  const handleAvailabilityConfirmed = useCallback((result: AvailabilityResult) => {
-    setAvailabilityResult(result);
-    setQuantity(1);
-  }, []);
 
   const handleVariantChange = useCallback((variant: Variant | null) => {
     setSelectedVariant(variant);
-    setAvailabilityResult(null);
-    setQuantity(1);
   }, []);
-
-  const isAvailable = availabilityResult !== null && availabilityResult.available > 0;
 
   return (
     <div className="space-y-6">
       {hasVariants ? (
         <VariantSelector
-          productId={productId}
           basePrice={basePrice}
           baseStock={baseStock}
           pricingModel={priceType}
@@ -82,10 +64,8 @@ export function ProductDetailActions({
             pricePerUnit: labels.pricePerUnit,
             stock: labels.stock,
             selectVariant: labels.selectVariant,
-            availability: labels.availability,
           }}
           onVariantChange={handleVariantChange}
-          onAvailabilityConfirmed={handleAvailabilityConfirmed}
         />
       ) : (
         <>
@@ -108,60 +88,30 @@ export function ProductDetailActions({
               <span className="font-medium">{labels.stock}:</span> {baseStock}
             </p>
           )}
-
-          {/* Availability checker */}
-          <AvailabilityChecker
-            productId={productId}
-            pricingModel={priceType}
-            stock={baseStock}
-            labels={labels.availability}
-            onAvailabilityConfirmed={handleAvailabilityConfirmed}
-          />
         </>
       )}
 
-      {/* Quantity selector (PER_UNIT only, shown after availability confirmed) */}
-      {priceType === "PER_UNIT" && isAvailable && (
-        <QuantitySelector
-          value={quantity}
-          max={maxQty}
-          onChange={setQuantity}
-          label={labels.quantity}
-        />
-      )}
-
-      {/* Add to Cart */}
-      <AddToCartButton
-        item={{
-          productId,
-          productName,
-          productSlug,
-          productPhoto,
-          variantId: selectedVariant?.id ?? null,
-          variantName: selectedVariant?.name ?? null,
-          quantity: priceType === "FIXED" ? 1 : quantity,
-          unitPrice: currentPrice,
-          priceType,
-          startDate: availabilityResult
-            ? toDateString(availabilityResult.startDate)
-            : "",
-          endDate: availabilityResult
-            ? toDateString(availabilityResult.endDate)
-            : "",
-          stock: maxQty,
+      {/* Add to Cart (opens dialog with availability checker inside) */}
+      <AddToCartDialog
+        // Remount when variant changes so the internal availability state resets
+        key={selectedVariant?.id ?? "no-variant"}
+        productId={productId}
+        productName={productName}
+        productSlug={productSlug}
+        productPhoto={productPhoto}
+        variantId={selectedVariant?.id ?? null}
+        variantName={selectedVariant?.name ?? null}
+        unitPrice={currentPrice}
+        priceType={priceType}
+        stock={currentStock}
+        labels={{
+          availability: labels.availability,
+          addToCart: labels.addToCart,
+          addedToCart: labels.addedToCart,
+          selectDatesFirst: labels.selectDatesFirst,
+          quantity: labels.quantity,
         }}
-        disabled={!isAvailable}
-        disabledMessage={labels.selectDatesFirst}
-        label={labels.addToCart}
-        addedLabel={labels.addedToCart}
       />
     </div>
   );
-}
-
-function toDateString(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
 }

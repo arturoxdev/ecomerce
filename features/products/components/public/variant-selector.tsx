@@ -3,11 +3,6 @@
 import { useState } from "react";
 
 import { cn } from "@/lib/utils";
-import {
-  AvailabilityChecker,
-  type AvailabilityLabels,
-  type AvailabilityResult,
-} from "./availability-checker";
 
 export type Variant = {
   id: string;
@@ -17,7 +12,6 @@ export type Variant = {
 };
 
 type Props = {
-  productId: string;
   basePrice: number;
   baseStock: number;
   pricingModel: "FIXED" | "PER_UNIT";
@@ -27,21 +21,17 @@ type Props = {
     pricePerUnit: string;
     stock: string;
     selectVariant: string;
-    availability: AvailabilityLabels;
   };
   onVariantChange?: (variant: Variant | null) => void;
-  onAvailabilityConfirmed?: (result: AvailabilityResult) => void;
 };
 
 export function VariantSelector({
-  productId,
   basePrice,
   baseStock,
   pricingModel,
   variants,
   labels,
   onVariantChange,
-  onAvailabilityConfirmed,
 }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -101,16 +91,6 @@ export function VariantSelector({
           <span className="font-medium">{labels.stock}:</span> {displayStock}
         </p>
       )}
-
-      {/* Availability checker */}
-      <AvailabilityChecker
-        productId={productId}
-        variantId={selectedId}
-        pricingModel={pricingModel}
-        stock={displayStock}
-        labels={labels.availability}
-        onAvailabilityConfirmed={onAvailabilityConfirmed}
-      />
     </div>
   );
 }
