@@ -149,6 +149,12 @@
     "selectDatesFirst": "Selecciona fechas y verifica disponibilidad primero",
     "perUnit": "por unidad"
   },
+  "payment": {
+    "splitBadge": "50% ahora · 50% en entrega",
+    "splitNotice": "El 50% del total se paga en línea para asegurar tu reserva. El 50% restante se paga en persona al momento de la entrega.",
+    "payNow": "Pagar ahora (50%)",
+    "balanceOnDelivery": "Saldo en la entrega (50%)"
+  },
   "order": {
     "confirmed": "¡Pedido Confirmado!",
     "confirmedDescription": "Tu pedido ha sido recibido. Te contactaremos para confirmar los detalles de entrega.",

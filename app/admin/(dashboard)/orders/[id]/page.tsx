@@ -70,9 +70,12 @@ export default async function AdminOrderDetailPage({ params }: Props) {
                     <TableRow key={item.id}>
                       <TableCell>
                         <div>
-                          <p className="text-sm font-medium">
+                          <Link
+                            href={`/admin/products/${item.product.id}/edit`}
+                            className="text-sm font-medium hover:underline hover:text-primary"
+                          >
                             {item.product.name}
-                          </p>
+                          </Link>
                           {item.variant?.name && (
                             <p className="text-xs text-muted-foreground">
                               {item.variant.name}
@@ -134,30 +137,57 @@ export default async function AdminOrderDetailPage({ params }: Props) {
                 </div>
               </CardHeader>
               <CardContent className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span>${parseFloat(order.subtotal).toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Delivery</span>
-                  <span>
-                    {parseFloat(order.deliveryFee) === 0
-                      ? "Included"
-                      : `$${parseFloat(order.deliveryFee).toFixed(2)}`}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Deposit</span>
-                  <span>${parseFloat(order.depositAmount).toFixed(2)}</span>
-                </div>
-                <Separator />
-                <div className="flex justify-between text-base font-bold">
-                  <span>Total</span>
-                  <span>${parseFloat(order.total).toFixed(2)}</span>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Created: {format(new Date(order.createdAt), "MMM d, yyyy HH:mm")}
-                </p>
+                {(() => {
+                  const totalNum = parseFloat(order.total);
+                  const paidNum = parseFloat(order.amountPaid);
+                  const balanceNum = Math.max(0, totalNum - paidNum);
+                  const isSplit = paidNum > 0 && paidNum < totalNum;
+                  return (
+                    <>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Subtotal</span>
+                        <span>${parseFloat(order.subtotal).toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Delivery</span>
+                        <span>
+                          {parseFloat(order.deliveryFee) === 0
+                            ? "Included"
+                            : `$${parseFloat(order.deliveryFee).toFixed(2)}`}
+                        </span>
+                      </div>
+                      <Separator />
+                      <div className="flex justify-between text-base font-bold">
+                        <span>Total</span>
+                        <span>${totalNum.toFixed(2)}</span>
+                      </div>
+                      <Separator />
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">
+                          Paid online
+                          {isSplit ? " (50%)" : paidNum >= totalNum && totalNum > 0 ? " (100%)" : ""}
+                        </span>
+                        <span className="font-medium text-primary">
+                          ${paidNum.toFixed(2)}
+                        </span>
+                      </div>
+                      {balanceNum > 0 && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">
+                            Balance on delivery
+                            {isSplit ? " (50%)" : ""}
+                          </span>
+                          <span className="font-medium">
+                            ${balanceNum.toFixed(2)}
+                          </span>
+                        </div>
+                      )}
+                      <p className="text-xs text-muted-foreground pt-2">
+                        Created: {format(new Date(order.createdAt), "MMM d, yyyy HH:mm")}
+                      </p>
+                    </>
+                  );
+                })()}
               </CardContent>
             </Card>
           </div>

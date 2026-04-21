@@ -45,7 +45,11 @@ export function ProductCard({ product, locale, labels }: ProductCardProps) {
 
   return (
     <div className="group relative rounded-xl border border-slate-100 bg-white p-4 shadow-sm transition-all duration-300 hover:shadow-lg">
-      <div className="aspect-[4/3] w-full overflow-hidden rounded-lg bg-slate-100">
+      <Link
+        href={`/${locale}/catalog/${product.slug}`}
+        aria-label={product.name}
+        className="block aspect-[4/3] w-full overflow-hidden rounded-lg bg-slate-100"
+      >
         {photo ? (
           <Image
             src={photo}
@@ -59,15 +63,24 @@ export function ProductCard({ product, locale, labels }: ProductCardProps) {
             <ImageOff className="size-12" />
           </div>
         )}
-      </div>
+      </Link>
 
       <div className="mt-4 space-y-2">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="text-lg font-bold text-slate-900">{product.name}</h3>
-          <Badge variant="outline">{product.category.name}</Badge>
+        <h3 className="text-lg font-bold text-slate-900">{product.name}</h3>
+        <div className="flex items-center justify-between gap-2">
+          <Link
+            href={`/${locale}/${product.category.slug}`}
+            aria-label={product.category.name}
+          >
+            <Badge
+              variant="outline"
+              className="transition-colors hover:bg-slate-100"
+            >
+              {product.category.name}
+            </Badge>
+          </Link>
+          <p className="text-sm font-semibold text-primary">{priceDisplay}</p>
         </div>
-
-        <p className="text-sm font-semibold text-primary">{priceDisplay}</p>
 
         <Link
           href={`/${locale}/catalog/${product.slug}`}
