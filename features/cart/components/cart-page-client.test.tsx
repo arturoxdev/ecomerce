@@ -155,13 +155,19 @@ describe("CartPageClient", () => {
   });
 
   describe("✅ Happy path", () => {
-    it("valid checkout -> submits order payload and redirects to confirmation page", async () => {
+    it("valid checkout -> submits order payload, clears cart, and redirects to Stripe", async () => {
       // Arrange
       const user = userEvent.setup();
       mocks.placeOrder.mockResolvedValue({
         success: true,
         orderId: "order-123",
         checkoutUrl: "https://checkout.stripe.test/session_123",
+      });
+      const assignMock = vi.fn();
+      const originalLocation = window.location;
+      Object.defineProperty(window, "location", {
+        configurable: true,
+        value: { assign: assignMock },
       });
       render(<CartPageClient locale="en" labels={labels} />);
 
@@ -192,7 +198,52 @@ describe("CartPageClient", () => {
           ],
         });
       });
+      await waitFor(() => {
+        expect(mocks.clearCart).toHaveBeenCalledTimes(1);
+      });
+      expect(assignMock).toHaveBeenCalledWith(
+        "https://checkout.stripe.test/session_123",
+      );
       expect(mocks.toastError).not.toHaveBeenCalled();
+
+      Object.defineProperty(window, "location", {
+        configurable: true,
+        value: originalLocation,
+      });
+    });
+
+    it("missing checkoutUrl -> does not clear cart nor redirect", async () => {
+      // Arrange
+      const user = userEvent.setup();
+      mocks.placeOrder.mockResolvedValue({
+        success: true,
+        orderId: "order-123",
+      });
+      const assignMock = vi.fn();
+      const originalLocation = window.location;
+      Object.defineProperty(window, "location", {
+        configurable: true,
+        value: { assign: assignMock },
+      });
+      render(<CartPageClient locale="en" labels={labels} />);
+
+      // Act
+      await user.type(screen.getByLabelText("Name"), "Jane Doe");
+      await user.type(screen.getByLabelText("Email"), "jane@example.com");
+      await user.type(screen.getByLabelText("Phone"), "555-1111");
+      await user.click(screen.getByRole("button", { name: "Confirm order" }));
+
+      // Assert
+      await waitFor(() => {
+        expect(mocks.toastError).toHaveBeenCalledWith("No checkout URL returned");
+      });
+      expect(mocks.clearCart).not.toHaveBeenCalled();
+      expect(assignMock).not.toHaveBeenCalled();
+
+      Object.defineProperty(window, "location", {
+        configurable: true,
+        value: originalLocation,
+      });
     });
   });
 });

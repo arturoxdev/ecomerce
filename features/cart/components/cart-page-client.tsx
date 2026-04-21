@@ -51,6 +51,7 @@ export function CartPageClient({ locale, labels }: Props) {
   const items = useCartStore((s) => s.items);
   const removeItem = useCartStore((s) => s.removeItem);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
+  const clearCart = useCartStore((s) => s.clearCart);
 
   const [hydrated, setHydrated] = useState(
     () => useCartStore.persist?.hasHydrated?.() ?? false,
@@ -154,6 +155,7 @@ export function CartPageClient({ locale, labels }: Props) {
             setIsPending(false);
             return;
           }
+          clearCart();
           window.location.assign(result.checkoutUrl);
           return;
         }
