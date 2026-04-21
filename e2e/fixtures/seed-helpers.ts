@@ -318,6 +318,7 @@ export async function upsertTestSettings(values: {
   deliveryMode?: DeliveryMode;
   deliveryFee?: string | null;
   depositPercent?: string;
+  paymentMode?: "FULL_ONLINE" | "SPLIT_50_50";
   themeId?: string;
 }): Promise<Settings> {
   await readTestSettings();
@@ -332,6 +333,9 @@ export async function upsertTestSettings(values: {
         : {}),
       ...(values.depositPercent !== undefined
         ? { depositPercent: values.depositPercent }
+        : {}),
+      ...(values.paymentMode !== undefined
+        ? { paymentMode: values.paymentMode }
         : {}),
       ...(values.themeId !== undefined ? { themeId: values.themeId } : {}),
     })

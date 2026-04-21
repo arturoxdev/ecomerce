@@ -38,6 +38,7 @@ test.describe("T1 checkout order happy path", () => {
       deliveryMode: "FIXED_FEE",
       deliveryFee: "25.00",
       depositPercent: "0.3000",
+      paymentMode: "FULL_ONLINE",
     });
   });
 
@@ -46,6 +47,7 @@ test.describe("T1 checkout order happy path", () => {
       deliveryMode: settingsSnapshot.deliveryMode,
       deliveryFee: settingsSnapshot.deliveryFee,
       depositPercent: settingsSnapshot.depositPercent,
+      paymentMode: settingsSnapshot.paymentMode,
       themeId: settingsSnapshot.themeId,
     });
   });
@@ -80,16 +82,16 @@ test.describe("T1 checkout order happy path", () => {
       page.getByRole("heading", { name: /your cart/i }),
     ).toBeVisible();
 
-    // Summary reflects seeded settings: $100 subtotal + $25 delivery = $125 total
-    // Deposit is 30% of subtotal = $30 (shown separately, not added to total)
+    // Summary reflects seeded settings: $100 subtotal + $25 delivery = $125 total.
+    // paymentMode=FULL_ONLINE → no split breakdown rows.
     await expect(page.getByTestId("cart-summary-subtotal")).toHaveText(
       "$100.00",
     );
     await expect(page.getByTestId("cart-summary-delivery")).toHaveText(
       "$25.00",
     );
-    await expect(page.getByTestId("cart-summary-deposit")).toHaveText("$30.00");
     await expect(page.getByTestId("cart-summary-total")).toHaveText("$125.00");
+    await expect(page.getByTestId("cart-summary-pay-now")).toHaveCount(0);
 
     const email = `e2e-t1-${Date.now().toString(36)}@example.com`;
     await fillCheckoutForm(page, {

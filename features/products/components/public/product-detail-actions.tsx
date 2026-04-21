@@ -2,6 +2,8 @@
 
 import { useCallback, useState } from "react";
 
+import { Badge } from "@/components/ui/badge";
+
 import { AddToCartDialog } from "./add-to-cart-dialog";
 import type { AvailabilityLabels } from "./availability-checker";
 import { VariantSelector, type Variant } from "./variant-selector";
@@ -15,6 +17,7 @@ type Props = {
   baseStock: number;
   priceType: "FIXED" | "PER_UNIT";
   variants: Variant[];
+  showSplitNotice?: boolean;
   labels: {
     price: string;
     pricePerUnit: string;
@@ -26,6 +29,8 @@ type Props = {
     selectDatesFirst: string;
     quantity: string;
     perUnit: string;
+    splitBadge?: string;
+    splitNotice?: string;
   };
 };
 
@@ -38,6 +43,7 @@ export function ProductDetailActions({
   baseStock,
   priceType,
   variants,
+  showSplitNotice = false,
   labels,
 }: Props) {
   const hasVariants = variants.length > 0;
@@ -89,6 +95,17 @@ export function ProductDetailActions({
             </p>
           )}
         </>
+      )}
+
+      {showSplitNotice && labels.splitBadge && labels.splitNotice && (
+        <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+          <Badge variant="secondary" className="mb-2">
+            {labels.splitBadge}
+          </Badge>
+          <p className="text-sm text-slate-600 leading-relaxed">
+            {labels.splitNotice}
+          </p>
+        </div>
       )}
 
       {/* Add to Cart (opens dialog with availability checker inside) */}

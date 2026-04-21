@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { getStoreSettings } from "@/features/cart/services/cart-order.service";
 import { ProductDetailActions, ProductGallery } from "@/features/products";
 import {
   findBySlug as findBySlug,
@@ -41,7 +42,10 @@ export default async function ProductDetailPage({
   const typedLocale = locale as Locale;
   const m = getMessages(typedLocale);
 
-  const product = await findBySlug(slug);
+  const [product, settings] = await Promise.all([
+    findBySlug(slug),
+    getStoreSettings(),
+  ]);
 
   if (!product || !product.isActive) {
     notFound();
@@ -49,6 +53,7 @@ export default async function ProductDetailPage({
 
   const basePrice = parseFloat(product.basePrice);
   const activeVariants = product.variants?.filter((v) => v.isActive) ?? [];
+  const showSplitNotice = settings.paymentMode === "SPLIT_50_50";
 
   return (
     <div className="min-h-screen bg-white">
@@ -114,6 +119,7 @@ export default async function ProductDetailPage({
                 price: parseFloat(v.price),
                 stock: v.stock,
               }))}
+              showSplitNotice={showSplitNotice}
               labels={{
                 price: m.catalog.product.price,
                 pricePerUnit: m.catalog.product.pricePerUnit,
@@ -136,6 +142,8 @@ export default async function ProductDetailPage({
                 selectDatesFirst: m.cart.selectDatesFirst,
                 quantity: m.cart.quantity,
                 perUnit: m.cart.perUnit,
+                splitBadge: m.payment.splitBadge,
+                splitNotice: m.payment.splitNotice,
               }}
             />
           </div>

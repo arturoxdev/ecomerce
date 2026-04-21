@@ -71,10 +71,15 @@ export default async function CategoryLandingPage({
         </nav>
 
         {/* Page header */}
-        <div className="mb-10">
+        <div className="mb-10 space-y-3">
           <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
             {category.name}
           </h1>
+          {category.description && (
+            <p className="max-w-3xl text-lg leading-relaxed text-slate-600">
+              {category.description}
+            </p>
+          )}
         </div>
 
         {/* Product grid or empty state */}

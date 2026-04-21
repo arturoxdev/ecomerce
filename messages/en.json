@@ -149,6 +149,12 @@
     "selectDatesFirst": "Select dates and check availability first",
     "perUnit": "per unit"
   },
+  "payment": {
+    "splitBadge": "50% now · 50% on delivery",
+    "splitNotice": "50% of the total is paid online to secure your reservation. The remaining 50% is paid in person at delivery.",
+    "payNow": "Pay now (50%)",
+    "balanceOnDelivery": "Balance on delivery (50%)"
+  },
   "order": {
     "confirmed": "Order Confirmed!",
     "confirmedDescription": "Your order has been received. We'll contact you to confirm delivery details.",

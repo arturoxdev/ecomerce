@@ -5,7 +5,14 @@ import { ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -28,7 +35,6 @@ type Labels = {
   summary: string;
   subtotal: string;
   deliveryFee: string;
-  deposit: string;
   total: string;
   included: string;
   customerInfo: string;
@@ -40,6 +46,10 @@ type Labels = {
   confirmOrder: string;
   processing: string;
   itemUnavailable: string;
+  splitBadge: string;
+  splitNotice: string;
+  payNow: string;
+  balanceOnDelivery: string;
 };
 
 type Props = {
@@ -194,63 +204,70 @@ export function CartPageClient({ locale, labels }: Props) {
             ))}
 
             {/* Customer info */}
-            <Separator className="my-6" />
-            <h2 className="text-lg font-semibold text-slate-900">
-              {labels.customerInfo}
-            </h2>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <Label htmlFor="name">{labels.name}</Label>
-                <Input
-                  id="name"
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  className={formErrors.name ? "border-red-500" : ""}
-                />
-                {formErrors.name && (
-                  <p className="mt-1 text-xs text-red-500">{formErrors.name}</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="email">{labels.email}</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={customerEmail}
-                  onChange={(e) => setCustomerEmail(e.target.value)}
-                  className={formErrors.email ? "border-red-500" : ""}
-                />
-                {formErrors.email && (
-                  <p className="mt-1 text-xs text-red-500">
-                    {formErrors.email}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="phone">{labels.phone}</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={customerPhone}
-                  onChange={(e) => setCustomerPhone(e.target.value)}
-                  className={formErrors.phone ? "border-red-500" : ""}
-                />
-                {formErrors.phone && (
-                  <p className="mt-1 text-xs text-red-500">
-                    {formErrors.phone}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="address">{labels.address}</Label>
-                <Input
-                  id="address"
-                  value={deliveryAddress}
-                  onChange={(e) => setDeliveryAddress(e.target.value)}
-                  placeholder={labels.addressPlaceholder}
-                />
-              </div>
-            </div>
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-slate-900">
+                  {labels.customerInfo}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="name">{labels.name}</Label>
+                    <Input
+                      id="name"
+                      value={customerName}
+                      onChange={(e) => setCustomerName(e.target.value)}
+                      className={formErrors.name ? "border-red-500" : ""}
+                    />
+                    {formErrors.name && (
+                      <p className="mt-1 text-xs text-red-500">
+                        {formErrors.name}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="email">{labels.email}</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={customerEmail}
+                      onChange={(e) => setCustomerEmail(e.target.value)}
+                      className={formErrors.email ? "border-red-500" : ""}
+                    />
+                    {formErrors.email && (
+                      <p className="mt-1 text-xs text-red-500">
+                        {formErrors.email}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="phone">{labels.phone}</Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      value={customerPhone}
+                      onChange={(e) => setCustomerPhone(e.target.value)}
+                      className={formErrors.phone ? "border-red-500" : ""}
+                    />
+                    {formErrors.phone && (
+                      <p className="mt-1 text-xs text-red-500">
+                        {formErrors.phone}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="address">{labels.address}</Label>
+                    <Input
+                      id="address"
+                      value={deliveryAddress}
+                      onChange={(e) => setDeliveryAddress(e.target.value)}
+                      placeholder={labels.addressPlaceholder}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Summary sidebar */}
@@ -279,17 +296,6 @@ export function CartPageClient({ locale, labels }: Props) {
                     : `$${summary.deliveryFee.toFixed(2)}`}
                 </span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-slate-600">
-                  {labels.deposit} ({(resolvedSettings.depositPercent * 100).toFixed(0)}%)
-                </span>
-                <span
-                  className="font-medium"
-                  data-testid="cart-summary-deposit"
-                >
-                  ${summary.deposit.toFixed(2)}
-                </span>
-              </div>
               <Separator />
               <div className="flex justify-between text-base font-bold">
                 <span>{labels.total}</span>
@@ -300,7 +306,45 @@ export function CartPageClient({ locale, labels }: Props) {
                   ${summary.total.toFixed(2)}
                 </span>
               </div>
+              {resolvedSettings.paymentMode === "SPLIT_50_50" && (
+                <>
+                  <Separator />
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-600">{labels.payNow}</span>
+                    <span
+                      className="font-medium text-primary"
+                      data-testid="cart-summary-pay-now"
+                    >
+                      ${(summary.total * 0.5).toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-600">
+                      {labels.balanceOnDelivery}
+                    </span>
+                    <span
+                      className="font-medium"
+                      data-testid="cart-summary-balance-delivery"
+                    >
+                      ${(summary.total * 0.5).toFixed(2)}
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
+            {resolvedSettings.paymentMode === "SPLIT_50_50" && (
+              <div
+                className="mt-4 rounded-lg border border-primary/20 bg-primary/5 p-3"
+                data-testid="cart-summary-split-notice"
+              >
+                <Badge variant="secondary" className="mb-2">
+                  {labels.splitBadge}
+                </Badge>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  {labels.splitNotice}
+                </p>
+              </div>
+            )}
             <Button
               type="submit"
               size="lg"

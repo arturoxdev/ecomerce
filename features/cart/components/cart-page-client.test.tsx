@@ -95,7 +95,6 @@ describe("CartPageClient", () => {
     summary: "Summary",
     subtotal: "Subtotal",
     deliveryFee: "Delivery",
-    deposit: "Deposit",
     total: "Total",
     included: "Included",
     customerInfo: "Customer info",
@@ -107,6 +106,10 @@ describe("CartPageClient", () => {
     confirmOrder: "Confirm order",
     processing: "Processing",
     itemUnavailable: "Unavailable item",
+    splitBadge: "50% now · 50% on delivery",
+    splitNotice: "50% online, 50% on delivery",
+    payNow: "Pay now (50%)",
+    balanceOnDelivery: "Balance on delivery (50%)",
   };
 
   beforeEach(() => {

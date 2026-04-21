@@ -17,7 +17,13 @@ export default async function CartPage({ params }: Props) {
   return (
     <CartPageClient
       locale={locale}
-      labels={m.cart}
+      labels={{
+        ...m.cart,
+        splitBadge: m.payment.splitBadge,
+        splitNotice: m.payment.splitNotice,
+        payNow: m.payment.payNow,
+        balanceOnDelivery: m.payment.balanceOnDelivery,
+      }}
     />
   );
 }
