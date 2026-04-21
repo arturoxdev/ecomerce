@@ -74,6 +74,17 @@ export function forbiddenProblem(
   };
 }
 
+export function tooManyRequestsProblem(
+  detail = "Rate limit exceeded",
+): ProblemDetail {
+  return {
+    type: ProblemType.TOO_MANY_REQUESTS,
+    status: 429,
+    title: "Too many requests",
+    detail,
+  };
+}
+
 export function internalProblem(
   detail = "An unexpected error occurred",
 ): ProblemDetail {

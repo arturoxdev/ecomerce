@@ -1,7 +1,11 @@
+import type { PaymentMode } from "@/lib/db/schema";
+
 export type CartStoreSettings = {
   deliveryMode: string;
   deliveryFee: number;
   depositPercent: number;
+  paymentMode: PaymentMode;
+  currency: string;
 };
 
 export type CartSummaryInput = {

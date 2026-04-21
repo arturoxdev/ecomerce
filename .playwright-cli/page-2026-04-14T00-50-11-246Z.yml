@@ -1,0 +1,278 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e5]:
+      - list [ref=e7]:
+        - listitem [ref=e8]:
+          - link "Admin" [ref=e9] [cursor=pointer]:
+            - /url: /admin/products
+            - img [ref=e10]
+            - generic [ref=e16]: Admin
+      - generic [ref=e17]:
+        - generic [ref=e18]:
+          - generic [ref=e19]: Navigation
+          - list [ref=e21]:
+            - listitem [ref=e22]:
+              - link "Products" [ref=e23] [cursor=pointer]:
+                - /url: /admin/products
+                - img [ref=e24]
+                - generic [ref=e28]: Products
+            - listitem [ref=e29]:
+              - link "Categories" [ref=e30] [cursor=pointer]:
+                - /url: /admin/categories
+                - img [ref=e31]
+                - generic [ref=e33]: Categories
+            - listitem [ref=e34]:
+              - link "Users" [ref=e35] [cursor=pointer]:
+                - /url: /admin/users
+                - img [ref=e36]
+                - generic [ref=e41]: Users
+            - listitem [ref=e42]:
+              - link "Orders" [ref=e43] [cursor=pointer]:
+                - /url: /admin/orders
+                - img [ref=e44]
+                - generic [ref=e47]: Orders
+            - listitem [ref=e48]:
+              - link "Calendar" [ref=e49] [cursor=pointer]:
+                - /url: /admin/calendar
+                - img [ref=e50]
+                - generic [ref=e52]: Calendar
+            - listitem [ref=e53]:
+              - link "Pages" [ref=e54] [cursor=pointer]:
+                - /url: /admin/pages
+                - img [ref=e55]
+                - generic [ref=e58]: Pages
+        - generic [ref=e59]:
+          - generic [ref=e60]: Support
+          - list [ref=e62]:
+            - listitem [ref=e63]:
+              - link "Settings" [ref=e64] [cursor=pointer]:
+                - /url: /admin/settings
+                - img [ref=e65]
+                - generic [ref=e68]: Settings
+      - list [ref=e70]:
+        - listitem [ref=e71]:
+          - button "A Admin admin@admin.com" [ref=e72]:
+            - generic [ref=e73]: A
+            - generic [ref=e74]:
+              - generic [ref=e75]: Admin
+              - generic [ref=e76]: admin@admin.com
+            - img [ref=e77]
+    - main [ref=e80]:
+      - generic [ref=e82]:
+        - generic [ref=e84]:
+          - button "Toggle Sidebar" [ref=e85]:
+            - img
+            - generic [ref=e86]: Toggle Sidebar
+          - separator [ref=e87]
+          - heading "New product" [level=1] [ref=e88]
+        - generic [ref=e91]:
+          - generic [ref=e92]:
+            - tablist [ref=e93]:
+              - tab "Basic Info" [selected] [ref=e94]
+              - tab "About" [ref=e95]
+              - tab "Variants" [ref=e96]
+            - tabpanel "Basic Info" [ref=e165]:
+              - generic [ref=e98]:
+                - generic [ref=e99]:
+                  - heading "General" [level=3] [ref=e100]
+                  - paragraph [ref=e101]: Name, slug, and short description.
+                - generic [ref=e102]:
+                  - generic [ref=e103]:
+                    - generic [ref=e104]: Name
+                    - textbox "Product name" [ref=e105]: Test Product Playwright
+                  - generic [ref=e106]:
+                    - generic [ref=e107]: Slug
+                    - textbox "product-slug" [ref=e108]: test-product-playwright
+                - generic [ref=e109]:
+                  - generic [ref=e110]: Description
+                  - textbox "Brief description of the product" [ref=e111]: Producto creado por test e2e
+                  - paragraph [ref=e112]: 28/150
+              - separator [ref=e113]
+              - generic [ref=e114]:
+                - generic [ref=e115]:
+                  - heading "Pricing & inventory" [level=3] [ref=e116]
+                  - paragraph [ref=e117]: Set the category, pricing model, and stock levels.
+                - generic [ref=e118]:
+                  - generic [ref=e119]:
+                    - generic [ref=e120]: Category
+                    - combobox [expanded] [ref=e121]:
+                      - generic [ref=e122]: Select category
+                      - img: ▼
+                    - listbox [ref=e186]:
+                      - option "Inflables" [active] [ref=e187]:
+                        - generic [ref=e188]: Inflables
+                      - option "Mesas y Sillas" [ref=e189]:
+                        - generic [ref=e190]: Mesas y Sillas
+                      - option "Carpas" [ref=e191]:
+                        - generic [ref=e192]: Carpas
+                      - option "Equipo y Mobiliario para Eventos" [ref=e193]:
+                        - generic [ref=e194]: Equipo y Mobiliario para Eventos
+                      - option "Mantelería y detalles de mesa" [ref=e195]:
+                        - generic [ref=e196]: Mantelería y detalles de mesa
+                      - option "Decoraciones" [ref=e197]:
+                        - generic [ref=e198]: Decoraciones
+                    - textbox [ref=e123]
+                  - generic [ref=e124]:
+                    - generic [ref=e125]: Price type
+                    - combobox [ref=e126]:
+                      - generic [ref=e127]: FIXED
+                      - img: ▼
+                    - textbox [ref=e128]: FIXED
+                - generic [ref=e129]:
+                  - generic [ref=e130]:
+                    - generic [ref=e131]: Base price
+                    - spinbutton [ref=e132]: "199.99"
+                  - generic [ref=e133]:
+                    - generic [ref=e134]: Stock
+                    - spinbutton [ref=e135]: "10"
+              - separator [ref=e136]
+              - generic [ref=e137]:
+                - generic [ref=e138]:
+                  - heading "Media" [level=3] [ref=e139]
+                  - paragraph [ref=e140]: Upload images and videos. Max 6 files (images up to 5 MB, videos up to 20 MB).
+                - generic [ref=e141]:
+                  - generic [ref=e142]: Photos & Videos
+                  - generic [ref=e143]:
+                    - button "Upload media" [ref=e144]
+                    - generic [ref=e145]: 0/6
+              - separator [ref=e146]
+              - generic [ref=e147]:
+                - checkbox "Active" [checked] [ref=e148]
+                - generic [ref=e149]:
+                  - generic [ref=e150]: Active
+                  - generic [ref=e151]: Visible on the storefront when enabled.
+          - separator [ref=e152]
+          - generic [ref=e153]:
+            - button "Save product" [ref=e154]
+            - button "Cancel" [ref=e155]
+            - link "View product" [ref=e166] [cursor=pointer]:
+              - /url: /catalog/test-product-playwright
+              - img
+              - text: View product
+  - region "Notifications alt+T"
+  - generic [ref=e160] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e161]:
+      - img [ref=e162]
+    - generic [ref=e167]:
+      - button "Open issues overlay" [ref=e168]:
+        - generic [ref=e169]:
+          - generic [ref=e170]: "0"
+          - generic [ref=e171]: "1"
+        - generic [ref=e172]: Issue
+      - button "Collapse issues badge" [ref=e173]:
+        - img [ref=e174]
+  - alert [ref=e176]
+  - button "v3.0.2 Output Detail Standard React Components Hide Until Restart Marker Color Clear on copy/send Block page interactions Manage MCP & Webhooks Manage MCP & Webhooks MCP Connection MCP connection allows agents to receive and act on annotations. Learn more Webhooks Auto-Send The webhook URL will receive live annotation changes and annotation data." [ref=e178] [cursor=pointer]:
+    - img [ref=e180]
+    - generic:
+      - generic:
+        - button:
+          - img
+      - generic:
+        - button:
+          - img
+      - generic:
+        - button [disabled]:
+          - img
+      - generic:
+        - button [disabled]:
+          - img
+      - generic:
+        - button [disabled]:
+          - img
+      - generic:
+        - button [disabled]:
+          - img
+      - generic:
+        - button:
+          - img
+      - generic:
+        - button:
+          - img
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - link:
+              - /url: https://agentation.com
+              - img
+            - paragraph: v3.0.2
+            - button "Switch to light mode":
+              - generic:
+                - generic:
+                  - img
+          - generic:
+            - generic:
+              - generic:
+                - text: Output Detail
+                - generic:
+                  - img
+              - button "Standard":
+                - generic: Standard
+            - generic:
+              - generic:
+                - text: React Components
+                - generic:
+                  - img
+              - generic:
+                - checkbox [checked]
+            - generic:
+              - generic:
+                - text: Hide Until Restart
+                - generic:
+                  - img
+              - generic:
+                - checkbox
+          - generic:
+            - generic: Marker Color
+            - generic:
+              - button "Indigo"
+              - button "Blue"
+              - button "Cyan"
+              - button "Green"
+              - button "Yellow"
+              - button "Orange"
+              - button "Red"
+          - generic:
+            - generic:
+              - generic:
+                - checkbox "Clear on copy/send"
+                - img
+              - generic: Clear on copy/send
+              - generic:
+                - img
+            - generic:
+              - generic:
+                - checkbox "Block page interactions" [checked]
+                - img
+              - generic: Block page interactions
+          - button "Manage MCP & Webhooks":
+            - generic: Manage MCP & Webhooks
+            - generic:
+              - img
+        - generic:
+          - button "Manage MCP & Webhooks":
+            - img
+            - generic: Manage MCP & Webhooks
+          - generic:
+            - generic:
+              - generic:
+                - text: MCP Connection
+                - generic:
+                  - img
+            - paragraph:
+              - text: MCP connection allows agents to receive and act on annotations.
+              - link "Learn more":
+                - /url: https://agentation.dev/mcp
+          - generic:
+            - generic:
+              - generic:
+                - text: Webhooks
+                - generic:
+                  - img
+              - generic:
+                - generic: Auto-Send
+                - generic:
+                  - checkbox "Auto-Send" [checked] [disabled]
+            - paragraph: The webhook URL will receive live annotation changes and annotation data.
+            - textbox "Webhook URL"

@@ -75,7 +75,13 @@ function buildFindProductByIdWithVariants() {
 }
 
 async function loadStoreSettings() {
-  return { deliveryMode: "INCLUDED", deliveryFee: 0, depositPercent: 0.1 };
+  return {
+    deliveryMode: "INCLUDED",
+    deliveryFee: 0,
+    depositPercent: 0.1,
+    paymentMode: "SPLIT_50_50" as const,
+    currency: "USD",
+  };
 }
 
 describe("cart-order service — integration", () => {

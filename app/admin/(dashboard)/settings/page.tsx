@@ -1,4 +1,4 @@
-import { Palette } from "lucide-react";
+import { CreditCard, Palette } from "lucide-react";
 import Link from "next/link";
 
 import { SiteHeader } from "@/components/admin/site-header";
@@ -10,6 +10,12 @@ const sections = [
     label: "Appearance",
     description: "Choose a theme for the admin panel and the storefront.",
     icon: Palette,
+  },
+  {
+    href: "/admin/settings/payments",
+    label: "Payments & delivery",
+    description: "Payment mode, delivery, and deposit configuration.",
+    icon: CreditCard,
   },
 ];
 

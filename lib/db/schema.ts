@@ -3,6 +3,7 @@ import {
   boolean,
   index,
   integer,
+  jsonb,
   numeric,
   pgEnum,
   pgTable,
@@ -22,8 +23,15 @@ export const paymentStatusEnum = pgEnum("payment_status", [
   "CAPTURED",
   "VOIDED",
   "FAILED",
+  "SUSPICIOUS",
 ]);
 export type PaymentStatus = (typeof paymentStatusEnum.enumValues)[number];
+
+export const paymentModeEnum = pgEnum("payment_mode", [
+  "SPLIT_50_50",
+  "FULL_ONLINE",
+]);
+export type PaymentMode = (typeof paymentModeEnum.enumValues)[number];
 
 export const orderStatusEnum = pgEnum("order_status", [
   "PENDING",
@@ -133,6 +141,12 @@ export const orders = pgTable("orders", {
   total: numeric("total", { precision: 10, scale: 2 }).notNull(),
   amountPaid: numeric("amount_paid", { precision: 10, scale: 2 }).notNull(),
   squarePaymentId: text("square_payment_id"),
+  stripeSessionId: text("stripe_session_id").unique(),
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
+  stripeSessionExpiresAt: timestamp("stripe_session_expires_at", {
+    withTimezone: true,
+  }),
+  currency: text("currency").notNull().default("USD"),
   paymentStatus: paymentStatusEnum("payment_status")
     .notNull()
     .default("AUTHORIZED"),
@@ -190,10 +204,48 @@ export const settings = pgTable("settings", {
   depositPercent: numeric("deposit_percent", { precision: 5, scale: 4 })
     .notNull()
     .default("0.1"),
+  paymentMode: paymentModeEnum("payment_mode")
+    .notNull()
+    .default("SPLIT_50_50"),
+  currency: text("currency").notNull().default("USD"),
   themeId: text("theme_id").notNull().default("default"),
   updatedAt: timestamp("updated_at")
     .notNull()
     .$onUpdate(() => new Date()),
+});
+
+// ── Stripe, rate limiting, audit (PRD Scope D) ─────────────────
+
+export const stripeWebhookEvents = pgTable("stripe_webhook_events", {
+  eventId: text("event_id").primaryKey(),
+  type: text("type").notNull(),
+  status: text("status").notNull().default("processed"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const rateLimits = pgTable("rate_limits", {
+  key: text("key").primaryKey(),
+  count: integer("count").notNull().default(0),
+  windowStart: timestamp("window_start", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const auditLog = pgTable("audit_log", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  action: text("action").notNull(),
+  entity: text("entity").notNull(),
+  entityId: text("entity_id"),
+  before: jsonb("before"),
+  after: jsonb("after"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 export const zipDeliveryZones = pgTable(

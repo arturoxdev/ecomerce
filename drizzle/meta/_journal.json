@@ -22,6 +22,13 @@
       "when": 1775862644162,
       "tag": "0002_short_genesis",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1776794595340,
+      "tag": "0003_organic_mordo",
+      "breakpoints": true
     }
   ]
 }

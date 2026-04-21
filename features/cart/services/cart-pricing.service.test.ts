@@ -12,6 +12,8 @@ describe("cart pricing service", () => {
           deliveryMode: "INCLUDED",
           deliveryFee: 30,
           depositPercent: 0.1,
+          paymentMode: "SPLIT_50_50" as const,
+          currency: "USD",
         },
       };
 
@@ -32,6 +34,8 @@ describe("cart pricing service", () => {
           deliveryMode: "CUSTOM",
           deliveryFee: 20,
           depositPercent: 0.15,
+          paymentMode: "SPLIT_50_50" as const,
+          currency: "USD",
         },
       };
 

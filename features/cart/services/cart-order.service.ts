@@ -33,11 +33,18 @@ export type FindProductByIdWithVariants = (
   productId: string,
 ) => PromiseLike<ProductLookupResult>;
 
+export type RateLimitCheck = (
+  key: string,
+  max: number,
+  windowSeconds: number,
+) => Promise<{ allowed: boolean }>;
+
 export type CartOrderServiceDeps = {
   db: Database;
   storeId: string;
   findProductByIdWithVariants: FindProductByIdWithVariants;
   loadStoreSettings?: () => Promise<CartStoreSettings>;
+  checkRateLimit?: RateLimitCheck;
 };
 
 const placeOrderItemSchema = z.object({
@@ -54,12 +61,13 @@ const placeOrderSchema = z.object({
   customerEmail: z.string().email("Valid email is required"),
   customerPhone: z.string().min(1, "Phone is required"),
   deliveryAddress: z.string().optional().default(""),
+  locale: z.enum(["en", "es"]).optional().default("en"),
   items: z.array(placeOrderItemSchema).min(1, "Cart cannot be empty"),
 });
 
-export type PlaceOrderInput = z.infer<typeof placeOrderSchema>;
+export type PlaceOrderInput = z.input<typeof placeOrderSchema>;
 export type PlaceOrderResult =
-  | { success: true; orderId: string }
+  | { success: true; orderId: string; locale: "en" | "es" }
   | { success: false; error: string; unavailableItems?: string[] };
 
 // ---------------------------------------------------------------------------
@@ -77,6 +85,8 @@ export async function getStoreSettings(): Promise<CartStoreSettings> {
     depositPercent: settings?.depositPercent
       ? parseFloat(settings.depositPercent)
       : 0.1,
+    paymentMode: settings?.paymentMode ?? "SPLIT_50_50",
+    currency: settings?.currency ?? "USD",
   };
 }
 
@@ -99,6 +109,18 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
     }
 
     const data = parsed.data;
+
+    if (deps.checkRateLimit) {
+      const emailLimit = await deps.checkRateLimit(
+        `placeOrder:email:${data.customerEmail.toLowerCase()}`,
+        3,
+        60 * 60,
+      );
+      if (!emailLimit.allowed) {
+        return { success: false, error: "Too many requests. Try again later." };
+      }
+    }
+
     const storeSettings = await loadStoreSettings();
 
     return deps.db
@@ -192,7 +214,8 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
             total: summary.total.toFixed(2),
             amountPaid: "0",
             paymentStatus: "AUTHORIZED",
-            status: "CONFIRMED",
+            status: "PENDING",
+            currency: storeSettings.currency,
           })
           .returning();
 
@@ -218,7 +241,11 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
           });
         }
 
-        return { success: true as const, orderId: order.id };
+        return {
+          success: true as const,
+          orderId: order.id,
+          locale: data.locale,
+        };
       })
       .catch((error: Error) => {
         if (error.message.startsWith("UNAVAILABLE:")) {
@@ -250,12 +277,16 @@ export type CartOrderService = ReturnType<typeof createCartOrderService>;
 
 export async function placeOrder(
   input: PlaceOrderInput,
-  dependencies: { findProductByIdWithVariants: FindProductByIdWithVariants },
+  dependencies: {
+    findProductByIdWithVariants: FindProductByIdWithVariants;
+    checkRateLimit?: RateLimitCheck;
+  },
 ): Promise<PlaceOrderResult> {
   const service = createCartOrderService({
     db,
     storeId: getStoreId(),
     findProductByIdWithVariants: dependencies.findProductByIdWithVariants,
+    checkRateLimit: dependencies.checkRateLimit,
   });
   return service.placeOrder(input);
 }

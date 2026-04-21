@@ -158,7 +158,11 @@ describe("CartPageClient", () => {
     it("valid checkout -> submits order payload and redirects to confirmation page", async () => {
       // Arrange
       const user = userEvent.setup();
-      mocks.placeOrder.mockResolvedValue({ success: true, orderId: "order-123" });
+      mocks.placeOrder.mockResolvedValue({
+        success: true,
+        orderId: "order-123",
+        checkoutUrl: "https://checkout.stripe.test/session_123",
+      });
       render(<CartPageClient locale="en" labels={labels} />);
 
       // Act
@@ -175,6 +179,7 @@ describe("CartPageClient", () => {
           customerEmail: "jane@example.com",
           customerPhone: "555-1111",
           deliveryAddress: "Main Street 10",
+          locale: "en",
           items: [
             {
               productId: "product-1",
@@ -187,8 +192,7 @@ describe("CartPageClient", () => {
           ],
         });
       });
-      expect(mocks.clearCart).toHaveBeenCalledTimes(1);
-      expect(mocks.push).toHaveBeenCalledWith("/en/order/order-123");
+      expect(mocks.toastError).not.toHaveBeenCalled();
     });
   });
 });

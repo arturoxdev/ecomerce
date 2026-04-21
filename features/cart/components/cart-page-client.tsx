@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import { ShoppingBag } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -52,7 +51,6 @@ export function CartPageClient({ locale, labels }: Props) {
   const items = useCartStore((s) => s.items);
   const removeItem = useCartStore((s) => s.removeItem);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
-  const clearCart = useCartStore((s) => s.clearCart);
 
   const [hydrated, setHydrated] = useState(
     () => useCartStore.persist?.hasHydrated?.() ?? false,
@@ -61,9 +59,10 @@ export function CartPageClient({ locale, labels }: Props) {
     deliveryMode: string;
     deliveryFee: number;
     depositPercent: number;
+    paymentMode: "SPLIT_50_50" | "FULL_ONLINE";
+    currency: string;
   } | null>(null);
-  const [isPending, startTransition] = useTransition();
-  const router = useRouter();
+  const [isPending, setIsPending] = useState(false);
 
   // Customer form state
   const [customerName, setCustomerName] = useState("");
@@ -106,6 +105,8 @@ export function CartPageClient({ locale, labels }: Props) {
     deliveryMode: "INCLUDED",
     deliveryFee: 0,
     depositPercent: 0.1,
+    paymentMode: "SPLIT_50_50" as const,
+    currency: "USD",
   };
   const summary = calculateCartSummary({
     subtotal,
@@ -130,6 +131,7 @@ export function CartPageClient({ locale, labels }: Props) {
       customerEmail: customerEmail.trim(),
       customerPhone: customerPhone.trim(),
       deliveryAddress: deliveryAddress.trim(),
+      locale: locale === "es" ? "es" : "en",
       items: items.map((item) => ({
         productId: item.productId,
         variantId: item.variantId,
@@ -140,12 +142,21 @@ export function CartPageClient({ locale, labels }: Props) {
       })),
     };
 
-    startTransition(async () => {
-      const result = await placeOrder(input);
-      if (result.success) {
-        clearCart();
-        router.push(`/${locale}/order/${result.orderId}`);
-      } else {
+    setIsPending(true);
+    (async () => {
+      try {
+        const result = await placeOrder(input);
+        console.log("[checkout] placeOrder result:", result);
+        if (result.success) {
+          if (!result.checkoutUrl) {
+            console.error("[checkout] missing checkoutUrl", result);
+            toast.error("No checkout URL returned");
+            setIsPending(false);
+            return;
+          }
+          window.location.assign(result.checkoutUrl);
+          return;
+        }
         if (result.unavailableItems) {
           toast.error(
             `${labels.itemUnavailable}: ${result.unavailableItems.join(", ")}`,
@@ -153,8 +164,13 @@ export function CartPageClient({ locale, labels }: Props) {
         } else {
           toast.error(result.error);
         }
+      } catch (err) {
+        console.error("[checkout] placeOrder threw:", err);
+        toast.error("Unexpected error");
+      } finally {
+        setIsPending(false);
       }
-    });
+    })();
   }
 
   return (
