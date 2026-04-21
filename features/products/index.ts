@@ -34,7 +34,10 @@ export type {
 } from "./components/public/product-card";
 export { CategoryFilter } from "./components/public/category-filter";
 export type { FilterCategory } from "./components/public/category-filter";
-export { AvailabilityChecker } from "./components/public/availability-checker";
+export {
+  AvailabilityChecker,
+  AvailabilityCheckerBody,
+} from "./components/public/availability-checker";
 export type {
   AvailabilityLabels,
   AvailabilityResult,
@@ -43,3 +46,4 @@ export { ProductGallery } from "./components/public/product-gallery";
 export { VariantSelector } from "./components/public/variant-selector";
 export { ProductDetailActions } from "./components/public/product-detail-actions";
 export { AddToCartButton } from "./components/public/add-to-cart-button";
+export { AddToCartDialog } from "./components/public/add-to-cart-dialog";

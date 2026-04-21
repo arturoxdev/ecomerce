@@ -63,7 +63,7 @@ export default async function Home({ params }: HomeProps) {
               <div className="flex flex-col gap-4 sm:flex-row">
                 <Link
                   href={`/${typedLocale}/catalog`}
-                  className="inline-flex items-center justify-center rounded-lg bg-secondary px-6 py-3.5 text-base font-bold text-white shadow-sm transition-all hover:bg-green-800"
+                  className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3.5 text-base font-bold text-primary-foreground shadow-sm transition-all hover:bg-primary/90"
                 >
                   <CalendarDays className="mr-2 size-5" />
                   {m.hero.primaryCta}
@@ -203,7 +203,7 @@ export default async function Home({ params }: HomeProps) {
                               ? `${product.stock} available`
                               : `Stock: ${product.stock}`}
                           </div>
-                          <span className="rounded-lg bg-[#2d6a4f] px-4 py-2 text-sm font-bold text-white">
+                          <span className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-primary-foreground">
                             {typedLocale === "es" ? "Reservar" : "Reserve"}
                           </span>
                         </div>

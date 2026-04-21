@@ -1,17 +1,6 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("./availability-checker", () => ({
-  AvailabilityChecker: (props: { productId: string; variantId?: string | null }) => (
-    <div data-testid="availability-mock">
-      <span data-testid="availability-productId">{props.productId}</span>
-      <span data-testid="availability-variantId">
-        {props.variantId ?? "none"}
-      </span>
-    </div>
-  ),
-}));
-
 import { VariantSelector, type Variant } from "./variant-selector";
 
 describe("VariantSelector", () => {
@@ -22,17 +11,6 @@ describe("VariantSelector", () => {
     pricePerUnit: "day",
     stock: "Stock",
     selectVariant: "Pick one",
-    availability: {
-      checkDates: "Check",
-      startDate: "Start",
-      endDate: "End",
-      loading: "Loading",
-      available: "Available",
-      notAvailable: "Not available",
-      unitsAvailable: "units",
-      invalidRange: "Invalid",
-      errorFetch: "Error",
-    },
   };
 
   const variants: Variant[] = [
@@ -44,7 +22,6 @@ describe("VariantSelector", () => {
     // Arrange / Act
     render(
       <VariantSelector
-        productId="p1"
         basePrice={15}
         baseStock={10}
         pricingModel="PER_UNIT"
@@ -58,12 +35,11 @@ describe("VariantSelector", () => {
     expect(screen.getByText("Stock:", { exact: false })).toBeInTheDocument();
   });
 
-  it("variant click -> switches price/stock and notifies parent", () => {
+  it("variant click -> switches price and notifies parent", () => {
     // Arrange
     const onVariantChange = vi.fn();
     render(
       <VariantSelector
-        productId="p1"
         basePrice={15}
         baseStock={10}
         pricingModel="PER_UNIT"
@@ -81,7 +57,6 @@ describe("VariantSelector", () => {
     expect(onVariantChange).toHaveBeenCalledWith(
       expect.objectContaining({ id: "v2", name: "Blue" }),
     );
-    expect(screen.getByTestId("availability-variantId")).toHaveTextContent("v2");
   });
 
   it("click selected variant again -> deselects and restores base price", () => {
@@ -89,7 +64,6 @@ describe("VariantSelector", () => {
     const onVariantChange = vi.fn();
     render(
       <VariantSelector
-        productId="p1"
         basePrice={15}
         baseStock={10}
         pricingModel="PER_UNIT"
@@ -112,7 +86,6 @@ describe("VariantSelector", () => {
     // Arrange / Act
     render(
       <VariantSelector
-        productId="p1"
         basePrice={15}
         baseStock={10}
         pricingModel="FIXED"

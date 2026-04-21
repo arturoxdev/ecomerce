@@ -36,6 +36,7 @@ export type AvailabilityCheckerProps = {
   stock: number;
   labels: AvailabilityLabels;
   onAvailabilityConfirmed?: (result: AvailabilityResult) => void;
+  onUnavailable?: () => void;
 };
 
 type AvailabilityStatus =
@@ -60,12 +61,13 @@ function countDays(from: Date, to: Date): number {
   return Math.max(1, diff);
 }
 
-export function AvailabilityChecker({
+export function AvailabilityCheckerBody({
   productId,
   variantId,
   pricingModel,
   labels,
   onAvailabilityConfirmed,
+  onUnavailable,
 }: AvailabilityCheckerProps) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -79,10 +81,10 @@ export function AvailabilityChecker({
   const endDate = dateRange?.to;
   const hasValidRange = Boolean(startDate && endDate && endDate >= startDate);
 
-  // When user clicks "Start Date" pill, clear range so next click sets a fresh start
   function handleStartClick() {
     setDateRange(undefined);
     setActiveField("start");
+    onUnavailable?.();
   }
 
   function handleEndClick() {
@@ -92,17 +94,17 @@ export function AvailabilityChecker({
   function handleSelect(range: DateRange | undefined) {
     if (!range) {
       setDateRange(undefined);
+      onUnavailable?.();
       return;
     }
 
     if (activeField === "start") {
-      // Range was cleared — this click sets the new start
       if (range.from) {
         setDateRange({ from: range.from, to: undefined });
         setActiveField("end");
+        onUnavailable?.();
       }
     } else {
-      // activeField === "end"
       if (range.from && range.to) {
         if (range.to < range.from) {
           setDateRange({ from: range.to, to: range.from });
@@ -138,6 +140,7 @@ export function AvailabilityChecker({
         });
         if (!response.ok) {
           setStatus("error");
+          onUnavailable?.();
           return;
         }
         setAvailable(response.available);
@@ -148,14 +151,25 @@ export function AvailabilityChecker({
             endDate,
             available: response.available,
           });
+        } else if (response.available <= 0) {
+          onUnavailable?.();
         }
       } catch {
         setStatus("error");
+        onUnavailable?.();
       }
     }, 400);
 
     return () => clearTimeout(timer);
-  }, [endDate, hasValidRange, onAvailabilityConfirmed, productId, startDate, variantId]);
+  }, [
+    endDate,
+    hasValidRange,
+    onAvailabilityConfirmed,
+    onUnavailable,
+    productId,
+    startDate,
+    variantId,
+  ]);
 
   const dayCount = startDate && endDate ? countDays(startDate, endDate) : null;
 
@@ -195,97 +209,109 @@ export function AvailabilityChecker({
   }
 
   return (
+    <div className="flex flex-col gap-4">
+      {/* Date pills — always visible, clickable to toggle active field */}
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={handleStartClick}
+          className={cn(
+            "flex flex-1 flex-col gap-0.5 rounded-lg border px-3 py-2 text-left transition-colors",
+            activeField === "start"
+              ? "border-secondary bg-background-light"
+              : "border-border bg-card"
+          )}
+        >
+          <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+            {labels.startDate}
+          </span>
+          <span
+            className={cn(
+              "flex items-center gap-1.5 text-sm font-semibold",
+              startDate ? "text-foreground" : "text-muted-foreground"
+            )}
+          >
+            <CalendarDays className="size-3.5" />
+            {startDate ? format(startDate, "MMM d, yyyy") : "—"}
+          </span>
+        </button>
+        <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
+        <button
+          type="button"
+          onClick={handleEndClick}
+          className={cn(
+            "flex flex-1 flex-col gap-0.5 rounded-lg border px-3 py-2 text-left transition-colors",
+            activeField === "end"
+              ? "border-secondary bg-background-light"
+              : "border-border bg-card"
+          )}
+        >
+          <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+            {labels.endDate}
+          </span>
+          <span
+            className={cn(
+              "flex items-center gap-1.5 text-sm font-semibold",
+              endDate ? "text-foreground" : "text-muted-foreground"
+            )}
+          >
+            <CalendarDays className="size-3.5" />
+            {endDate ? format(endDate, "MMM d, yyyy") : "—"}
+          </span>
+        </button>
+      </div>
+
+      {/* Calendar */}
+      <div className="w-full overflow-x-auto">
+        <Calendar
+          mode="range"
+          selected={dateRange}
+          onSelect={handleSelect}
+          disabled={{ before: today }}
+          className="w-full"
+        />
+      </div>
+
+      {/* Day counter + status */}
+      {dayCount !== null && (
+        <>
+          <Separator />
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-muted-foreground">
+              {dayCount} {dayCount === 1 ? "day" : "days"}
+            </span>
+            <div
+              role="status"
+              aria-live="polite"
+              data-testid="availability-status"
+            >
+              {renderStatus()}
+            </div>
+          </div>
+        </>
+      )}
+
+      {dayCount === null && (
+        <div
+          role="status"
+          aria-live="polite"
+          data-testid="availability-status"
+        >
+          {renderStatus()}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function AvailabilityChecker(props: AvailabilityCheckerProps) {
+  return (
     <Card className="max-w-xs">
       <CardHeader>
-        <CardTitle className="font-bold">{labels.checkDates}</CardTitle>
+        <CardTitle className="font-bold">{props.labels.checkDates}</CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col gap-4">
-        {/* Date pills — always visible, clickable to toggle active field */}
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={handleStartClick}
-            className={cn(
-              "flex flex-1 flex-col gap-0.5 rounded-lg border px-3 py-2 text-left transition-colors",
-              activeField === "start"
-                ? "border-secondary bg-background-light"
-                : "border-border bg-card"
-            )}
-          >
-            <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-              {labels.startDate}
-            </span>
-            <span className={cn(
-              "flex items-center gap-1.5 text-sm font-semibold",
-              startDate ? "text-secondary" : "text-muted-foreground"
-            )}>
-              <CalendarDays className="size-3.5" />
-              {startDate ? format(startDate, "MMM d, yyyy") : "—"}
-            </span>
-          </button>
-          <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
-          <button
-            type="button"
-            onClick={handleEndClick}
-            className={cn(
-              "flex flex-1 flex-col gap-0.5 rounded-lg border px-3 py-2 text-left transition-colors",
-              activeField === "end"
-                ? "border-secondary bg-background-light"
-                : "border-border bg-card"
-            )}
-          >
-            <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-              {labels.endDate}
-            </span>
-            <span className={cn(
-              "flex items-center gap-1.5 text-sm font-semibold",
-              endDate ? "text-secondary" : "text-muted-foreground"
-            )}>
-              <CalendarDays className="size-3.5" />
-              {endDate ? format(endDate, "MMM d, yyyy") : "—"}
-            </span>
-          </button>
-        </div>
-
-        {/* Calendar */}
-        <div>
-          <Calendar
-            mode="range"
-            selected={dateRange}
-            onSelect={handleSelect}
-            disabled={{ before: today }}
-            className="w-full"
-          />
-        </div>
-
-        {/* Day counter + status */}
-        {dayCount !== null && (
-          <>
-            <Separator />
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-muted-foreground">
-                {dayCount} {dayCount === 1 ? "day" : "days"}
-              </span>
-              <div
-                role="status"
-                aria-live="polite"
-                data-testid="availability-status"
-              >
-                {renderStatus()}
-              </div>
-            </div>
-          </>
-        )}
-
-        {dayCount === null && (
-          <div
-            role="status"
-            aria-live="polite"
-            data-testid="availability-status"
-          >
-            {renderStatus()}
-          </div>
-        )}
+      <CardContent>
+        <AvailabilityCheckerBody {...props} />
       </CardContent>
     </Card>
   );

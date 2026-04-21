@@ -16,10 +16,8 @@ export function SuccessClient({ poll }: Props) {
   const router = useRouter();
 
   useEffect(() => {
-    if (!poll) {
-      clearCart();
-    }
-  }, [poll, clearCart]);
+    clearCart();
+  }, [clearCart]);
 
   useEffect(() => {
     if (!poll) return;
