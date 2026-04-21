@@ -365,7 +365,7 @@ export async function reconcileStripeOrder(order: OrderRow): Promise<void> {
   const syntheticId = `reconcile:${session.id}:${session.status}`;
   const recorded = await recordEventIfNew({
     id: syntheticId,
-    type: `reconcile.${session.status}`,
+    type: `reconcile.${session.status}` as Stripe.Event["type"],
   });
   if (!recorded) return;
 

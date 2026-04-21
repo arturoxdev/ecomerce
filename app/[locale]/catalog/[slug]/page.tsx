@@ -1,12 +1,14 @@
 import { ImageOff } from "lucide-react";
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { ProductDetailActions, ProductGallery } from "@/features/catalog/components";
-import { findProductBySlug as findBySlug, findBySlugMeta } from "@/features/catalog";
-import { MarkdownContent } from "@/features/static-pages";
+import { ProductDetailActions, ProductGallery } from "@/features/products";
+import {
+  findBySlug as findBySlug,
+  findBySlugMeta,
+} from "@/features/products/services/products.service";
+import { MarkdownContent } from "@/features/pages";
 import { Badge } from "@/components/ui/badge";
 import { siteConfig } from "@/lib/config/site";
 import { isLocale, type Locale } from "@/lib/i18n/config";
@@ -47,7 +49,6 @@ export default async function ProductDetailPage({
 
   const basePrice = parseFloat(product.basePrice);
   const activeVariants = product.variants?.filter((v) => v.isActive) ?? [];
-  const hasVariants = activeVariants.length > 0;
 
   return (
     <div className="min-h-screen bg-white">

@@ -26,6 +26,6 @@ if (process.env.NODE_ENV === "production") {
 }
 
 export const stripe = new Stripe(secret, {
-  apiVersion: "2025-09-30.clover",
+  apiVersion: "2025-10-29.clover",
   typescript: true,
 });

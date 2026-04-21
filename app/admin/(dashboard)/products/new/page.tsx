@@ -1,7 +1,7 @@
 import { asc } from "drizzle-orm";
 
-import { createProduct, ProductForm } from "@/features/admin-products";
-import { findAllCategories } from "@/features/catalog";
+import { createProduct, ProductForm } from "@/features/products";
+import { findAll as findAllCategories } from "@/features/categories/services/categories.service";
 import { categories } from "@/lib/db/schema";
 import { SiteHeader } from "@/components/admin/site-header";
 

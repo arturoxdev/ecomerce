@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { PaymentBreakdown } from "@/features/checkout";
-import * as orderRepo from "@/features/admin-orders";
+import { findByIdWithItems } from "@/features/orders/services/orders.service";
 import { getSettings } from "@/features/admin-settings";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { headers } from "next/headers";
@@ -25,7 +25,7 @@ export default async function SuccessPage({ params, searchParams }: Props) {
   );
   if (!rate.allowed) notFound();
 
-  const order = await orderRepo.findByIdWithItems(orderId);
+  const order = await findByIdWithItems(orderId);
   if (!order) notFound();
 
   // D.4 — if caller sends a session_id hint, it must match. Always 404, never redirect.

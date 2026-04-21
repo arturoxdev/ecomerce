@@ -1,8 +1,7 @@
 import { notFound } from "next/navigation";
 
-import { updateUser, UserForm, findUserById as findById } from "@/features/admin-users";
-import { getSessionUser } from "@/features/auth";
-import { getAssignableRoles } from "@/features/auth";
+import { updateUser, UserForm, findUserById as findById } from "@/features/users";
+import { getAssignableRoles, getSessionUser } from "@/lib/services/auth";
 import {
   Card,
   CardContent,

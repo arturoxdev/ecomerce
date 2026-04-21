@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
 
-import { MarkdownContent } from "@/features/static-pages";
+import { MarkdownContent } from "@/features/pages";
 import {
   DocumentShell,
   StaticPageHero,
-} from "@/features/static-pages";
+} from "@/features/pages";
 import { isLocale, type Locale } from "@/lib/i18n/config";
-import { getLegalDocument } from "@/features/static-pages";
+import { getLegalDocument } from "@/features/pages";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -18,7 +18,7 @@ export default async function PrivacyPage({ params }: Props) {
     notFound();
   }
 
-  const content = await getLegalDocument("privacy", locale as Locale);
+  const { data: content } = await getLegalDocument("privacy", locale as Locale);
 
   return (
     <>

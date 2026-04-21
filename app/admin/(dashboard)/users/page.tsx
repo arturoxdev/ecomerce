@@ -1,7 +1,7 @@
 import Link from "next/link";
 
-import { findAllByStore, UserTable } from "@/features/admin-users";
-import { getSessionUser } from "@/features/auth";
+import { findAllByStore, UserTable } from "@/features/users";
+import { getSessionUser } from "@/lib/services/auth";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/admin/site-header";
 

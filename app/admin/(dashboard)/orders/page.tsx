@@ -1,6 +1,6 @@
 import { SiteHeader } from "@/components/admin/site-header";
-import { getOrders } from "./actions";
-import { OrderTable } from "./order-table";
+import { OrderTable } from "@/features/orders";
+import { getOrders } from "@/features/orders/actions";
 
 type Props = {
   searchParams: Promise<{ page?: string }>;

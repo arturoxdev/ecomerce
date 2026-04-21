@@ -1,12 +1,12 @@
 import { asc } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
-import { CategoryFilter, ProductCard } from "@/features/catalog/components";
+import { CategoryFilter, ProductCard } from "@/features/products";
 import {
-  findAllCategories,
   findAllByCategorySlug,
   findAllWithCategory,
-} from "@/features/catalog";
+} from "@/features/products/services/products.service";
+import { findAll as findAllCategories } from "@/features/categories/services/categories.service";
 import { categories, products } from "@/lib/db/schema";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";

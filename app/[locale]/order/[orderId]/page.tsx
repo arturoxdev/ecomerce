@@ -5,9 +5,9 @@ import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { findByIdWithItems } from "@/features/orders/services/orders.service";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
-import * as orderRepo from "@/features/admin-orders";
 
 type Props = {
   params: Promise<{ locale: string; orderId: string }>;
@@ -18,7 +18,7 @@ export default async function OrderConfirmationPage({ params }: Props) {
   if (!isLocale(locale)) notFound();
 
   const m = getMessages(locale as Locale);
-  const order = await orderRepo.findByIdWithItems(orderId);
+  const order = await findByIdWithItems(orderId);
   if (!order) notFound();
 
   return (
@@ -35,7 +35,10 @@ export default async function OrderConfirmationPage({ params }: Props) {
           {m.order.confirmedDescription}
         </p>
         <p className="text-xs text-slate-400">
-          {m.order.orderNumber}: {order.id.slice(0, 8).toUpperCase()}
+          {m.order.orderNumber}:{" "}
+          <span data-testid="order-confirmation-number">
+            {order.id.slice(0, 8).toUpperCase()}
+          </span>
         </p>
       </div>
 

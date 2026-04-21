@@ -17,6 +17,7 @@
 | [flows.md](flows.md)         | Flujos del sistema con diagramas Mermaid      |
 | [database.md](database.md)   | Esquema de base de datos, tablas y relaciones |
 | [roadmap.md](roadmap.md)     | Sprints y tareas por semana                   |
+| [specs/README.md](specs/README.md) | Fuente de verdad funcional y plan de specs | 
 | [questions.md](questions.md) | Preguntas abiertas y respondidas              |
 | [resources.md](resources.md) | Links y materiales de referencia              |
 

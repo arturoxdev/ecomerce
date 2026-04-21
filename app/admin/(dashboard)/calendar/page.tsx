@@ -1,5 +1,5 @@
 import { SiteHeader } from "@/components/admin/site-header";
-import { CalendarSchedule } from "@/components/admin/calendar-schedule";
+import { CalendarSchedule } from "@/features/orders";
 
 export default function AdminCalendarPage() {
   return (

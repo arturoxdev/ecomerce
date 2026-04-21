@@ -1,0 +1,605 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e5]:
+      - list [ref=e7]:
+        - listitem [ref=e8]:
+          - link "Admin" [ref=e9] [cursor=pointer]:
+            - /url: /admin/products
+            - img [ref=e10]
+            - generic [ref=e16]: Admin
+      - generic [ref=e17]:
+        - generic [ref=e18]:
+          - generic [ref=e19]: Navigation
+          - list [ref=e21]:
+            - listitem [ref=e22]:
+              - link "Products" [ref=e23] [cursor=pointer]:
+                - /url: /admin/products
+                - img [ref=e24]
+                - generic [ref=e28]: Products
+            - listitem [ref=e29]:
+              - link "Categories" [ref=e30] [cursor=pointer]:
+                - /url: /admin/categories
+                - img [ref=e31]
+                - generic [ref=e33]: Categories
+            - listitem [ref=e34]:
+              - link "Users" [ref=e35] [cursor=pointer]:
+                - /url: /admin/users
+                - img [ref=e36]
+                - generic [ref=e41]: Users
+            - listitem [ref=e42]:
+              - link "Orders" [ref=e43] [cursor=pointer]:
+                - /url: /admin/orders
+                - img [ref=e44]
+                - generic [ref=e47]: Orders
+            - listitem [ref=e48]:
+              - link "Calendar" [ref=e49] [cursor=pointer]:
+                - /url: /admin/calendar
+                - img [ref=e50]
+                - generic [ref=e52]: Calendar
+            - listitem [ref=e53]:
+              - link "Pages" [ref=e54] [cursor=pointer]:
+                - /url: /admin/pages
+                - img [ref=e55]
+                - generic [ref=e58]: Pages
+        - generic [ref=e59]:
+          - generic [ref=e60]: Support
+          - list [ref=e62]:
+            - listitem [ref=e63]:
+              - link "Settings" [ref=e64] [cursor=pointer]:
+                - /url: /admin/settings
+                - img [ref=e65]
+                - generic [ref=e68]: Settings
+      - list [ref=e70]:
+        - listitem [ref=e71]:
+          - button "A Admin admin@admin.com" [ref=e72]:
+            - generic [ref=e73]: A
+            - generic [ref=e74]:
+              - generic [ref=e75]: Admin
+              - generic [ref=e76]: admin@admin.com
+            - img [ref=e77]
+    - main [ref=e80]:
+      - generic [ref=e82]:
+        - generic [ref=e202]:
+          - button "Toggle Sidebar" [ref=e203]:
+            - img
+            - generic [ref=e204]: Toggle Sidebar
+          - separator [ref=e205]
+          - heading "Products" [level=1] [ref=e206]
+          - link "Add product" [ref=e208] [cursor=pointer]:
+            - /url: /admin/products/new
+        - generic [ref=e209]:
+          - generic [ref=e211]:
+            - generic [ref=e212]:
+              - generic [ref=e213]: Search
+              - generic [ref=e214]:
+                - img
+                - textbox "Search" [ref=e215]:
+                  - /placeholder: Search by name...
+            - generic [ref=e216]:
+              - generic [ref=e217]: Category
+              - combobox [ref=e218]:
+                - text: All categories
+                - img: ▼
+              - textbox [ref=e219]: all
+            - generic [ref=e220]:
+              - generic [ref=e221]: Status
+              - combobox [ref=e222]:
+                - text: All
+                - img: ▼
+              - textbox [ref=e223]: all
+          - generic [ref=e224]:
+            - table [ref=e228]:
+              - rowgroup [ref=e229]:
+                - row "Name Category Price Stock Status Actions" [ref=e230]:
+                  - columnheader "Name" [ref=e231]
+                  - columnheader "Category" [ref=e232]
+                  - columnheader "Price" [ref=e233]
+                  - columnheader "Stock" [ref=e234]
+                  - columnheader "Status" [ref=e235]
+                  - columnheader "Actions" [ref=e236]
+              - rowgroup [ref=e237]:
+                - row "Test Product Playwright Inflables $199.99 10 Active" [ref=e238]:
+                  - cell "Test Product Playwright" [ref=e239]
+                  - cell "Inflables" [ref=e240]
+                  - cell "$199.99" [ref=e241]: $199.99
+                  - cell "10" [ref=e242]
+                  - cell "Active" [ref=e243]:
+                    - button "Active" [ref=e244] [cursor=pointer]:
+                      - generic [ref=e245]: Active
+                  - cell [ref=e246]:
+                    - generic [ref=e247]:
+                      - link "Manage availability" [ref=e248] [cursor=pointer]:
+                        - /url: /admin/products/0b211b76-db19-49e3-b5ad-2262df387a35/availability
+                        - img
+                      - link [ref=e249] [cursor=pointer]:
+                        - /url: /admin/products/0b211b76-db19-49e3-b5ad-2262df387a35/edit
+                        - img
+                      - button [ref=e250]:
+                        - img
+                - row "Decoraciones con telas Decoraciones $1.00 1 Active" [ref=e251]:
+                  - cell "Decoraciones con telas" [ref=e252]
+                  - cell "Decoraciones" [ref=e253]
+                  - cell "$1.00" [ref=e254]: $1.00
+                  - cell "1" [ref=e255]
+                  - cell "Active" [ref=e256]:
+                    - button "Active" [ref=e257] [cursor=pointer]:
+                      - generic [ref=e258]: Active
+                  - cell [ref=e259]:
+                    - generic [ref=e260]:
+                      - link "Manage availability" [ref=e261] [cursor=pointer]:
+                        - /url: /admin/products/af66048c-db76-4a32-b575-e3f6c05b61c0/availability
+                        - img
+                      - link [ref=e262] [cursor=pointer]:
+                        - /url: /admin/products/af66048c-db76-4a32-b575-e3f6c05b61c0/edit
+                        - img
+                      - button [ref=e263]:
+                        - img
+                - row "Decoraciones con globos Decoraciones $1.00 1 Active" [ref=e264]:
+                  - cell "Decoraciones con globos" [ref=e265]
+                  - cell "Decoraciones" [ref=e266]
+                  - cell "$1.00" [ref=e267]: $1.00
+                  - cell "1" [ref=e268]
+                  - cell "Active" [ref=e269]:
+                    - button "Active" [ref=e270] [cursor=pointer]:
+                      - generic [ref=e271]: Active
+                  - cell [ref=e272]:
+                    - generic [ref=e273]:
+                      - link "Manage availability" [ref=e274] [cursor=pointer]:
+                        - /url: /admin/products/c07ab296-9e91-4523-ae40-321f014e9b88/availability
+                        - img
+                      - link [ref=e275] [cursor=pointer]:
+                        - /url: /admin/products/c07ab296-9e91-4523-ae40-321f014e9b88/edit
+                        - img
+                      - button [ref=e276]:
+                        - img
+                - row "Números de Marquesina (set) Equipo y Mobiliario para Eventos $100.00 1 Active" [ref=e277]:
+                  - cell "Números de Marquesina (set)" [ref=e278]
+                  - cell "Equipo y Mobiliario para Eventos" [ref=e279]
+                  - cell "$100.00" [ref=e280]: $100.00
+                  - cell "1" [ref=e281]
+                  - cell "Active" [ref=e282]:
+                    - button "Active" [ref=e283] [cursor=pointer]:
+                      - generic [ref=e284]: Active
+                  - cell [ref=e285]:
+                    - generic [ref=e286]:
+                      - link "Manage availability" [ref=e287] [cursor=pointer]:
+                        - /url: /admin/products/a454a097-ce59-411a-9763-fd14d2e8188c/availability
+                        - img
+                      - link [ref=e288] [cursor=pointer]:
+                        - /url: /admin/products/a454a097-ce59-411a-9763-fd14d2e8188c/edit
+                        - img
+                      - button [ref=e289]:
+                        - img
+                - row "Servilletas de Tela Mantelería y detalles de mesa $1.50 750 Active" [ref=e290]:
+                  - cell "Servilletas de Tela" [ref=e291]
+                  - cell "Mantelería y detalles de mesa" [ref=e292]
+                  - cell "$1.50" [ref=e293]: $1.50
+                  - cell "750" [ref=e294]
+                  - cell "Active" [ref=e295]:
+                    - button "Active" [ref=e296] [cursor=pointer]:
+                      - generic [ref=e297]: Active
+                  - cell [ref=e298]:
+                    - generic [ref=e299]:
+                      - link "Manage availability" [ref=e300] [cursor=pointer]:
+                        - /url: /admin/products/3ef01b5c-55e6-4098-a5b7-233ec045190b/availability
+                        - img
+                      - link [ref=e301] [cursor=pointer]:
+                        - /url: /admin/products/3ef01b5c-55e6-4098-a5b7-233ec045190b/edit
+                        - img
+                      - button [ref=e302]:
+                        - img
+                - row "Cargador de Plato Trasparente -Dorado Mantelería y detalles de mesa $1.50 100 Active" [ref=e303]:
+                  - cell "Cargador de Plato Trasparente -Dorado" [ref=e304]
+                  - cell "Mantelería y detalles de mesa" [ref=e305]
+                  - cell "$1.50" [ref=e306]: $1.50
+                  - cell "100" [ref=e307]
+                  - cell "Active" [ref=e308]:
+                    - button "Active" [ref=e309] [cursor=pointer]:
+                      - generic [ref=e310]: Active
+                  - cell [ref=e311]:
+                    - generic [ref=e312]:
+                      - link "Manage availability" [ref=e313] [cursor=pointer]:
+                        - /url: /admin/products/eac0103c-4568-4a17-942a-f8d54df8b37f/availability
+                        - img
+                      - link [ref=e314] [cursor=pointer]:
+                        - /url: /admin/products/eac0103c-4568-4a17-942a-f8d54df8b37f/edit
+                        - img
+                      - button [ref=e315]:
+                        - img
+                - row "Cargadores de Platos Plateado Mantelería y detalles de mesa $1.50 200 Active" [ref=e316]:
+                  - cell "Cargadores de Platos Plateado" [ref=e317]
+                  - cell "Mantelería y detalles de mesa" [ref=e318]
+                  - cell "$1.50" [ref=e319]: $1.50
+                  - cell "200" [ref=e320]
+                  - cell "Active" [ref=e321]:
+                    - button "Active" [ref=e322] [cursor=pointer]:
+                      - generic [ref=e323]: Active
+                  - cell [ref=e324]:
+                    - generic [ref=e325]:
+                      - link "Manage availability" [ref=e326] [cursor=pointer]:
+                        - /url: /admin/products/1f41a5b0-0909-423d-b49a-e8df23ff75dc/availability
+                        - img
+                      - link [ref=e327] [cursor=pointer]:
+                        - /url: /admin/products/1f41a5b0-0909-423d-b49a-e8df23ff75dc/edit
+                        - img
+                      - button [ref=e328]:
+                        - img
+                - row "Cargador de Plato Dorado Mantelería y detalles de mesa $1.50 200 Active" [ref=e329]:
+                  - cell "Cargador de Plato Dorado" [ref=e330]
+                  - cell "Mantelería y detalles de mesa" [ref=e331]
+                  - cell "$1.50" [ref=e332]: $1.50
+                  - cell "200" [ref=e333]
+                  - cell "Active" [ref=e334]:
+                    - button "Active" [ref=e335] [cursor=pointer]:
+                      - generic [ref=e336]: Active
+                  - cell [ref=e337]:
+                    - generic [ref=e338]:
+                      - link "Manage availability" [ref=e339] [cursor=pointer]:
+                        - /url: /admin/products/0b27560b-bda2-4c66-8d91-2132367c43da/availability
+                        - img
+                      - link [ref=e340] [cursor=pointer]:
+                        - /url: /admin/products/0b27560b-bda2-4c66-8d91-2132367c43da/edit
+                        - img
+                      - button [ref=e341]:
+                        - img
+                - row "Sobre mantel Mantelería y detalles de mesa $3.50 1 Active" [ref=e342]:
+                  - cell "Sobre mantel" [ref=e343]
+                  - cell "Mantelería y detalles de mesa" [ref=e344]
+                  - cell "$3.50" [ref=e345]: $3.50
+                  - cell "1" [ref=e346]
+                  - cell "Active" [ref=e347]:
+                    - button "Active" [ref=e348] [cursor=pointer]:
+                      - generic [ref=e349]: Active
+                  - cell [ref=e350]:
+                    - generic [ref=e351]:
+                      - link "Manage availability" [ref=e352] [cursor=pointer]:
+                        - /url: /admin/products/5880dbda-de00-4d4f-a633-353c9f4d72ff/availability
+                        - img
+                      - link [ref=e353] [cursor=pointer]:
+                        - /url: /admin/products/5880dbda-de00-4d4f-a633-353c9f4d72ff/edit
+                        - img
+                      - button [ref=e354]:
+                        - img
+                - row "Base para Postres Madera Equipo y Mobiliario para Eventos $30.00 1 Active" [ref=e355]:
+                  - cell "Base para Postres Madera" [ref=e356]
+                  - cell "Equipo y Mobiliario para Eventos" [ref=e357]
+                  - cell "$30.00" [ref=e358]: $30.00
+                  - cell "1" [ref=e359]
+                  - cell "Active" [ref=e360]:
+                    - button "Active" [ref=e361] [cursor=pointer]:
+                      - generic [ref=e362]: Active
+                  - cell [ref=e363]:
+                    - generic [ref=e364]:
+                      - link "Manage availability" [ref=e365] [cursor=pointer]:
+                        - /url: /admin/products/7abb726f-3ae4-4eb9-b775-bf933591a771/availability
+                        - img
+                      - link [ref=e366] [cursor=pointer]:
+                        - /url: /admin/products/7abb726f-3ae4-4eb9-b775-bf933591a771/edit
+                        - img
+                      - button [ref=e367]:
+                        - img
+                - row "Base para Postres Blanco Equipo y Mobiliario para Eventos $30.00 1 Active" [ref=e368]:
+                  - cell "Base para Postres Blanco" [ref=e369]
+                  - cell "Equipo y Mobiliario para Eventos" [ref=e370]
+                  - cell "$30.00" [ref=e371]: $30.00
+                  - cell "1" [ref=e372]
+                  - cell "Active" [ref=e373]:
+                    - button "Active" [ref=e374] [cursor=pointer]:
+                      - generic [ref=e375]: Active
+                  - cell [ref=e376]:
+                    - generic [ref=e377]:
+                      - link "Manage availability" [ref=e378] [cursor=pointer]:
+                        - /url: /admin/products/fc64d5ce-450a-43e0-a339-abfecd2153ca/availability
+                        - img
+                      - link [ref=e379] [cursor=pointer]:
+                        - /url: /admin/products/fc64d5ce-450a-43e0-a339-abfecd2153ca/edit
+                        - img
+                      - button [ref=e380]:
+                        - img
+                - row "Bases para Postres Silver Equipo y Mobiliario para Eventos $50.00 1 Active" [ref=e381]:
+                  - cell "Bases para Postres Silver" [ref=e382]
+                  - cell "Equipo y Mobiliario para Eventos" [ref=e383]
+                  - cell "$50.00" [ref=e384]: $50.00
+                  - cell "1" [ref=e385]
+                  - cell "Active" [ref=e386]:
+                    - button "Active" [ref=e387] [cursor=pointer]:
+                      - generic [ref=e388]: Active
+                  - cell [ref=e389]:
+                    - generic [ref=e390]:
+                      - link "Manage availability" [ref=e391] [cursor=pointer]:
+                        - /url: /admin/products/60e247a4-4fe4-4e82-b2b4-e8b4edb10e50/availability
+                        - img
+                      - link [ref=e392] [cursor=pointer]:
+                        - /url: /admin/products/60e247a4-4fe4-4e82-b2b4-e8b4edb10e50/edit
+                        - img
+                      - button [ref=e393]:
+                        - img
+                - row "Bases para postres dorado Equipo y Mobiliario para Eventos $50.00 1 Active" [ref=e394]:
+                  - cell "Bases para postres dorado" [ref=e395]
+                  - cell "Equipo y Mobiliario para Eventos" [ref=e396]
+                  - cell "$50.00" [ref=e397]: $50.00
+                  - cell "1" [ref=e398]
+                  - cell "Active" [ref=e399]:
+                    - button "Active" [ref=e400] [cursor=pointer]:
+                      - generic [ref=e401]: Active
+                  - cell [ref=e402]:
+                    - generic [ref=e403]:
+                      - link "Manage availability" [ref=e404] [cursor=pointer]:
+                        - /url: /admin/products/1dfa08ea-ce6e-4bc7-a498-d5e195ca2f17/availability
+                        - img
+                      - link [ref=e405] [cursor=pointer]:
+                        - /url: /admin/products/1dfa08ea-ce6e-4bc7-a498-d5e195ca2f17/edit
+                        - img
+                      - button [ref=e406]:
+                        - img
+                - row "Fajas de sillas Mantelería y detalles de mesa $1.50 600 Active" [ref=e407]:
+                  - cell "Fajas de sillas" [ref=e408]
+                  - cell "Mantelería y detalles de mesa" [ref=e409]
+                  - cell "$1.50" [ref=e410]: $1.50
+                  - cell "600" [ref=e411]
+                  - cell "Active" [ref=e412]:
+                    - button "Active" [ref=e413] [cursor=pointer]:
+                      - generic [ref=e414]: Active
+                  - cell [ref=e415]:
+                    - generic [ref=e416]:
+                      - link "Manage availability" [ref=e417] [cursor=pointer]:
+                        - /url: /admin/products/d5432282-46bd-4798-a9d4-6ff01c960f36/availability
+                        - img
+                      - link [ref=e418] [cursor=pointer]:
+                        - /url: /admin/products/d5432282-46bd-4798-a9d4-6ff01c960f36/edit
+                        - img
+                      - button [ref=e419]:
+                        - img
+                - row "Cobertores de silla blanco Mantelería y detalles de mesa $2.50 250 Active" [ref=e420]:
+                  - cell "Cobertores de silla blanco" [ref=e421]
+                  - cell "Mantelería y detalles de mesa" [ref=e422]
+                  - cell "$2.50" [ref=e423]: $2.50
+                  - cell "250" [ref=e424]
+                  - cell "Active" [ref=e425]:
+                    - button "Active" [ref=e426] [cursor=pointer]:
+                      - generic [ref=e427]: Active
+                  - cell [ref=e428]:
+                    - generic [ref=e429]:
+                      - link "Manage availability" [ref=e430] [cursor=pointer]:
+                        - /url: /admin/products/671a8104-78c4-4b6e-aa7c-006330a7e75a/availability
+                        - img
+                      - link [ref=e431] [cursor=pointer]:
+                        - /url: /admin/products/671a8104-78c4-4b6e-aa7c-006330a7e75a/edit
+                        - img
+                      - button [ref=e432]:
+                        - img
+                - row "Camino de mesa satin Mantelería y detalles de mesa $1.50 120 Active" [ref=e433]:
+                  - cell "Camino de mesa satin" [ref=e434]
+                  - cell "Mantelería y detalles de mesa" [ref=e435]
+                  - cell "$1.50" [ref=e436]: $1.50
+                  - cell "120" [ref=e437]
+                  - cell "Active" [ref=e438]:
+                    - button "Active" [ref=e439] [cursor=pointer]:
+                      - generic [ref=e440]: Active
+                  - cell [ref=e441]:
+                    - generic [ref=e442]:
+                      - link "Manage availability" [ref=e443] [cursor=pointer]:
+                        - /url: /admin/products/90884821-825a-402c-bfc9-110b49f13e6c/availability
+                        - img
+                      - link [ref=e444] [cursor=pointer]:
+                        - /url: /admin/products/90884821-825a-402c-bfc9-110b49f13e6c/edit
+                        - img
+                      - button [ref=e445]:
+                        - img
+                - row "Manteles Rectangular Mantelería y detalles de mesa $12.00 30 Active" [ref=e446]:
+                  - cell "Manteles Rectangular" [ref=e447]
+                  - cell "Mantelería y detalles de mesa" [ref=e448]
+                  - cell "$12.00" [ref=e449]: $12.00
+                  - cell "30" [ref=e450]
+                  - cell "Active" [ref=e451]:
+                    - button "Active" [ref=e452] [cursor=pointer]:
+                      - generic [ref=e453]: Active
+                  - cell [ref=e454]:
+                    - generic [ref=e455]:
+                      - link "Manage availability" [ref=e456] [cursor=pointer]:
+                        - /url: /admin/products/00fb02f3-5708-43f0-a633-1b8881ce8a39/availability
+                        - img
+                      - link [ref=e457] [cursor=pointer]:
+                        - /url: /admin/products/00fb02f3-5708-43f0-a633-1b8881ce8a39/edit
+                        - img
+                      - button [ref=e458]:
+                        - img
+                - row "Manteles Redondos Mantelería y detalles de mesa $14.00 85 Active" [ref=e459]:
+                  - cell "Manteles Redondos" [ref=e460]
+                  - cell "Mantelería y detalles de mesa" [ref=e461]
+                  - cell "$14.00" [ref=e462]: $14.00
+                  - cell "85" [ref=e463]
+                  - cell "Active" [ref=e464]:
+                    - button "Active" [ref=e465] [cursor=pointer]:
+                      - generic [ref=e466]: Active
+                  - cell [ref=e467]:
+                    - generic [ref=e468]:
+                      - link "Manage availability" [ref=e469] [cursor=pointer]:
+                        - /url: /admin/products/dd4c9021-8c8a-45ae-89b4-bcc11126c842/availability
+                        - img
+                      - link [ref=e470] [cursor=pointer]:
+                        - /url: /admin/products/dd4c9021-8c8a-45ae-89b4-bcc11126c842/edit
+                        - img
+                      - button [ref=e471]:
+                        - img
+                - row "Mesa Pequeña para pastel o postres Equipo y Mobiliario para Eventos $25.00 1 Active" [ref=e472]:
+                  - cell "Mesa Pequeña para pastel o postres" [ref=e473]
+                  - cell "Equipo y Mobiliario para Eventos" [ref=e474]
+                  - cell "$25.00" [ref=e475]: $25.00
+                  - cell "1" [ref=e476]
+                  - cell "Active" [ref=e477]:
+                    - button "Active" [ref=e478] [cursor=pointer]:
+                      - generic [ref=e479]: Active
+                  - cell [ref=e480]:
+                    - generic [ref=e481]:
+                      - link "Manage availability" [ref=e482] [cursor=pointer]:
+                        - /url: /admin/products/184c0f57-19a0-4e99-8b86-ed7bcf3ca305/availability
+                        - img
+                      - link [ref=e483] [cursor=pointer]:
+                        - /url: /admin/products/184c0f57-19a0-4e99-8b86-ed7bcf3ca305/edit
+                        - img
+                      - button [ref=e484]:
+                        - img
+                - row "Mesa dorado y blanco Equipo y Mobiliario para Eventos $30.00 1 Active" [ref=e485]:
+                  - cell "Mesa dorado y blanco" [ref=e486]
+                  - cell "Equipo y Mobiliario para Eventos" [ref=e487]
+                  - cell "$30.00" [ref=e488]: $30.00
+                  - cell "1" [ref=e489]
+                  - cell "Active" [ref=e490]:
+                    - button "Active" [ref=e491] [cursor=pointer]:
+                      - generic [ref=e492]: Active
+                  - cell [ref=e493]:
+                    - generic [ref=e494]:
+                      - link "Manage availability" [ref=e495] [cursor=pointer]:
+                        - /url: /admin/products/09467c36-d3b0-4a77-a073-f96f86d2036f/availability
+                        - img
+                      - link [ref=e496] [cursor=pointer]:
+                        - /url: /admin/products/09467c36-d3b0-4a77-a073-f96f86d2036f/edit
+                        - img
+                      - button [ref=e497]:
+                        - img
+            - navigation "pagination" [ref=e499]:
+              - list [ref=e500]:
+                - listitem [ref=e501]:
+                  - button "Go to previous page" [disabled]:
+                    - img
+                    - generic: Previous
+                - listitem [ref=e502]:
+                  - button "1" [ref=e503] [cursor=pointer]
+                - listitem [ref=e504]:
+                  - button "2" [ref=e505] [cursor=pointer]
+                - listitem [ref=e506]:
+                  - button "3" [ref=e507] [cursor=pointer]
+                - listitem [ref=e508]:
+                  - button "Go to next page" [ref=e509] [cursor=pointer]:
+                    - generic [ref=e510]: Next
+                    - img
+  - region "Notifications alt+T"
+  - generic [ref=e160] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e161]:
+      - img [ref=e162]
+    - generic [ref=e167]:
+      - button "Open issues overlay" [ref=e168]:
+        - generic [ref=e511]:
+          - generic [ref=e512]: "2"
+          - generic [ref=e513]: "3"
+        - generic [ref=e172]:
+          - text: Issue
+          - generic [ref=e514]: s
+      - button "Collapse issues badge" [ref=e173]:
+        - img [ref=e174]
+  - alert [ref=e176]
+  - button "v3.0.2 Output Detail Standard React Components Hide Until Restart Marker Color Clear on copy/send Block page interactions Manage MCP & Webhooks Manage MCP & Webhooks MCP Connection MCP connection allows agents to receive and act on annotations. Learn more Webhooks Auto-Send The webhook URL will receive live annotation changes and annotation data." [ref=e178] [cursor=pointer]:
+    - img [ref=e180]
+    - generic:
+      - generic:
+        - button:
+          - img
+      - generic:
+        - button:
+          - img
+      - generic:
+        - button [disabled]:
+          - img
+      - generic:
+        - button [disabled]:
+          - img
+      - generic:
+        - button [disabled]:
+          - img
+      - generic:
+        - button [disabled]:
+          - img
+      - generic:
+        - button:
+          - img
+      - generic:
+        - button:
+          - img
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - link:
+              - /url: https://agentation.com
+              - img
+            - paragraph: v3.0.2
+            - button "Switch to light mode":
+              - generic:
+                - generic:
+                  - img
+          - generic:
+            - generic:
+              - generic:
+                - text: Output Detail
+                - generic:
+                  - img
+              - button "Standard":
+                - generic: Standard
+            - generic:
+              - generic:
+                - text: React Components
+                - generic:
+                  - img
+              - generic:
+                - checkbox [checked]
+            - generic:
+              - generic:
+                - text: Hide Until Restart
+                - generic:
+                  - img
+              - generic:
+                - checkbox
+          - generic:
+            - generic: Marker Color
+            - generic:
+              - button "Indigo"
+              - button "Blue"
+              - button "Cyan"
+              - button "Green"
+              - button "Yellow"
+              - button "Orange"
+              - button "Red"
+          - generic:
+            - generic:
+              - generic:
+                - checkbox "Clear on copy/send"
+                - img
+              - generic: Clear on copy/send
+              - generic:
+                - img
+            - generic:
+              - generic:
+                - checkbox "Block page interactions" [checked]
+                - img
+              - generic: Block page interactions
+          - button "Manage MCP & Webhooks":
+            - generic: Manage MCP & Webhooks
+            - generic:
+              - img
+        - generic:
+          - button "Manage MCP & Webhooks":
+            - img
+            - generic: Manage MCP & Webhooks
+          - generic:
+            - generic:
+              - generic:
+                - text: MCP Connection
+                - generic:
+                  - img
+            - paragraph:
+              - text: MCP connection allows agents to receive and act on annotations.
+              - link "Learn more":
+                - /url: https://agentation.dev/mcp
+          - generic:
+            - generic:
+              - generic:
+                - text: Webhooks
+                - generic:
+                  - img
+              - generic:
+                - generic: Auto-Send
+                - generic:
+                  - checkbox "Auto-Send" [checked] [disabled]
+            - paragraph: The webhook URL will receive live annotation changes and annotation data.
+            - textbox "Webhook URL"

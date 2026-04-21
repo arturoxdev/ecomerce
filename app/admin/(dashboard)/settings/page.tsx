@@ -1,33 +1,47 @@
+import { CreditCard, Palette } from "lucide-react";
+import Link from "next/link";
+
 import { SiteHeader } from "@/components/admin/site-header";
-import {
-  SettingsForm,
-  getSettings,
-  updateSettingsAction,
-} from "@/features/admin-settings";
+import { Card } from "@/components/ui/card";
 
-export default async function AdminSettingsPage() {
-  const current = await getSettings();
+const sections = [
+  {
+    href: "/admin/settings/appearance",
+    label: "Appearance",
+    description: "Choose a theme for the admin panel and the storefront.",
+    icon: Palette,
+  },
+  {
+    href: "/admin/settings/payments",
+    label: "Payments & delivery",
+    description: "Payment mode, delivery, and deposit configuration.",
+    icon: CreditCard,
+  },
+];
 
+export default function AdminSettingsPage() {
   return (
     <>
       <SiteHeader title="Settings" />
-      <div className="flex flex-1 flex-col gap-6 px-4 py-8">
-        <div>
-          <h1 className="text-xl font-semibold">Store settings</h1>
-          <p className="text-sm text-muted-foreground">
-            Payment mode, delivery, and deposit configuration.
-          </p>
-        </div>
-        <SettingsForm
-          action={updateSettingsAction}
-          defaultValues={{
-            paymentMode: current?.paymentMode ?? "SPLIT_50_50",
-            deliveryMode:
-              current?.deliveryMode === "FIXED_FEE" ? "FIXED_FEE" : "INCLUDED",
-            deliveryFee: current?.deliveryFee ?? null,
-            depositPercent: current?.depositPercent ?? "0.10",
-          }}
-        />
+      <div className="grid gap-4 p-6 sm:grid-cols-2 lg:grid-cols-3">
+        {sections.map((section) => {
+          const Icon = section.icon;
+          return (
+            <Link key={section.href} href={section.href}>
+              <Card className="gap-2 p-5 transition-colors hover:border-primary">
+                <div className="flex items-center gap-3">
+                  <div className="rounded-md bg-muted p-2">
+                    <Icon className="size-5 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-base font-medium">{section.label}</h3>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {section.description}
+                </p>
+              </Card>
+            </Link>
+          );
+        })}
       </div>
     </>
   );

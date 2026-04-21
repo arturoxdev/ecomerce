@@ -1,10 +1,13 @@
 import { asc, desc } from "drizzle-orm";
 import Link from "next/link";
 
-import { ProductFilters, ProductTable } from "@/features/admin-products";
-import { findAllCategories, findAllWithCategory, countProducts } from "@/features/catalog";
-import { getSessionUser } from "@/features/auth";
-import { canWriteData } from "@/features/auth";
+import { ProductFilters, ProductTable } from "@/features/products";
+import {
+  countProducts,
+  findAllWithCategory,
+} from "@/features/products/services/products.service";
+import { findAll as findAllCategories } from "@/features/categories/services/categories.service";
+import { canWriteData, getSessionUser } from "@/lib/services/auth";
 import { categories, products } from "@/lib/db/schema";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/admin/site-header";

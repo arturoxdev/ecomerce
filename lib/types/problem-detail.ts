@@ -27,5 +27,6 @@ export const ProblemType = {
   FOREIGN_KEY_VIOLATION: "/problems/foreign-key-violation",
   UNAUTHORIZED: "/problems/unauthorized",
   FORBIDDEN: "/problems/forbidden",
+  TOO_MANY_REQUESTS: "/problems/too-many-requests",
   INTERNAL_ERROR: "/problems/internal-error",
 } as const;

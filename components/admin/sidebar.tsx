@@ -83,7 +83,7 @@ export function AdminSidebar({ userRole = "EMPLOYEE", userName, userEmail }: Pro
     : "U";
 
   return (
-    <Sidebar collapsible="offcanvas" variant="inset">
+    <Sidebar collapsible="offcanvas">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -173,6 +173,7 @@ export function AdminSidebar({ userRole = "EMPLOYEE", userName, userEmail }: Pro
                 sideOffset={4}
               >
                 <DropdownMenuItem
+                  data-testid="logout-button"
                   onSelect={() => logoutFormRef.current?.requestSubmit()}
                 >
                   <LogOut />

@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getOrderDetail } from "../actions";
+import { getOrderDetail } from "@/features/orders/actions";
 
 type Props = {
   params: Promise<{ id: string }>;

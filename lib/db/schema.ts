@@ -208,6 +208,7 @@ export const settings = pgTable("settings", {
     .notNull()
     .default("SPLIT_50_50"),
   currency: text("currency").notNull().default("USD"),
+  themeId: text("theme_id").notNull().default("default"),
   updatedAt: timestamp("updated_at")
     .notNull()
     .$onUpdate(() => new Date()),

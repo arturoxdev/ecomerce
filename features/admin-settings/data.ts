@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { requireWriteAccess } from "@/features/auth";
+import { requireWriteAccess } from "@/features/auth/session";
 import { recordAudit } from "@/lib/audit";
 import { getStoreId } from "@/lib/config/tenant";
 import { db } from "@/lib/db";

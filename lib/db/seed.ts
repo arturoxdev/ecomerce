@@ -8,7 +8,7 @@ import {
   contactPageFallbacks,
   faqFallbacks,
   legalPageFallbacks,
-} from "@/features/static-pages";
+} from "@/features/pages";
 
 import * as schema from "./schema";
 import {

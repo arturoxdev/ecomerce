@@ -1,21 +1,24 @@
-import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AdminSidebar } from "@/components/admin/sidebar";
 import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar";
-import { getSessionUser } from "@/features/auth";
+import { getSessionUser } from "@/lib/services/auth";
+import { getThemeId } from "@/lib/data/settings";
+import { getThemeById, serializeTheme } from "@/lib/themes";
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = await getSessionUser();
+  const [user, themeId] = await Promise.all([getSessionUser(), getThemeId()]);
+  const theme = getThemeById(themeId);
 
   return (
     <TooltipProvider>
+      <style dangerouslySetInnerHTML={{ __html: serializeTheme(theme) }} />
       <SidebarProvider
         style={
           {
@@ -36,7 +39,6 @@ export default async function AdminLayout({
             </div>
           </div>
         </SidebarInset>
-        <Toaster />
       </SidebarProvider>
     </TooltipProvider>
   );
