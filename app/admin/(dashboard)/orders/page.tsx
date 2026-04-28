@@ -18,7 +18,7 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
 
   return (
     <>
-      <SiteHeader title="Orders" />
+      <SiteHeader title="Órdenes" />
       <div className="flex flex-1 flex-col gap-4 p-4">
         <div className="flex items-center justify-end">
           <CreateOrderButton currentRole={user.role} />

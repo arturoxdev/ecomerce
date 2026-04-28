@@ -46,6 +46,7 @@ import {
 import { deleteProduct } from "../../actions";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { PRICE_TYPE_LABEL } from "@/lib/admin/labels";
 import { SlugField } from "./slug-field";
 import {
   isVideoUrl,
@@ -119,7 +120,7 @@ export function ProductForm({
 
   useEffect(() => {
     if ("success" in state && state.success) {
-      toast.success("Product saved");
+      toast.success("Producto guardado");
     }
   }, [state]);
 
@@ -144,7 +145,7 @@ export function ProductForm({
         toast.error(result.detail ?? result.title);
         return;
       }
-      toast.success("Product deleted");
+      toast.success("Producto eliminado");
       router.push("/admin/products");
     });
   }
@@ -163,8 +164,8 @@ export function ProductForm({
         const maxSize = getMaxSizeForMime(file.type);
         if (file.size > maxSize) {
           const limitMB = maxSize / (1024 * 1024);
-          const label = isVideoMime(file.type) ? "Videos" : "Images";
-          toast.error(`${label} must be under ${limitMB}MB`, {
+          const label = isVideoMime(file.type) ? "Los videos" : "Las imágenes";
+          toast.error(`${label} deben pesar menos de ${limitMB}MB`, {
             description: file.name,
           });
           continue;
@@ -183,7 +184,7 @@ export function ProductForm({
 
         if (!presignRes.ok) {
           const err = await presignRes.json();
-          toast.error(err.detail ?? err.title ?? "Upload failed", {
+          toast.error(err.detail ?? err.title ?? "No se pudo subir el archivo", {
             description: file.name,
           });
           continue;
@@ -199,8 +200,8 @@ export function ProductForm({
         });
 
         if (!uploadRes.ok) {
-          toast.error("Upload to storage failed", {
-            description: "Please try again.",
+          toast.error("No se pudo subir el archivo al almacenamiento", {
+            description: "Inténtalo de nuevo.",
           });
           continue;
         }
@@ -214,7 +215,7 @@ export function ProductForm({
           }
         }
 
-        toast.success("File uploaded", { description: file.name });
+        toast.success("Archivo subido", { description: file.name });
         setPhotos((prev) => [...prev, publicUrl]);
       }
     } finally {
@@ -230,7 +231,7 @@ export function ProductForm({
         toast.error(result.detail ?? result.title);
         return;
       }
-      toast.success("File removed");
+      toast.success("Archivo eliminado");
     }
     setPhotos((prev) => prev.filter((p) => p !== url));
   }
@@ -249,18 +250,18 @@ export function ProductForm({
       <Tabs defaultValue="basic" className="flex-col">
         <TabsList variant="line">
           <TabsTrigger value="basic" className="relative">
-            Basic Info
+            Información básica
             {hasBasicErrors && (
               <span className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-destructive" />
             )}
           </TabsTrigger>
           <TabsTrigger value="about" className="relative">
-            About
+            Acerca de
             {hasAboutErrors && (
               <span className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-destructive" />
             )}
           </TabsTrigger>
-          <TabsTrigger value="variants">Variants</TabsTrigger>
+          <TabsTrigger value="variants">Variantes</TabsTrigger>
         </TabsList>
 
         <TabsContent value="basic" keepMounted className="flex flex-col gap-6 pt-6">
@@ -268,17 +269,17 @@ export function ProductForm({
             <CardHeader>
               <CardTitle>General</CardTitle>
               <CardDescription>
-                Name, slug, and short description.
+                Nombre, slug y descripción corta.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Name" error={fieldErrors?.name?.[0]}>
+                <Field label="Nombre" error={fieldErrors?.name?.[0]}>
                   <Input
                     name="name"
                     value={name}
                     onChange={handleNameChange}
-                    placeholder="Product name"
+                    placeholder="Nombre del producto"
                     required
                   />
                 </Field>
@@ -291,14 +292,14 @@ export function ProductForm({
                 />
               </div>
 
-              <Field label="Description" error={fieldErrors?.description?.[0]}>
+              <Field label="Descripción" error={fieldErrors?.description?.[0]}>
                 <textarea
                   name="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   maxLength={150}
                   rows={3}
-                  placeholder="Brief description of the product"
+                  placeholder="Breve descripción del producto"
                   className="min-h-[70px] w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                 />
                 <p
@@ -315,21 +316,21 @@ export function ProductForm({
 
           <Card>
             <CardHeader>
-              <CardTitle>Pricing & inventory</CardTitle>
+              <CardTitle>Precio e inventario</CardTitle>
               <CardDescription>
-                Set the category, pricing model, and stock levels.
+                Define la categoría, el modelo de precio y el stock.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Category" error={fieldErrors?.categoryId?.[0]}>
+                <Field label="Categoría" error={fieldErrors?.categoryId?.[0]}>
                   <Select
                     name="categoryId"
                     defaultValue={defaultValues?.categoryId}
                     items={categories.map((c) => ({ value: c.id, label: c.name }))}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
+                      <SelectValue placeholder="Selecciona categoría" />
                     </SelectTrigger>
                     <SelectContent>
                       {categories.map((cat) => (
@@ -341,21 +342,35 @@ export function ProductForm({
                   </Select>
                 </Field>
 
-                <Field label="Price type" error={fieldErrors?.priceType?.[0]}>
-                  <Select name="priceType" defaultValue={defaultValues?.priceType ?? "FIXED"}>
+                <Field label="Tipo de precio" error={fieldErrors?.priceType?.[0]}>
+                  <Select
+                    name="priceType"
+                    defaultValue={defaultValues?.priceType ?? "FIXED"}
+                    items={[
+                      { value: "FIXED", label: PRICE_TYPE_LABEL.FIXED },
+                      { value: "PER_UNIT", label: PRICE_TYPE_LABEL.PER_UNIT },
+                    ]}
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="FIXED">Fixed</SelectItem>
-                      <SelectItem value="PER_UNIT">Per unit</SelectItem>
+                      <SelectItem value="FIXED" label={PRICE_TYPE_LABEL.FIXED}>
+                        {PRICE_TYPE_LABEL.FIXED}
+                      </SelectItem>
+                      <SelectItem
+                        value="PER_UNIT"
+                        label={PRICE_TYPE_LABEL.PER_UNIT}
+                      >
+                        {PRICE_TYPE_LABEL.PER_UNIT}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </Field>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Base price" error={fieldErrors?.basePrice?.[0]}>
+                <Field label="Precio base" error={fieldErrors?.basePrice?.[0]}>
                   <Input
                     name="basePrice"
                     type="number"
@@ -368,7 +383,7 @@ export function ProductForm({
                   />
                 </Field>
 
-                <Field label="Stock" error={fieldErrors?.stock?.[0]}>
+                <Field label="Existencias" error={fieldErrors?.stock?.[0]}>
                   <Input
                     name="stock"
                     type="number"
@@ -384,14 +399,13 @@ export function ProductForm({
 
           <Card>
             <CardHeader>
-              <CardTitle>Media</CardTitle>
+              <CardTitle>Multimedia</CardTitle>
               <CardDescription>
-                Upload images and videos. Max {MAX_MEDIA_COUNT} files (images up
-                to 5 MB, videos up to 20 MB).
+                Sube imágenes y videos. Máximo {MAX_MEDIA_COUNT} archivos (imágenes hasta 5 MB, videos hasta 20 MB).
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
-              <Field label="Photos & Videos" error={fieldErrors?.photos?.[0]}>
+              <Field label="Fotos y videos" error={fieldErrors?.photos?.[0]}>
                 <input type="hidden" name="photos" value={photos.join("\n")} />
 
                 <div className="grid grid-cols-6 gap-2.5">
@@ -438,7 +452,7 @@ export function ProductForm({
                       className="flex aspect-square flex-col items-center justify-center gap-1 rounded-md border border-dashed border-border-strong bg-background text-[11px] text-muted-foreground transition-colors hover:bg-muted/40 disabled:opacity-50"
                     >
                       <Upload className="size-4" />
-                      {uploading ? "Uploading\u2026" : "Upload"}
+                      {uploading ? "Subiendo\u2026" : "Subir"}
                     </button>
                   )}
                 </div>
@@ -453,7 +467,7 @@ export function ProductForm({
                 />
 
                 <span className="text-[11.5px] text-subtle">
-                  {photos.length}/{MAX_MEDIA_COUNT} files uploaded
+                  {photos.length}/{MAX_MEDIA_COUNT} archivos subidos
                 </span>
               </Field>
             </CardContent>
@@ -461,9 +475,9 @@ export function ProductForm({
 
           <Card>
             <CardHeader>
-              <CardTitle>Visibility</CardTitle>
+              <CardTitle>Visibilidad</CardTitle>
               <CardDescription>
-                Control whether the product is visible in the storefront.
+                Controla si el producto se muestra en la tienda.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -487,10 +501,10 @@ export function ProductForm({
                 </span>
                 <span className="flex flex-col">
                   <span className="text-[13px] font-semibold text-foreground">
-                    Active
+                    Activo
                   </span>
                   <span className="mt-0.5 text-xs text-muted-foreground">
-                    Visible on the storefront when in stock.
+                    Visible en la tienda cuando hay existencias.
                   </span>
                 </span>
               </label>
@@ -500,12 +514,12 @@ export function ProductForm({
 
         <TabsContent value="about" keepMounted className="flex flex-col gap-6 pt-6">
           <div>
-            <h3 className="text-sm font-medium text-foreground">About this product</h3>
+            <h3 className="text-sm font-medium text-foreground">Acerca de este producto</h3>
             <p className="text-sm text-muted-foreground">
-              Rich text description displayed on the product page.
+              Descripción enriquecida que aparece en la página del producto.
             </p>
           </div>
-          <Field label="Content" error={fieldErrors?.about?.[0]}>
+          <Field label="Contenido" error={fieldErrors?.about?.[0]}>
             <MarkdownEditor
               value={about}
               onChange={setAbout}
@@ -524,10 +538,10 @@ export function ProductForm({
           ) : (
             <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-muted-foreground/25 py-12">
               <p className="text-sm font-medium text-muted-foreground">
-                No variants yet
+                Aún no hay variantes
               </p>
               <p className="text-xs text-muted-foreground/70">
-                Save the product first to start adding variants.
+                Guarda primero el producto para agregar variantes.
               </p>
             </div>
           )}
@@ -541,7 +555,7 @@ export function ProductForm({
           disabled={pending}
           className="h-9 gap-1.5 rounded-md px-4 text-[13.5px] font-semibold"
         >
-          {pending ? "Saving\u2026" : "Save product"}
+          {pending ? "Guardando\u2026" : "Guardar producto"}
         </Button>
         <Button
           type="button"
@@ -549,7 +563,7 @@ export function ProductForm({
           onClick={() => history.back()}
           className="h-9 rounded-md px-3.5 text-[13.5px] font-semibold"
         >
-          Cancel
+          Cancelar
         </Button>
 
         <div className="ml-auto flex items-center gap-1">
@@ -564,7 +578,7 @@ export function ProductForm({
               }
             >
               <CalendarX2 data-icon="inline-start" />
-              Availability
+              Disponibilidad
             </Button>
           )}
           {productId && (
@@ -577,7 +591,7 @@ export function ProductForm({
               onClick={() => setDeleteOpen(true)}
             >
               <Trash2 data-icon="inline-start" />
-              Delete
+              Eliminar
             </Button>
           )}
           {slug && (
@@ -591,7 +605,7 @@ export function ProductForm({
               )}
             >
               <ExternalLink data-icon="inline-start" />
-              View product
+              Ver producto
             </a>
           )}
         </div>
@@ -600,20 +614,19 @@ export function ProductForm({
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete product?</AlertDialogTitle>
+            <AlertDialogTitle>\u00bfEliminar producto?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. Products with associated orders
-              cannot be deleted.
+              Esta acci\u00f3n no se puede deshacer. Los productos con \u00f3rdenes asociadas no pueden eliminarse.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={deleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive/30"
             >
-              {deleting ? "Deleting\u2026" : "Delete"}
+              {deleting ? "Eliminando\u2026" : "Eliminar"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

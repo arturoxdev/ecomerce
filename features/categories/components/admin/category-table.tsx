@@ -80,16 +80,16 @@ export function CategoryTable({ categories, canWrite = true }: Props) {
   }
 
   function handleDelete() {
-    confirmDelete(deleteCategory, "Category deleted");
+    confirmDelete(deleteCategory, "Categoría eliminada");
   }
 
   if (categories.length === 0) {
     return (
       <Card>
         <CardContent className="flex flex-col items-center gap-4 py-16 text-center">
-          <p className="text-muted-foreground">No categories yet.</p>
+          <p className="text-muted-foreground">Aún no hay categorías.</p>
           <Button render={<Link href="/admin/categories/new" />}>
-            Create category
+            Crear categoría
           </Button>
         </CardContent>
       </Card>
@@ -103,20 +103,20 @@ export function CategoryTable({ categories, canWrite = true }: Props) {
           <Table>
             <TableHeader className="bg-sidebar">
               <TableRow className="border-b border-border hover:bg-transparent">
-                <TableHead className={cn(headCellCn, "w-[20%]")}>Name</TableHead>
+                <TableHead className={cn(headCellCn, "w-[20%]")}>Nombre</TableHead>
                 <TableHead className={cn(headCellCn, "w-[18%]")}>Slug</TableHead>
-                <TableHead className={cn(headCellCn)}>Description</TableHead>
+                <TableHead className={cn(headCellCn)}>Descripción</TableHead>
                 <TableHead className={cn(headCellCn, "w-[110px] text-center")}>
-                  Products
+                  Productos
                 </TableHead>
                 {canWrite && (
                   <TableHead className={cn(headCellCn, "w-[90px] text-center")}>
-                    Order
+                    Orden
                   </TableHead>
                 )}
                 {canWrite && (
                   <TableHead className={cn(headCellCn, "w-[110px] text-right")}>
-                    Actions
+                    Acciones
                   </TableHead>
                 )}
               </TableRow>
@@ -163,7 +163,7 @@ export function CategoryTable({ categories, canWrite = true }: Props) {
                           className="text-muted-foreground"
                           onClick={() => handleReorder(index, "up")}
                           disabled={index === 0 || isPending}
-                          aria-label="Move up"
+                          aria-label="Mover arriba"
                         >
                           <ChevronUp className="size-3.5" />
                         </Button>
@@ -175,7 +175,7 @@ export function CategoryTable({ categories, canWrite = true }: Props) {
                           disabled={
                             index === categories.length - 1 || isPending
                           }
-                          aria-label="Move down"
+                          aria-label="Mover abajo"
                         >
                           <ChevronDown className="size-3.5" />
                         </Button>
@@ -194,7 +194,7 @@ export function CategoryTable({ categories, canWrite = true }: Props) {
                               href={`/admin/categories/${category.id}/edit`}
                             />
                           }
-                          aria-label="Edit"
+                          aria-label="Editar"
                         >
                           <Pencil className="size-3.5" />
                         </Button>
@@ -203,7 +203,7 @@ export function CategoryTable({ categories, canWrite = true }: Props) {
                           size="icon-sm"
                           className="text-muted-foreground hover:text-destructive"
                           onClick={() => setDeleteId(category.id)}
-                          aria-label="Delete"
+                          aria-label="Eliminar"
                         >
                           <Trash2 className="size-3.5" />
                         </Button>
@@ -220,20 +220,19 @@ export function CategoryTable({ categories, canWrite = true }: Props) {
       <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && closeDialog()}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete category?</AlertDialogTitle>
+            <AlertDialogTitle>¿Eliminar categoría?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. Categories with associated products
-              cannot be deleted.
+              Esta acción no se puede deshacer. Las categorías con productos asociados no pueden eliminarse.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isPending}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive/30"
             >
-              {isPending ? "Deleting…" : "Delete"}
+              {isPending ? "Eliminando…" : "Eliminar"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

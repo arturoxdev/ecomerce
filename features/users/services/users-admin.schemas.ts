@@ -3,9 +3,9 @@ import { z } from "zod";
 import { userRoleEnum } from "@/lib/db/schema";
 
 export const createUserSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Valid email is required"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  name: z.string().min(1, "El nombre es requerido"),
+  email: z.string().email("El correo electrónico no es válido"),
+  password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
   role: z.enum(userRoleEnum.enumValues),
   isActive: z.boolean().default(true),
 });
@@ -13,8 +13,8 @@ export const createUserSchema = z.object({
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 
 export const updateUserSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Valid email is required"),
+  name: z.string().min(1, "El nombre es requerido"),
+  email: z.string().email("El correo electrónico no es válido"),
   role: z.enum(userRoleEnum.enumValues),
   isActive: z.boolean().default(true),
 });

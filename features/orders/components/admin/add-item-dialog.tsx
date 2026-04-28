@@ -16,6 +16,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { QuantitySelector } from "@/components/quantity-selector";
 
 import { fetchAvailability } from "@/lib/api/availability-client";
+import { formatAdminCurrency } from "@/lib/admin/format";
 
 import type { ProductSearchSuggestion } from "@/features/products/actions";
 import type { DraftItem } from "./item-card";
@@ -113,7 +114,7 @@ export function AddItemDialog({ product, open, onOpenChange, onConfirm }: Props)
                   <div key={v.id} className="flex items-center gap-2">
                     <RadioGroupItem value={v.id} id={`variant-${v.id}`} />
                     <Label htmlFor={`variant-${v.id}`} className="font-normal">
-                      {v.name} — ${parseFloat(v.price).toFixed(2)}
+                      {v.name} — {formatAdminCurrency(v.price)}
                     </Label>
                   </div>
                 ))}

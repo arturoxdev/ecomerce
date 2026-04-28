@@ -2,9 +2,12 @@
 
 import { CalendarDays, Trash2 } from "lucide-react";
 import Image from "next/image";
-import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
+import {
+  formatAdminCurrency,
+  formatAdminDate,
+} from "@/lib/admin/format";
 
 export type DraftItem = {
   draftId: string;
@@ -47,15 +50,15 @@ export function ItemCard({ item, onRemove }: Props) {
         )}
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           <CalendarDays className="size-3" />
-          {format(item.date, "MMM d, yyyy")}
+          {formatAdminDate(item.date)}
         </div>
       </div>
       <div className="text-right text-sm">
         <p className="font-medium">
-          ${(item.unitPrice * item.quantity).toFixed(2)}
+          {formatAdminCurrency(item.unitPrice * item.quantity)}
         </p>
         <p className="text-xs text-muted-foreground">
-          {item.quantity} × ${item.unitPrice.toFixed(2)}
+          {item.quantity} × {formatAdminCurrency(item.unitPrice)}
         </p>
       </div>
       <Button

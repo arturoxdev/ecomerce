@@ -25,20 +25,20 @@ type Props = {
 export function ContactForm({ action, defaultValues, canWrite }: Props) {
   const [state, formAction, pending] = useActionState(action, {} as StaticPageFormState);
   const fieldErrors = getFieldErrors(state);
-  useFormActionToast(state, "Contact page updated");
+  useFormActionToast(state, "Página de contacto actualizada");
 
   return (
     <form action={formAction} className="space-y-6">
       <div className="grid gap-5 md:grid-cols-2">
-        <Field label="Title" error={fieldErrors?.title?.[0]} className="space-y-2">
+        <Field label="Título" error={fieldErrors?.title?.[0]} className="space-y-2">
           <Input name="title" defaultValue={defaultValues.title} disabled={!canWrite} />
         </Field>
-        <Field label="Email" error={fieldErrors?.email?.[0]} className="space-y-2">
+        <Field label="Correo electrónico" error={fieldErrors?.email?.[0]} className="space-y-2">
           <Input name="email" defaultValue={defaultValues.email} disabled={!canWrite} />
         </Field>
       </div>
 
-      <Field label="Subtitle" error={fieldErrors?.subtitle?.[0]} className="space-y-2">
+      <Field label="Subtítulo" error={fieldErrors?.subtitle?.[0]} className="space-y-2">
         <textarea
           name="subtitle"
           defaultValue={defaultValues.subtitle}
@@ -49,11 +49,11 @@ export function ContactForm({ action, defaultValues, canWrite }: Props) {
       </Field>
 
       <div className="grid gap-5 md:grid-cols-2">
-        <Field label="Phone" error={fieldErrors?.phone?.[0]} className="space-y-2">
+        <Field label="Teléfono" error={fieldErrors?.phone?.[0]} className="space-y-2">
           <Input name="phone" defaultValue={defaultValues.phone} disabled={!canWrite} />
         </Field>
         <Field
-          label="Business hours"
+          label="Horario de atención"
           error={fieldErrors?.businessHours?.[0]}
           className="space-y-2"
         >
@@ -65,7 +65,7 @@ export function ContactForm({ action, defaultValues, canWrite }: Props) {
         </Field>
       </div>
 
-      <Field label="Location" error={fieldErrors?.location?.[0]} className="space-y-2">
+      <Field label="Ubicación" error={fieldErrors?.location?.[0]} className="space-y-2">
         <textarea
           name="location"
           defaultValue={defaultValues.location}
@@ -82,7 +82,7 @@ export function ContactForm({ action, defaultValues, canWrite }: Props) {
             disabled={pending}
             className="h-10 rounded-xl bg-secondary px-5 text-white hover:bg-green-800"
           >
-            {pending ? "Saving..." : "Save changes"}
+            {pending ? "Guardando..." : "Guardar cambios"}
           </Button>
         </div>
       ) : null}

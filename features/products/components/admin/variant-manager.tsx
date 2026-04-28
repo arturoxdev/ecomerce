@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { isFormError, getFieldErrors, type FormState as VariantFormState } from "@/lib/types/form-state";
+import { formatAdminCurrency } from "@/lib/admin/format";
 import { deleteVariant } from "../../actions";
 
 type Variant = {
@@ -70,11 +71,11 @@ function VariantInlineForm({
       )}
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="flex flex-col gap-1">
-          <Label className="text-xs">Name</Label>
+          <Label className="text-xs">Nombre</Label>
           <Input
             name="name"
             defaultValue={defaultValues?.name}
-            placeholder="e.g. Rosa"
+            placeholder="ej. Rosa"
             required
           />
           {fieldErrors?.name && (
@@ -82,7 +83,7 @@ function VariantInlineForm({
           )}
         </div>
         <div className="flex flex-col gap-1">
-          <Label className="text-xs">Price</Label>
+          <Label className="text-xs">Precio</Label>
           <Input
             name="price"
             type="number"
@@ -97,7 +98,7 @@ function VariantInlineForm({
           )}
         </div>
         <div className="flex flex-col gap-1">
-          <Label className="text-xs">Stock</Label>
+          <Label className="text-xs">Existencias</Label>
           <Input
             name="stock"
             type="number"
@@ -112,10 +113,10 @@ function VariantInlineForm({
       </div>
       <div className="flex gap-2">
         <Button type="button" size="sm" disabled={pending} onClick={handleSubmit}>
-          {pending ? "Saving..." : submitLabel}
+          {pending ? "Guardando..." : submitLabel}
         </Button>
         <Button type="button" size="sm" variant="outline" onClick={onCancel}>
-          Cancel
+          Cancelar
         </Button>
       </div>
     </div>
@@ -139,7 +140,7 @@ export function VariantManager({
         toast.error(result.detail ?? result.title);
       }
     } catch {
-      toast.error("Failed to delete variant");
+      toast.error("No se pudo eliminar la variante");
     } finally {
       setDeleting(null);
     }
@@ -148,7 +149,7 @@ export function VariantManager({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">Variations</h2>
+        <h2 className="text-lg font-semibold text-gray-900">Variantes</h2>
         {!showAdd && (
           <Button
             type="button"
@@ -157,14 +158,14 @@ export function VariantManager({
             onClick={() => setShowAdd(true)}
           >
             <Plus className="mr-1.5 size-3.5" />
-            Add variation
+            Agregar variante
           </Button>
         )}
       </div>
 
       {variants.length === 0 && !showAdd && (
         <p className="text-sm text-gray-500">
-          No variations yet. Add variations if this product comes in different options (e.g. colors, sizes).
+          Aún no hay variantes. Agrega variantes si este producto se ofrece en diferentes opciones (p. ej. colores, tallas).
         </p>
       )}
 
@@ -180,17 +181,17 @@ export function VariantManager({
                 stock: variant.stock.toString(),
               }}
               onCancel={() => setEditingId(null)}
-              submitLabel="Update"
+              submitLabel="Actualizar"
             />
           ) : (
             <div className="flex items-center justify-between rounded-md border border-gray-200 bg-white px-4 py-3">
               <div className="flex items-center gap-4">
                 <span className="font-medium text-gray-900">{variant.name}</span>
                 <span className="text-sm text-gray-500">
-                  ${parseFloat(variant.price).toFixed(2)}
+                  {formatAdminCurrency(variant.price)}
                 </span>
                 <span className="text-sm text-gray-500">
-                  Stock: {variant.stock}
+                  Existencias: {variant.stock}
                 </span>
               </div>
               <div className="flex items-center gap-1">
@@ -223,7 +224,7 @@ export function VariantManager({
         <VariantInlineForm
           action={createAction}
           onCancel={() => setShowAdd(false)}
-          submitLabel="Add variation"
+          submitLabel="Agregar variante"
         />
       )}
     </div>

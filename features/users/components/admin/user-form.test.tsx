@@ -35,13 +35,13 @@ describe("UserForm", () => {
       );
 
       // Act
-      const passwordInput = screen.getByLabelText("Password");
-      const roleSelect = screen.getByLabelText("Role");
+      const passwordInput = screen.getByLabelText("Contraseña");
+      const roleSelect = screen.getByLabelText("Rol");
 
       // Assert
       expect(passwordInput).toBeInTheDocument();
-      expect(screen.getByRole("option", { name: "ADMIN" })).toBeInTheDocument();
-      expect(screen.getByRole("option", { name: "EMPLOYEE" })).toBeInTheDocument();
+      expect(screen.getByRole("option", { name: "Administrador" })).toBeInTheDocument();
+      expect(screen.getByRole("option", { name: "Empleado" })).toBeInTheDocument();
       expect(roleSelect).toHaveValue("EMPLOYEE");
     });
 
@@ -62,14 +62,14 @@ describe("UserForm", () => {
       );
 
       // Act
-      const nameInput = screen.getByLabelText("Full Name");
-      const emailInput = screen.getByLabelText("Email");
+      const nameInput = screen.getByLabelText("Nombre completo");
+      const emailInput = screen.getByLabelText("Correo electrónico");
       const activeCheckbox = screen.getByLabelText(
-        "Active (can sign in to admin panel)",
+        "Activo (puede iniciar sesión en el panel administrador)",
       );
 
       // Assert
-      expect(screen.queryByLabelText("Password")).not.toBeInTheDocument();
+      expect(screen.queryByLabelText("Contraseña")).not.toBeInTheDocument();
       expect(nameInput).toHaveValue("Jane Doe");
       expect(emailInput).toHaveValue("jane@example.com");
       expect(activeCheckbox).toBeChecked();
@@ -88,7 +88,7 @@ describe("UserForm", () => {
       );
 
       // Act
-      await user.click(screen.getByRole("button", { name: "Cancel" }));
+      await user.click(screen.getByRole("button", { name: "Cancelar" }));
 
       // Assert
       expect(routerBack).toHaveBeenCalledTimes(1);

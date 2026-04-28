@@ -17,10 +17,10 @@ export default async function NewUserPage() {
   if (assignableRoles.length === 0) {
     return (
       <>
-        <SiteHeader title="New User" />
+        <SiteHeader title="Nuevo usuario" />
         <div className="flex flex-1 flex-col items-center justify-center py-24">
-          <h2 className="text-lg font-medium">Access Denied</h2>
-          <p className="mt-2 text-sm text-muted-foreground">You cannot create users.</p>
+          <h2 className="text-lg font-medium">Acceso denegado</h2>
+          <p className="mt-2 text-sm text-muted-foreground">No puedes crear usuarios.</p>
         </div>
       </>
     );
@@ -28,14 +28,14 @@ export default async function NewUserPage() {
 
   return (
     <>
-      <SiteHeader title="New User" />
+      <SiteHeader title="Nuevo usuario" />
       <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
         <div className="mx-auto w-full max-w-lg px-4 lg:px-6">
           <Card>
             <CardHeader>
-              <CardTitle>User details</CardTitle>
+              <CardTitle>Datos del usuario</CardTitle>
               <CardDescription>
-                Create a new admin panel user.
+                Crea un nuevo usuario del panel administrador.
               </CardDescription>
             </CardHeader>
             <CardContent>

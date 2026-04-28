@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/table";
 import type { UserRole } from "@/lib/db/schema";
 import { cn } from "@/lib/utils";
+import { formatAdminDate } from "@/lib/admin/format";
 
 import { toggleUserActive } from "../../actions";
 
@@ -63,7 +64,7 @@ export function UserTable({ users, currentUserRole }: Props) {
   void currentUserRole;
 
   function handleToggle() {
-    confirmDelete(toggleUserActive, "User status updated");
+    confirmDelete(toggleUserActive, "Estado del usuario actualizado");
   }
 
   return (
@@ -74,19 +75,19 @@ export function UserTable({ users, currentUserRole }: Props) {
             <TableHeader className="bg-sidebar">
               <TableRow className="border-b border-border hover:bg-transparent">
                 <TableHead className={cn(headCellCn, "w-[60px]")} />
-                <TableHead className={cn(headCellCn, "w-[20%]")}>Name</TableHead>
-                <TableHead className={cn(headCellCn)}>Email</TableHead>
+                <TableHead className={cn(headCellCn, "w-[20%]")}>Nombre</TableHead>
+                <TableHead className={cn(headCellCn)}>Correo electrónico</TableHead>
                 <TableHead className={cn(headCellCn, "w-[110px]")}>
-                  Role
+                  Rol
                 </TableHead>
                 <TableHead className={cn(headCellCn, "w-[120px]")}>
-                  Status
+                  Estado
                 </TableHead>
                 <TableHead className={cn(headCellCn, "w-[140px]")}>
-                  Created
+                  Creado
                 </TableHead>
                 <TableHead className={cn(headCellCn, "w-[110px] text-right")}>
-                  Actions
+                  Acciones
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -143,11 +144,7 @@ export function UserTable({ users, currentUserRole }: Props) {
                       "font-mono text-xs text-muted-foreground",
                     )}
                   >
-                    {user.createdAt.toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
+                    {formatAdminDate(user.createdAt)}
                   </TableCell>
                   <TableCell className={cn(bodyCellCn, "py-2")}>
                     <div className="flex items-center justify-end gap-1.5">
@@ -160,7 +157,7 @@ export function UserTable({ users, currentUserRole }: Props) {
                             render={
                               <Link href={`/admin/users/${user.id}/edit`} />
                             }
-                            aria-label="Edit user"
+                            aria-label="Editar usuario"
                           >
                             <Pencil className="size-3.5" />
                           </Button>
@@ -169,7 +166,7 @@ export function UserTable({ users, currentUserRole }: Props) {
                             size="icon-sm"
                             className="text-muted-foreground hover:text-destructive"
                             onClick={() => setToggleId(user.id)}
-                            aria-label="Toggle user active"
+                            aria-label="Cambiar estado del usuario"
                           >
                             <Trash2 className="size-3.5" />
                           </Button>
@@ -187,15 +184,14 @@ export function UserTable({ users, currentUserRole }: Props) {
       <AlertDialog open={!!toggleId} onOpenChange={(o) => !o && closeDialog()}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Toggle user status</AlertDialogTitle>
+            <AlertDialogTitle>Cambiar estado del usuario</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to change this user&apos;s active status? If
-              deactivated, their session will be invalidated.
+              ¿Confirmas el cambio de estado de este usuario? Si lo desactivas, su sesión se invalidará.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleToggle}>Confirm</AlertDialogAction>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleToggle}>Confirmar</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

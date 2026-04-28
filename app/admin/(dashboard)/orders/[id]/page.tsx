@@ -1,12 +1,17 @@
 import { ArrowLeft, CalendarDays } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { format } from "date-fns";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { SiteHeader } from "@/components/admin/site-header";
+import { ORDER_STATUS_LABEL } from "@/lib/admin/labels";
+import {
+  formatAdminCurrency,
+  formatAdminDate,
+  formatAdminDateTime,
+} from "@/lib/admin/format";
 import {
   Table,
   TableBody,
@@ -43,7 +48,7 @@ export default async function AdminOrderDetailPage({ params }: Props) {
 
   return (
     <>
-      <SiteHeader title={`Order #${shortId}`} />
+      <SiteHeader title={`Orden #${shortId}`} />
       <div className="flex flex-1 flex-col gap-6 p-4">
         <div className="flex items-center justify-between gap-4">
           <Link
@@ -51,7 +56,7 @@ export default async function AdminOrderDetailPage({ params }: Props) {
             className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="size-4" />
-            Back to Orders
+            Volver a Órdenes
           </Link>
           <OrderDetailActions
             orderId={order.id}
@@ -67,16 +72,16 @@ export default async function AdminOrderDetailPage({ params }: Props) {
           {/* Items */}
           <Card>
             <CardHeader>
-              <CardTitle>Items</CardTitle>
+              <CardTitle>Artículos</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Product</TableHead>
-                    <TableHead>Rental Period</TableHead>
-                    <TableHead className="text-right">Qty</TableHead>
-                    <TableHead className="text-right">Unit Price</TableHead>
+                    <TableHead>Producto</TableHead>
+                    <TableHead>Periodo de renta</TableHead>
+                    <TableHead className="text-right">Cantidad</TableHead>
+                    <TableHead className="text-right">Precio unitario</TableHead>
                     <TableHead className="text-right">Subtotal</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -101,15 +106,15 @@ export default async function AdminOrderDetailPage({ params }: Props) {
                       <TableCell>
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <CalendarDays className="size-3" />
-                          {format(new Date(item.rentDate), "MMM d, yyyy")}
+                          {formatAdminDate(item.rentDate)}
                         </div>
                       </TableCell>
                       <TableCell className="text-right">{item.quantity}</TableCell>
                       <TableCell className="text-right">
-                        ${parseFloat(item.unitPrice).toFixed(2)}
+                        {formatAdminCurrency(item.unitPrice)}
                       </TableCell>
                       <TableCell className="text-right font-medium">
-                        ${parseFloat(item.subtotal).toFixed(2)}
+                        {formatAdminCurrency(item.subtotal)}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -123,7 +128,7 @@ export default async function AdminOrderDetailPage({ params }: Props) {
             {/* Customer info */}
             <Card>
               <CardHeader>
-                <CardTitle>Customer</CardTitle>
+                <CardTitle>Cliente</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
                 <p className="font-medium">{order.customerName}</p>
@@ -141,12 +146,12 @@ export default async function AdminOrderDetailPage({ params }: Props) {
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>Summary</CardTitle>
+                  <CardTitle>Resumen</CardTitle>
                   <Badge
                     variant="secondary"
                     className={statusColors[order.status] ?? ""}
                   >
-                    {order.status}
+                    {ORDER_STATUS_LABEL[order.status] ?? order.status}
                   </Badge>
                 </div>
               </CardHeader>
@@ -160,44 +165,44 @@ export default async function AdminOrderDetailPage({ params }: Props) {
                     <>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Subtotal</span>
-                        <span>${parseFloat(order.subtotal).toFixed(2)}</span>
+                        <span>{formatAdminCurrency(order.subtotal)}</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Delivery</span>
+                        <span className="text-muted-foreground">Entrega</span>
                         <span>
                           {parseFloat(order.deliveryFee) === 0
-                            ? "Included"
-                            : `$${parseFloat(order.deliveryFee).toFixed(2)}`}
+                            ? "Incluida"
+                            : formatAdminCurrency(order.deliveryFee)}
                         </span>
                       </div>
                       <Separator />
                       <div className="flex justify-between text-base font-bold">
                         <span>Total</span>
-                        <span>${totalNum.toFixed(2)}</span>
+                        <span>{formatAdminCurrency(totalNum)}</span>
                       </div>
                       <Separator />
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">
-                          Paid online
+                          Pagado en línea
                           {isSplit ? " (50%)" : paidNum >= totalNum && totalNum > 0 ? " (100%)" : ""}
                         </span>
                         <span className="font-medium text-primary">
-                          ${paidNum.toFixed(2)}
+                          {formatAdminCurrency(paidNum)}
                         </span>
                       </div>
                       {balanceNum > 0 && (
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground">
-                            Balance on delivery
+                            Saldo a la entrega
                             {isSplit ? " (50%)" : ""}
                           </span>
                           <span className="font-medium">
-                            ${balanceNum.toFixed(2)}
+                            {formatAdminCurrency(balanceNum)}
                           </span>
                         </div>
                       )}
                       <p className="text-xs text-muted-foreground pt-2">
-                        Created: {format(new Date(order.createdAt), "MMM d, yyyy HH:mm")}
+                        Creada: {formatAdminDateTime(order.createdAt)}
                       </p>
                     </>
                   );

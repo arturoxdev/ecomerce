@@ -23,6 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatAdminDate } from "@/lib/admin/format";
 
 import { deleteManualBlock } from "../../actions";
 
@@ -39,14 +40,6 @@ type Props = {
   blocks: Block[];
 };
 
-function formatDate(date: Date) {
-  return new Date(date).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
 export function AvailabilityBlockTable({ blocks }: Props) {
   const router = useRouter();
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -60,7 +53,7 @@ export function AvailabilityBlockTable({ blocks }: Props) {
       if ("type" in result) {
         toast.error(result.detail ?? result.title);
       } else {
-        toast.success("Block deleted");
+        toast.success("Bloqueo eliminado");
         router.refresh();
       }
     });
@@ -69,7 +62,7 @@ export function AvailabilityBlockTable({ blocks }: Props) {
   if (blocks.length === 0) {
     return (
       <div className="py-12 text-center text-gray-500">
-        No blocks registered
+        No hay bloqueos registrados
       </div>
     );
   }
@@ -79,11 +72,11 @@ export function AvailabilityBlockTable({ blocks }: Props) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Type</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Qty</TableHead>
-            <TableHead>Reason</TableHead>
-            <TableHead className="w-16">Actions</TableHead>
+            <TableHead>Tipo</TableHead>
+            <TableHead>Fecha</TableHead>
+            <TableHead>Cantidad</TableHead>
+            <TableHead>Motivo</TableHead>
+            <TableHead className="w-16">Acciones</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -92,15 +85,15 @@ export function AvailabilityBlockTable({ blocks }: Props) {
               <TableCell>
                 {block.orderId === null ? (
                   <span className="inline-flex rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700">
-                    Manual block
+                    Bloqueo manual
                   </span>
                 ) : (
                   <span className="inline-flex rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
-                    Reservation — {block.order?.customerName}
+                    Reservación — {block.order?.customerName}
                   </span>
                 )}
               </TableCell>
-              <TableCell>{formatDate(block.date)}</TableCell>
+              <TableCell>{formatAdminDate(block.date)}</TableCell>
               <TableCell>{block.quantity}</TableCell>
               <TableCell className="max-w-xs truncate text-sm text-gray-500">
                 {block.reason ?? "—"}
@@ -123,20 +116,19 @@ export function AvailabilityBlockTable({ blocks }: Props) {
       <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete block?</AlertDialogTitle>
+            <AlertDialogTitle>¿Eliminar bloqueo?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will remove the manual block and free up availability for
-              those dates.
+              Esto eliminará el bloqueo manual y liberará la disponibilidad para esas fechas.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isPending}
               className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
             >
-              {isPending ? "Deleting…" : "Delete"}
+              {isPending ? "Eliminando…" : "Eliminar"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

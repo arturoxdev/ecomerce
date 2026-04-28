@@ -3,6 +3,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { formatAdminCurrency } from "@/lib/admin/format";
 
 export type PaymentValue = {
   paymentMethod: "CASH" | "TRANSFER";
@@ -68,7 +69,7 @@ export function PaymentBox({ value, total, onChange }: Props) {
         />
         {overpaid && (
           <p className="mt-1 text-xs text-red-600">
-            El adelanto no puede exceder el total (${total.toFixed(2)}).
+            El adelanto no puede exceder el total ({formatAdminCurrency(total)}).
           </p>
         )}
       </div>

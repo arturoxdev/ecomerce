@@ -18,7 +18,7 @@ export async function loginAction(
     });
   } catch (error) {
     if (error instanceof AuthError) {
-      return unauthorizedProblem("Invalid credentials");
+      return unauthorizedProblem("Credenciales inválidas");
     }
     throw error;
   }

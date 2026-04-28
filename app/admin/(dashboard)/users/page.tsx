@@ -17,11 +17,11 @@ export default async function AdminUsersPage({
   if (currentUser.role === "EMPLOYEE") {
     return (
       <>
-        <SiteHeader title="Users" />
+        <SiteHeader title="Usuarios" />
         <div className="flex flex-1 flex-col items-center justify-center py-24">
-          <h2 className="text-lg font-medium">Access Denied</h2>
+          <h2 className="text-lg font-medium">Acceso denegado</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            You do not have permission to view this page.
+            No tienes permisos para ver esta página.
           </p>
         </div>
       </>
@@ -47,8 +47,8 @@ export default async function AdminUsersPage({
   return (
     <>
       <SiteHeader
-        title="Users"
-        subtitle={`${all.length} user${all.length === 1 ? "" : "s"} · ${activeCount} active`}
+        title="Usuarios"
+        subtitle={`${all.length} usuario${all.length === 1 ? "" : "s"} · ${activeCount} activo${activeCount === 1 ? "" : "s"}`}
         actions={
           <Button
             variant="cta"
@@ -56,12 +56,12 @@ export default async function AdminUsersPage({
             render={<Link href="/admin/users/new" />}
           >
             <Plus className="size-3.5" strokeWidth={2.4} />
-            Add user
+            Nuevo usuario
           </Button>
         }
       />
       <div className="flex flex-col gap-3.5 px-7 pt-5 pb-7">
-        <SearchFilter placeholder="Search user…" width={320} />
+        <SearchFilter placeholder="Buscar usuario…" width={320} />
         <UserTable users={filtered} currentUserRole={currentUser.role} />
       </div>
     </>

@@ -33,7 +33,7 @@ export function ThemeGrid({ themes, current }: Props) {
     startTransition(async () => {
       const result = await updateTheme(formData);
       if (result && "success" in result) {
-        toast.success("Theme updated");
+        toast.success("Tema actualizado");
       } else if (result && "title" in result) {
         toast.error(result.title, { description: result.detail });
       }
@@ -90,7 +90,7 @@ export function ThemeGrid({ themes, current }: Props) {
 
       <div className="flex justify-end">
         <Button type="submit" disabled={!dirty || isPending}>
-          {isPending ? "Saving..." : "Save"}
+          {isPending ? "Guardando..." : "Guardar"}
         </Button>
       </div>
     </form>

@@ -21,7 +21,7 @@ export default async function AdminPagesIndexPage() {
 
   return (
     <>
-      <SiteHeader title="Pages" />
+      <SiteHeader title="Páginas" />
       <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
         <div className="px-4 lg:px-6">
           <Card>
@@ -29,11 +29,11 @@ export default async function AdminPagesIndexPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Page</TableHead>
+                    <TableHead>Página</TableHead>
                     <TableHead>Slug</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Locales</TableHead>
-                    <TableHead className="text-right">Action</TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead>Idiomas</TableHead>
+                    <TableHead className="text-right">Acción</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -62,7 +62,7 @@ export default async function AdminPagesIndexPage() {
                           size="sm"
                           render={<Link href={`/admin/pages/${page.slug}`} />}
                         >
-                          {canWrite ? "Edit page" : "View page"}
+                          {canWrite ? "Editar página" : "Ver página"}
                         </Button>
                       </TableCell>
                     </TableRow>

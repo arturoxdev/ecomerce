@@ -102,7 +102,7 @@ export function FaqManager({ locale, items, canWrite }: Props) {
         return;
       }
 
-      toast.success("FAQ entry created");
+      toast.success("Pregunta creada");
       setCreateOpen(false);
       setCreateDraft({ ...emptyDraft, sortOrder: String(items.length + 1) });
       router.refresh();
@@ -124,7 +124,7 @@ export function FaqManager({ locale, items, canWrite }: Props) {
         return;
       }
 
-      toast.success("FAQ entry updated");
+      toast.success("Pregunta actualizada");
       setEditId(null);
       router.refresh();
     });
@@ -141,7 +141,7 @@ export function FaqManager({ locale, items, canWrite }: Props) {
         return;
       }
 
-      toast.success("FAQ entry deleted");
+      toast.success("Pregunta eliminada");
       router.refresh();
     });
   }
@@ -150,9 +150,9 @@ export function FaqManager({ locale, items, canWrite }: Props) {
     <>
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-bold text-slate-900">Questions and answers</h2>
+          <h2 className="text-lg font-bold text-slate-900">Preguntas frecuentes</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Manage the FAQ entries rendered on the public page for this locale.
+            Administra las preguntas que aparecen en la página pública para este idioma.
           </p>
         </div>
         {canWrite ? (
@@ -162,7 +162,7 @@ export function FaqManager({ locale, items, canWrite }: Props) {
             className="h-10 rounded-xl bg-secondary px-4 text-white hover:bg-green-800"
           >
             <Plus className="size-4" />
-            Add question
+            Agregar pregunta
           </Button>
         ) : null}
       </div>
@@ -171,12 +171,12 @@ export function FaqManager({ locale, items, canWrite }: Props) {
         <Table>
           <TableHeader>
             <TableRow className="bg-[#fafaf9] hover:bg-[#fafaf9]">
-              <TableHead className="px-5 py-4 text-slate-500">Order</TableHead>
-              <TableHead className="px-5 py-4 text-slate-500">Question</TableHead>
-              <TableHead className="px-5 py-4 text-slate-500">Answer</TableHead>
+              <TableHead className="px-5 py-4 text-slate-500">Orden</TableHead>
+              <TableHead className="px-5 py-4 text-slate-500">Pregunta</TableHead>
+              <TableHead className="px-5 py-4 text-slate-500">Respuesta</TableHead>
               {canWrite ? (
                 <TableHead className="px-5 py-4 text-right text-slate-500">
-                  Actions
+                  Acciones
                 </TableHead>
               ) : null}
             </TableRow>
@@ -222,18 +222,18 @@ export function FaqManager({ locale, items, canWrite }: Props) {
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent className="sm:max-w-xl">
           <DialogHeader>
-            <DialogTitle>Create FAQ entry</DialogTitle>
+            <DialogTitle>Crear pregunta</DialogTitle>
             <DialogDescription>
-              Add a question and answer for the selected locale.
+              Agrega una pregunta y respuesta para el idioma seleccionado.
             </DialogDescription>
           </DialogHeader>
           <FaqFields draft={createDraft} setDraft={setCreateDraft} />
           <DialogFooter>
             <Button variant="outline" onClick={() => setCreateOpen(false)}>
-              Cancel
+              Cancelar
             </Button>
             <Button disabled={isPending} onClick={submitCreate}>
-              {isPending ? "Saving..." : "Save entry"}
+              {isPending ? "Guardando..." : "Guardar"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -242,18 +242,18 @@ export function FaqManager({ locale, items, canWrite }: Props) {
       <Dialog open={!!editId} onOpenChange={(open) => !open && setEditId(null)}>
         <DialogContent className="sm:max-w-xl">
           <DialogHeader>
-            <DialogTitle>Edit FAQ entry</DialogTitle>
+            <DialogTitle>Editar pregunta</DialogTitle>
             <DialogDescription>
-              Update the content visible on the public FAQ page.
+              Actualiza el contenido visible en la página pública de preguntas frecuentes.
             </DialogDescription>
           </DialogHeader>
           <FaqFields draft={editDraft} setDraft={setEditDraft} />
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditId(null)}>
-              Cancel
+              Cancelar
             </Button>
             <Button disabled={isPending || !editingItem} onClick={submitEdit}>
-              {isPending ? "Saving..." : "Save changes"}
+              {isPending ? "Guardando..." : "Guardar cambios"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -262,20 +262,19 @@ export function FaqManager({ locale, items, canWrite }: Props) {
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete FAQ entry?</AlertDialogTitle>
+            <AlertDialogTitle>¿Eliminar pregunta?</AlertDialogTitle>
             <AlertDialogDescription>
-              This question will be removed from the admin table and the public FAQ
-              page for the selected locale.
+              Esta pregunta se eliminará de la tabla admin y de la página pública de preguntas frecuentes para el idioma seleccionado.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
               disabled={isPending}
               className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
             >
-              {isPending ? "Deleting..." : "Delete"}
+              {isPending ? "Eliminando..." : "Eliminar"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -294,7 +293,7 @@ function FaqFields({
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label>Question</Label>
+        <Label>Pregunta</Label>
         <Input
           value={draft.question}
           onChange={(event) =>
@@ -303,7 +302,7 @@ function FaqFields({
         />
       </div>
       <div className="space-y-2">
-        <Label>Answer</Label>
+        <Label>Respuesta</Label>
         <textarea
           rows={6}
           value={draft.answer}
@@ -314,7 +313,7 @@ function FaqFields({
         />
       </div>
       <div className="space-y-2">
-        <Label>Sort order</Label>
+        <Label>Orden</Label>
         <Input
           type="number"
           min="0"

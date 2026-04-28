@@ -34,8 +34,8 @@ export default async function AdminCategoriesPage({
   return (
     <>
       <SiteHeader
-        title="Categories"
-        subtitle={`${all.length} categor${all.length === 1 ? "y" : "ies"}`}
+        title="Categorías"
+        subtitle={`${all.length} categoría${all.length === 1 ? "" : "s"}`}
         actions={
           canWrite && (
             <Button
@@ -44,13 +44,13 @@ export default async function AdminCategoriesPage({
               render={<Link href="/admin/categories/new" />}
             >
               <Plus className="size-3.5" strokeWidth={2.4} />
-              Add category
+              Nueva categoría
             </Button>
           )
         }
       />
       <div className="flex flex-col gap-3.5 px-7 pt-5 pb-7">
-        <SearchFilter placeholder="Search category…" width={320} />
+        <SearchFilter placeholder="Buscar categoría…" width={320} />
         <CategoryTable categories={filtered} canWrite={canWrite} />
       </div>
     </>

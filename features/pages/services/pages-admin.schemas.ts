@@ -3,34 +3,34 @@ import { z } from "zod";
 export const localeSchema = z.enum(["en", "es"]);
 
 export const aboutSchema = z.object({
-  eyebrow: z.string().min(1, "Eyebrow is required"),
-  title: z.string().min(1, "Title is required"),
-  subtitle: z.string().min(1, "Subtitle is required"),
-  storyTitle: z.string().min(1, "Story title is required"),
-  storyBody: z.string().min(1, "Story body is required"),
-  valuesTitle: z.string().min(1, "Values title is required"),
-  valuesBody: z.string().min(1, "Values body is required"),
+  eyebrow: z.string().min(1, "El eyebrow es requerido"),
+  title: z.string().min(1, "El título es requerido"),
+  subtitle: z.string().min(1, "El subtítulo es requerido"),
+  storyTitle: z.string().min(1, "El título de la historia es requerido"),
+  storyBody: z.string().min(1, "El cuerpo de la historia es requerido"),
+  valuesTitle: z.string().min(1, "El título de los valores es requerido"),
+  valuesBody: z.string().min(1, "El cuerpo de los valores es requerido"),
 });
 
 export const markdownSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  subtitle: z.string().min(1, "Subtitle is required"),
-  body: z.string().min(1, "Markdown content is required"),
+  title: z.string().min(1, "El título es requerido"),
+  subtitle: z.string().min(1, "El subtítulo es requerido"),
+  body: z.string().min(1, "El contenido Markdown es requerido"),
 });
 
 export const contactSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  subtitle: z.string().min(1, "Subtitle is required"),
-  location: z.string().min(1, "Location is required"),
-  phone: z.string().min(1, "Phone is required"),
-  email: z.email("Valid email is required"),
-  businessHours: z.string().min(1, "Business hours are required"),
+  title: z.string().min(1, "El título es requerido"),
+  subtitle: z.string().min(1, "El subtítulo es requerido"),
+  location: z.string().min(1, "La ubicación es requerida"),
+  phone: z.string().min(1, "El teléfono es requerido"),
+  email: z.email("El correo electrónico no es válido"),
+  businessHours: z.string().min(1, "El horario de atención es requerido"),
 });
 
 export const faqSchema = z.object({
-  question: z.string().min(1, "Question is required"),
-  answer: z.string().min(1, "Answer is required"),
-  sortOrder: z.coerce.number().int().min(0, "Sort order must be 0 or more"),
+  question: z.string().min(1, "La pregunta es requerida"),
+  answer: z.string().min(1, "La respuesta es requerida"),
+  sortOrder: z.coerce.number().int().min(0, "El orden debe ser 0 o mayor"),
 });
 
 export type AboutInput = z.infer<typeof aboutSchema>;

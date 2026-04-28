@@ -68,7 +68,7 @@ describe("manual-block service", () => {
       expect(result.ok).toBe(false);
       if (result.ok) return;
       expect(result.problem.fieldErrors?.date?.[0]).toBe(
-        "Date cannot be in the past",
+        "La fecha no puede estar en el pasado",
       );
     });
 

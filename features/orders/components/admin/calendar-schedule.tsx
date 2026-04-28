@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { format } from "date-fns";
 import { CalendarDays } from "lucide-react";
 import Link from "next/link";
+
+import { formatAdminDate } from "@/lib/admin/format";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -45,7 +46,7 @@ export function CalendarSchedule() {
       <div className="flex items-end gap-4">
         <div>
           <Label htmlFor="schedule-date" className="mb-1.5 block text-sm">
-            Select Date
+            Selecciona fecha
           </Label>
           <Input
             id="schedule-date"
@@ -56,7 +57,7 @@ export function CalendarSchedule() {
           />
         </div>
         <p className="pb-2 text-sm text-muted-foreground">
-          {entries.length} {entries.length === 1 ? "entry" : "entries"}
+          {entries.length} {entries.length === 1 ? "registro" : "registros"}
           {isPending && " ..."}
         </p>
       </div>
@@ -65,7 +66,7 @@ export function CalendarSchedule() {
         <div className="flex flex-col items-center justify-center gap-2 py-16">
           <CalendarDays className="size-8 text-muted-foreground" />
           <p className="text-sm text-muted-foreground">
-            No reservations for this date.
+            No hay reservaciones para esta fecha.
           </p>
         </div>
       ) : (
@@ -74,12 +75,12 @@ export function CalendarSchedule() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Order</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Phone</TableHead>
-                  <TableHead>Items</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Address</TableHead>
+                  <TableHead>Orden</TableHead>
+                  <TableHead>Cliente</TableHead>
+                  <TableHead>Teléfono</TableHead>
+                  <TableHead>Artículos</TableHead>
+                  <TableHead>Fecha</TableHead>
+                  <TableHead>Dirección</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -103,7 +104,7 @@ export function CalendarSchedule() {
                       {entry.itemsSummary}
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">
-                      {format(new Date(entry.rentDate), "MMM d, yyyy")}
+                      {formatAdminDate(entry.rentDate)}
                     </TableCell>
                     <TableCell className="max-w-[150px] truncate text-xs text-muted-foreground">
                       {entry.deliveryAddress || "—"}

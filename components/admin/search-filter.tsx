@@ -17,7 +17,7 @@ type Props = {
 
 export function SearchFilter({
   paramKey = "search",
-  placeholder = "Search…",
+  placeholder = "Buscar…",
   width = 300,
   debounce = 300,
 }: Props) {

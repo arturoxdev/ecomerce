@@ -19,7 +19,7 @@ export default function AdminLoginPage() {
           <h1 className="text-2xl font-extrabold text-[#0f172a]">
             {siteConfig.adminTitle}
           </h1>
-          <p className="text-sm text-[#64748b]">Sign in to continue</p>
+          <p className="text-sm text-[#64748b]">Inicia sesión para continuar</p>
         </div>
 
         <form action={action} className="flex flex-col gap-7">
@@ -29,7 +29,7 @@ export default function AdminLoginPage() {
                 htmlFor="email"
                 className="text-sm font-medium text-[#0f172a]"
               >
-                Email
+                Correo electrónico
               </label>
               <input
                 id="email"
@@ -47,7 +47,7 @@ export default function AdminLoginPage() {
                 htmlFor="password"
                 className="text-sm font-medium text-[#0f172a]"
               >
-                Password
+                Contraseña
               </label>
               <input
                 id="password"
@@ -70,7 +70,7 @@ export default function AdminLoginPage() {
             disabled={pending}
             className="w-full rounded-[10px] bg-[#f28b0d] py-3.5 text-base font-bold text-white shadow-[0_2px_6px_rgba(242,139,13,0.25)] transition-colors hover:bg-[#e07d0b] disabled:opacity-60"
           >
-            {pending ? "Signing in…" : "Sign in"}
+            {pending ? "Iniciando sesión…" : "Iniciar sesión"}
           </button>
         </form>
       </div>

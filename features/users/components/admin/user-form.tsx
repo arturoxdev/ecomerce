@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { UserRole } from "@/lib/db/schema";
+import { USER_ROLE_LABEL } from "@/lib/admin/labels";
 
 import { isFormError, getFieldErrors, type FormState as UserFormState } from "@/lib/types/form-state";
 
@@ -38,7 +39,7 @@ export function UserForm({ action, assignableRoles, user }: Props) {
       )}
 
       <div className="space-y-1.5">
-        <Label htmlFor="name">Full Name</Label>
+        <Label htmlFor="name">Nombre completo</Label>
         <Input
           id="name"
           name="name"
@@ -51,7 +52,7 @@ export function UserForm({ action, assignableRoles, user }: Props) {
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">Correo electrónico</Label>
         <Input
           id="email"
           name="email"
@@ -66,12 +67,12 @@ export function UserForm({ action, assignableRoles, user }: Props) {
 
       {!user && (
         <div className="space-y-1.5">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">Contraseña</Label>
           <Input
             id="password"
             name="password"
             type="password"
-            placeholder="Minimum 8 characters"
+            placeholder="Mínimo 8 caracteres"
             required
           />
           {fieldErrors?.password && (
@@ -81,9 +82,9 @@ export function UserForm({ action, assignableRoles, user }: Props) {
       )}
 
       <div className="space-y-1.5">
-        <Label htmlFor="role">Role</Label>
+        <Label htmlFor="role">Rol</Label>
         <p className="text-xs text-gray-500">
-          Determines what this user can do in the admin panel
+          Determina lo que este usuario puede hacer en el panel administrador
         </p>
         <select
           id="role"
@@ -93,7 +94,7 @@ export function UserForm({ action, assignableRoles, user }: Props) {
         >
           {assignableRoles.map((role) => (
             <option key={role} value={role}>
-              {role}
+              {USER_ROLE_LABEL[role] ?? role}
             </option>
           ))}
         </select>
@@ -109,24 +110,24 @@ export function UserForm({ action, assignableRoles, user }: Props) {
           className="size-4 rounded border-gray-300"
         />
         <Label htmlFor="isActive" className="cursor-pointer">
-          Active (can sign in to admin panel)
+          Activo (puede iniciar sesión en el panel administrador)
         </Label>
       </div>
 
       <div className="flex gap-3 pt-2">
         <Button type="submit" disabled={pending}>
           {pending
-            ? "Saving…"
+            ? "Guardando…"
             : user
-              ? "Save changes"
-              : "Create user"}
+              ? "Guardar cambios"
+              : "Crear usuario"}
         </Button>
         <Button
           type="button"
           variant="outline"
           onClick={() => router.back()}
         >
-          Cancel
+          Cancelar
         </Button>
       </div>
     </form>

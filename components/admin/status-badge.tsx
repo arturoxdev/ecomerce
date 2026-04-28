@@ -17,10 +17,10 @@ const config: Record<
   StatusBadgeState,
   { variant: "success" | "warning" | "outline"; label: string }
 > = {
-  active: { variant: "success", label: "Active" },
-  inactive: { variant: "outline", label: "Inactive" },
-  "out-of-stock": { variant: "warning", label: "Out of stock" },
-  "low-stock": { variant: "warning", label: "Low stock" },
+  active: { variant: "success", label: "Activo" },
+  inactive: { variant: "outline", label: "Inactivo" },
+  "out-of-stock": { variant: "warning", label: "Sin existencias" },
+  "low-stock": { variant: "warning", label: "Existencias bajas" },
 };
 
 export function StatusBadge({ state, label, className }: Props) {

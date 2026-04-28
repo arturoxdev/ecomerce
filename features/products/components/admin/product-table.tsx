@@ -25,6 +25,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { formatAdminCurrency } from "@/lib/admin/format";
 
 import { toggleProductActive } from "../../actions";
 
@@ -93,10 +94,10 @@ export function ProductTable({
     return (
       <Card>
         <CardContent className="flex flex-col items-center gap-4 py-16 text-center">
-          <p className="text-muted-foreground">No products yet.</p>
+          <p className="text-muted-foreground">Aún no hay productos.</p>
           {canWrite && (
             <Button render={<Link href="/admin/products/new" />}>
-              Create product
+              Crear producto
             </Button>
           )}
         </CardContent>
@@ -111,18 +112,18 @@ export function ProductTable({
           <Table>
             <TableHeader className="bg-sidebar">
               <TableRow className="hover:bg-transparent border-b border-border">
-                <TableHead className={cn(headCellCn, "w-[34%]")}>Name</TableHead>
+                <TableHead className={cn(headCellCn, "w-[34%]")}>Nombre</TableHead>
                 <TableHead className={cn(headCellCn, "w-[30%]")}>
-                  Category
+                  Categoría
                 </TableHead>
                 <TableHead className={cn(headCellCn, "w-[120px] text-right")}>
-                  Price
+                  Precio
                 </TableHead>
                 <TableHead className={cn(headCellCn, "w-[100px] text-right")}>
-                  Stock
+                  Existencias
                 </TableHead>
                 <TableHead className={cn(headCellCn, "w-[140px]")}>
-                  Status
+                  Estado
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -164,9 +165,9 @@ export function ProductTable({
                         "text-right font-mono text-[12.5px] font-medium text-foreground",
                       )}
                     >
-                      ${product.basePrice.toString()}
+                      {formatAdminCurrency(product.basePrice)}
                       <span className="ml-1 text-muted-foreground">
-                        {product.priceType === "PER_UNIT" ? "/unit" : ""}
+                        {product.priceType === "PER_UNIT" ? "/unidad" : ""}
                       </span>
                     </TableCell>
                     <TableCell
@@ -210,8 +211,8 @@ export function ProductTable({
         <div className="mt-3.5 flex items-center justify-between text-xs text-muted-foreground">
           <span>
             {typeof total === "number"
-              ? `Showing ${products.length} of ${total} products`
-              : `Showing ${products.length} products`}
+              ? `Mostrando ${products.length} de ${total} productos`
+              : `Mostrando ${products.length} productos`}
           </span>
           <Pagination className="mx-0 w-fit">
             <PaginationContent>

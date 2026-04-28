@@ -10,12 +10,12 @@ export default async function AdminPaymentsSettingsPage() {
 
   return (
     <>
-      <SiteHeader title="Payments & delivery" />
+      <SiteHeader title="Pagos y entrega" />
       <div className="flex flex-1 flex-col gap-6 px-4 py-8">
         <div>
-          <h1 className="text-xl font-semibold">Payments & delivery</h1>
+          <h1 className="text-xl font-semibold">Pagos y entrega</h1>
           <p className="text-sm text-muted-foreground">
-            Payment mode, delivery, and deposit configuration.
+            Configuración de modo de pago, entrega y anticipo.
           </p>
         </div>
         <SettingsForm

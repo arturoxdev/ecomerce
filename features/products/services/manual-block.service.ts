@@ -34,9 +34,9 @@ export function validateManualBlockDates(
       problem: {
         type: ProblemType.VALIDATION_ERROR,
         status: 422,
-        title: "Validation failed",
-        detail: "Date cannot be in the past",
-        fieldErrors: { date: ["Date cannot be in the past"] },
+        title: "Validación fallida",
+        detail: "La fecha no puede estar en el pasado",
+        fieldErrors: { date: ["La fecha no puede estar en el pasado"] },
       },
     };
   }
