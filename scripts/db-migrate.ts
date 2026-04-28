@@ -71,6 +71,22 @@ async function detectAppliedCount(pool: Pool) {
     exists(pool, `select exists(select 1 from information_schema.columns where table_schema = 'public' and table_name = 'orders' and column_name = 'stripe_session_id')`),
   ]).then((checks) => checks.every(Boolean));
 
+  // 0004_windy_adam_destine: single-day reservation
+  // availability gains `date`, drops `start_date`/`end_date`; order_items gains `rent_date`.
+  const migration5 = migration4 && await Promise.all([
+    exists(pool, `select exists(select 1 from information_schema.columns where table_schema = 'public' and table_name = 'availability' and column_name = 'date')`),
+    exists(pool, `select exists(select 1 from information_schema.columns where table_schema = 'public' and table_name = 'order_items' and column_name = 'rent_date')`),
+    exists(pool, `select not exists(select 1 from information_schema.columns where table_schema = 'public' and table_name = 'availability' and column_name = 'start_date')`),
+  ]).then((checks) => checks.every(Boolean));
+
+  // 0005_eminent_rictor: payment_method enum and orders.payment_method column
+  const migration6 = migration5 && await Promise.all([
+    exists(pool, `select exists(select 1 from pg_type where typname = 'payment_method')`),
+    exists(pool, `select exists(select 1 from information_schema.columns where table_schema = 'public' and table_name = 'orders' and column_name = 'payment_method')`),
+  ]).then((checks) => checks.every(Boolean));
+
+  if (migration6) return 6;
+  if (migration5) return 5;
   if (migration4) return 4;
   if (migration3) return 3;
   if (migration2) return 2;
@@ -96,19 +112,16 @@ async function bootstrapTracking(pool: Pool, entries: JournalEntry[]) {
     `select hash, created_at from "drizzle"."__drizzle_migrations" order by created_at asc`,
   );
   const trackedCount = tracked.rows.length;
+
+  // Once the tracking table has rows, drizzle-kit owns the migration state.
+  // The legacy schema detector is only useful for projects that had a schema
+  // before adopting drizzle-kit (tracking empty + schema populated): in that
+  // case we backfill the tracking table from the journal so drizzle-kit knows
+  // what's already applied. Otherwise (tracking populated), trust drizzle-kit.
+  if (trackedCount > 0) return;
+
   const appliedCount = await detectAppliedCount(pool);
-
-  if (trackedCount > appliedCount) {
-    throw new Error(
-      `Migration tracking is ahead of detected schema state (tracked=${trackedCount}, detected=${appliedCount}).`,
-    );
-  }
-
-  if (trackedCount === appliedCount) {
-    return;
-  }
-
-  for (const entry of entries.slice(trackedCount, appliedCount)) {
+  for (const entry of entries.slice(0, appliedCount)) {
     await pool.query(
       `insert into "drizzle"."__drizzle_migrations" ("hash", "created_at") values ($1, $2)`,
       [migrationHash(entry.tag), entry.when],

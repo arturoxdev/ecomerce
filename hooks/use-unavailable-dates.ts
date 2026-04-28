@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { fetchUnavailableDates } from "../services/availability.client-service";
+import { fetchUnavailableDates } from "@/lib/api/availability-client";
 
 export type UseUnavailableDatesInput = {
   productId: string;

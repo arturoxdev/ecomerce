@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 
+import { findActiveByQuery } from "./services/products.service";
 import {
   createProduct as dalCreateProduct,
   updateProduct as dalUpdateProduct,
@@ -100,4 +101,41 @@ export async function createManualBlock(
 
 export async function deleteManualBlock(blockId: string) {
   return dalDeleteBlock(blockId);
+}
+
+export type ProductSearchSuggestion = {
+  id: string;
+  name: string;
+  basePrice: string;
+  priceType: "FIXED" | "PER_UNIT";
+  stock: number;
+  photos: string[];
+  variants: Array<{
+    id: string;
+    name: string;
+    price: string;
+    stock: number;
+    isActive: boolean;
+  }>;
+};
+
+export async function searchActiveProducts(
+  query: string,
+): Promise<ProductSearchSuggestion[]> {
+  const rows = await findActiveByQuery(query, 10);
+  return rows.map((p) => ({
+    id: p.id,
+    name: p.name,
+    basePrice: p.basePrice,
+    priceType: p.priceType,
+    stock: p.stock,
+    photos: p.photos,
+    variants: (p.variants ?? []).map((v) => ({
+      id: v.id,
+      name: v.name,
+      price: v.price,
+      stock: v.stock,
+      isActive: v.isActive,
+    })),
+  }));
 }

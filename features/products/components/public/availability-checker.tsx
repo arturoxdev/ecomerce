@@ -3,11 +3,10 @@
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 
-import { Calendar } from "@/components/ui/calendar";
+import { AvailabilityCalendar } from "@/components/availability-calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { useUnavailableDates } from "../../hooks/use-unavailable-dates";
-import { fetchAvailability } from "../../services/availability.client-service";
+import { fetchAvailability } from "@/lib/api/availability-client";
 
 export type AvailabilityLabels = {
   checkDates: string;
@@ -64,15 +63,8 @@ export function AvailabilityCheckerBody({
   })();
 
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
-  const [visibleMonth, setVisibleMonth] = useState<Date>(tomorrow);
   const [status, setStatus] = useState<AvailabilityStatus>("idle");
   const [available, setAvailable] = useState(0);
-
-  const { unavailableDates } = useUnavailableDates({
-    productId,
-    variantId,
-    visibleMonth,
-  });
 
   useEffect(() => {
     if (!selectedDate) return;
@@ -167,17 +159,13 @@ export function AvailabilityCheckerBody({
         </span>
       </div>
 
-      <div className="w-full overflow-x-auto">
-        <Calendar
-          mode="single"
-          selected={selectedDate}
-          onSelect={handleSelect}
-          month={visibleMonth}
-          onMonthChange={setVisibleMonth}
-          disabled={[{ before: tomorrow }, ...unavailableDates]}
-          className="w-full"
-        />
-      </div>
+      <AvailabilityCalendar
+        productId={productId}
+        variantId={variantId}
+        selected={selectedDate}
+        onSelect={handleSelect}
+        minDate={tomorrow}
+      />
 
       <Separator />
       <div

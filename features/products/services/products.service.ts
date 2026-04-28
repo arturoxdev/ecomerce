@@ -114,6 +114,21 @@ export function createProductsService(deps: ProductsServiceDeps) {
     });
   }
 
+  function findActiveByQuery(query: string, limit = 20) {
+    const trimmed = query.trim();
+    if (trimmed.length === 0) return Promise.resolve([]);
+    return dbx.query.products.findMany({
+      where: and(
+        eq(products.storeId, storeId),
+        eq(products.isActive, true),
+        ilike(products.name, `%${trimmed}%`),
+      ),
+      orderBy: [asc(products.name)],
+      limit,
+      with: { variants: true },
+    });
+  }
+
   function findBySlugMeta(slug: string) {
     return dbx.query.products.findFirst({
       where: and(eq(products.slug, slug), eq(products.storeId, storeId)),
@@ -199,6 +214,7 @@ export function createProductsService(deps: ProductsServiceDeps) {
     findProductById,
     findBySlug,
     findByIdWithVariants,
+    findActiveByQuery,
     findBySlugMeta,
     countProducts,
     findVariantsByProductId,
@@ -225,6 +241,7 @@ export const findAllByCategorySlug = defaultService.findAllByCategorySlug;
 export const findProductById = defaultService.findProductById;
 export const findBySlug = defaultService.findBySlug;
 export const findByIdWithVariants = defaultService.findByIdWithVariants;
+export const findActiveByQuery = defaultService.findActiveByQuery;
 export const findBySlugMeta = defaultService.findBySlugMeta;
 export const countProducts = defaultService.countProducts;
 export const findVariantsByProductId = defaultService.findVariantsByProductId;

@@ -16,6 +16,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getOrderDetail } from "@/features/orders/actions";
+import { OrderDetailActions } from "@/features/orders/components/admin/order-detail-actions";
+import { getSessionUser } from "@/lib/services/auth";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -31,7 +33,10 @@ const statusColors: Record<string, string> = {
 
 export default async function AdminOrderDetailPage({ params }: Props) {
   const { id } = await params;
-  const order = await getOrderDetail(id);
+  const [order, user] = await Promise.all([
+    getOrderDetail(id),
+    getSessionUser(),
+  ]);
   if (!order) notFound();
 
   const shortId = order.id.slice(0, 8).toUpperCase();
@@ -40,13 +45,23 @@ export default async function AdminOrderDetailPage({ params }: Props) {
     <>
       <SiteHeader title={`Order #${shortId}`} />
       <div className="flex flex-1 flex-col gap-6 p-4">
-        <Link
-          href="/admin/orders"
-          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="size-4" />
-          Back to Orders
-        </Link>
+        <div className="flex items-center justify-between gap-4">
+          <Link
+            href="/admin/orders"
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="size-4" />
+            Back to Orders
+          </Link>
+          <OrderDetailActions
+            orderId={order.id}
+            status={order.status}
+            paymentStatus={order.paymentStatus}
+            paymentMethod={order.paymentMethod}
+            isStripe={Boolean(order.stripeSessionId)}
+            currentRole={user.role}
+          />
+        </div>
 
         <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
           {/* Items */}
