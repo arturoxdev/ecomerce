@@ -12,7 +12,7 @@ vi.mock("@/components/ui/calendar", () => ({
   ),
 }));
 
-vi.mock("../../hooks/use-unavailable-dates", () => ({
+vi.mock("@/hooks/use-unavailable-dates", () => ({
   useUnavailableDates: () => ({ unavailableDates: [], loading: false }),
 }));
 

@@ -77,10 +77,30 @@ flowchart TD
     A[Admin abre panel] --> B{¿Qué sección?}
     B -->|Pedidos| C[Lista de pedidos con email + teléfono]
     C --> D[Admin contacta cliente para coordinar entrega]
+    C --> M[Crear orden manual]
+    M --> M1[Sheet: buscar producto + calendario single + cliente + método]
+    M1 --> M2{¿amountPaid >= total?}
+    M2 -->|Sí| M3[CONFIRMED + CAPTURED + payment_method elegido]
+    M2 -->|No| M4[CONFIRMED + AUTHORIZED + adelanto]
+    M4 --> M5[Botón 'Marcar como pagada' → CAPTURED]
+    C --> CN[Cancelar orden]
+    CN --> CN1[Libera availability + status=CANCELLED]
+    CN1 --> CN2{¿Stripe CAPTURED?}
+    CN2 -->|No| CN3[paymentStatus=VOIDED]
+    CN2 -->|Sí| CN4[paymentStatus permanece CAPTURED · refund manual en Stripe Dashboard]
     B -->|Inventario| E[Editar precio / stock / fotos]
     B -->|Calendario| F[Vista de entregas y devoluciones próximas]
     B -->|Configuración| G[Cambiar modo delivery / depósito]
 ```
+
+### Reglas clave de órdenes manuales (PR-001)
+
+- Sólo `ROOT`/`ADMIN` ven los botones "Crear orden", "Marcar como pagada" y "Cancelar". `EMPLOYEE` no.
+- El admin puede reservar **HOY** desde el sheet (asimétrico con el carrito público que exige `>= mañana`).
+- Las órdenes manuales no llaman a Stripe ni envían email; persisten `payment_method = CASH | TRANSFER`.
+- Stripe siempre persiste `payment_method = CARD`. Las órdenes Stripe se confirman vía webhook, no con el botón "Marcar como pagada".
+- Cancelar es idempotente: rechaza segundas llamadas en `CANCELLED`/`DELIVERED`/`RETURNED`.
+- Ver [ADR-007](decisions/adr-007-manual-orders-and-payment-method.md) para el detalle de decisiones.
 
 ---
 
@@ -90,10 +110,11 @@ flowchart TD
 stateDiagram-v2
     [*] --> PENDING: Checkout iniciado, AUTHORIZE exitoso
     PENDING --> CONFIRMED: Stock OK + CAPTURE exitoso
+    [*] --> CONFIRMED: Orden manual (PR-001)
     PENDING --> CANCELLED: Stock insuficiente (VOID) o error de pago
     CONFIRMED --> DELIVERED: Admin marca como entregado
     DELIVERED --> RETURNED: Admin marca equipo devuelto
-    CONFIRMED --> CANCELLED: Cancelación manual (Fase 2)
+    CONFIRMED --> CANCELLED: Cancelación manual desde admin (PR-001)
 ```
 
 | Estado | Descripción |

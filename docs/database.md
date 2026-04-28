@@ -98,7 +98,10 @@ Table orders {
   total            decimal(10,2) [not null]
   amount_paid      decimal(10,2) [not null]
   square_payment_id text
+  stripe_session_id text [unique]
+  stripe_payment_intent_id text
   payment_status   payment_status [default: 'AUTHORIZED']
+  payment_method   payment_method [not null, default: 'CARD']
   status           order_status [default: 'PENDING']
   created_at       timestamp [default: `now()`]
   updated_at       timestamp
@@ -287,6 +290,13 @@ Enum payment_status {
   CAPTURED
   VOIDED
   FAILED
+  SUSPICIOUS
+}
+
+Enum payment_method {
+  CASH     [note: 'Efectivo (manual)']
+  CARD     [note: 'Tarjeta — Stripe']
+  TRANSFER [note: 'Transferencia (manual)']
 }
 
 Enum order_status {
@@ -324,6 +334,8 @@ Enum content_locale {
 **`availability.quantity` para PER_UNIT:** En lugar de crear un registro por unidad, se guarda la cantidad comprometida en un solo registro por dia. Esto hace el `SUM(quantity) FOR UPDATE` eficiente y el indice compuesto en `(product_id, date)` lo acelera.
 
 **`order_id = NULL` en availability:** Permite que el admin bloquee fechas manualmente sin crear una orden (ej. equipo en mantenimiento).
+
+**`payment_method` por orden, no por item:** PR-001 trata el método como propiedad de la orden completa. Stripe persiste `CARD` automáticamente; las órdenes manuales eligen `CASH` o `TRANSFER`. Cancelar una orden Stripe ya `CAPTURED` desde admin no dispara refund automático: se libera inventario localmente pero el `payment_status` permanece `CAPTURED` hasta que el webhook `handleChargeRefunded` lo cambie a `VOIDED`. Ver ADR-007.
 
 **`square_payment_id` unico para todo el ciclo:** Square usa el mismo `payment.id` para AUTHORIZE, CAPTURE y VOID.
 

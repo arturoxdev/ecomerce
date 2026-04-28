@@ -217,6 +217,7 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
             total: summary.total.toFixed(2),
             amountPaid: "0",
             paymentStatus: "AUTHORIZED",
+            paymentMethod: "CARD",
             status: "PENDING",
             currency: storeSettings.currency,
           })

@@ -33,6 +33,13 @@ export const paymentModeEnum = pgEnum("payment_mode", [
 ]);
 export type PaymentMode = (typeof paymentModeEnum.enumValues)[number];
 
+export const paymentMethodEnum = pgEnum("payment_method", [
+  "CASH",
+  "CARD",
+  "TRANSFER",
+]);
+export type PaymentMethod = (typeof paymentMethodEnum.enumValues)[number];
+
 export const orderStatusEnum = pgEnum("order_status", [
   "PENDING",
   "CONFIRMED",
@@ -150,6 +157,7 @@ export const orders = pgTable("orders", {
   paymentStatus: paymentStatusEnum("payment_status")
     .notNull()
     .default("AUTHORIZED"),
+  paymentMethod: paymentMethodEnum("payment_method").notNull().default("CARD"),
   status: orderStatusEnum("status").notNull().default("PENDING"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
