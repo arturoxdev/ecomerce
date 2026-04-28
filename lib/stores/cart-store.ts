@@ -16,18 +16,26 @@ export type CartItem = {
   stock: number;
 };
 
+export type DeliveryZone = {
+  city: string;
+  zipCode: string;
+};
+
 type CartStore = {
   items: CartItem[];
+  selectedZone: DeliveryZone | null;
   addItem: (item: Omit<CartItem, "id">) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
+  setSelectedZone: (zone: DeliveryZone | null) => void;
 };
 
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
+      selectedZone: null,
 
       addItem: (item) => {
         const existing = get().items.find(
@@ -63,13 +71,26 @@ export const useCartStore = create<CartStore>()(
       },
 
       clearCart: () => {
-        set({ items: [] });
+        set({ items: [], selectedZone: null });
+      },
+
+      setSelectedZone: (zone) => {
+        set({ selectedZone: zone });
       },
     }),
     {
       name: "festejos-cart",
-      version: 1,
-      migrate: () => ({ items: [] }),
+      version: 3,
+      migrate: (persisted, version) => {
+        const base = (persisted ?? {}) as Partial<CartStore>;
+        if (version < 3) {
+          return { items: base.items ?? [], selectedZone: null };
+        }
+        return {
+          items: base.items ?? [],
+          selectedZone: base.selectedZone ?? null,
+        };
+      },
     },
   ),
 );

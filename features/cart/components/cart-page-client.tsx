@@ -5,6 +5,7 @@ import { ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 
+import { ZipcodeCombobox } from "@/features/zipcodes/components/public/zipcode-combobox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -56,6 +57,13 @@ type Labels = {
   balanceOnDelivery: string;
   pastDateBadge: string;
   pastDateBlocking: string;
+  zipcodeLabel?: string;
+  zipcodePlaceholder?: string;
+  zipcodeSearchPlaceholder?: string;
+  zipcodeEmpty?: string;
+  zipcodeLoading?: string;
+  zipcodeRequired?: string;
+  zipcodeStale?: string;
 };
 
 type Props = {
@@ -68,6 +76,8 @@ export function CartPageClient({ locale, labels }: Props) {
   const removeItem = useCartStore((s) => s.removeItem);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const clearCart = useCartStore((s) => s.clearCart);
+  const selectedZone = useCartStore((s) => s.selectedZone);
+  const setSelectedZone = useCartStore((s) => s.setSelectedZone);
 
   const [hydrated, setHydrated] = useState(
     () => useCartStore.persist?.hasHydrated?.() ?? false,
@@ -79,6 +89,8 @@ export function CartPageClient({ locale, labels }: Props) {
     paymentMode: "SPLIT_50_50" | "FULL_ONLINE";
     currency: string;
   } | null>(null);
+  const [resolvedZipFee, setResolvedZipFee] = useState<number | null>(null);
+  const [zipcodeStale, setZipcodeStale] = useState(false);
   const [isPending, setIsPending] = useState(false);
 
   // Customer form state
@@ -97,6 +109,43 @@ export function CartPageClient({ locale, labels }: Props) {
 
     return unsubscribe;
   }, []);
+
+  useEffect(() => {
+    if (!settings || settings.deliveryMode !== "ZIP_CODE" || !selectedZone) {
+      setResolvedZipFee(null);
+      setZipcodeStale(false);
+      return;
+    }
+    const controller = new AbortController();
+    fetch(
+      `/api/zipcodes/search?q=${encodeURIComponent(selectedZone.zipCode)}&limit=20`,
+      { signal: controller.signal },
+    )
+      .then((res) => res.json())
+      .then(
+        (data: {
+          items: Array<{ city: string; zipcode: string; fee: number }>;
+        }) => {
+          const match = data.items?.find(
+            (row) =>
+              row.zipcode === selectedZone.zipCode &&
+              row.city.toLowerCase() === selectedZone.city.toLowerCase(),
+          );
+          if (match) {
+            setResolvedZipFee(match.fee);
+            setZipcodeStale(false);
+          } else {
+            setResolvedZipFee(null);
+            setZipcodeStale(true);
+            setSelectedZone(null);
+          }
+        },
+      )
+      .catch(() => {
+        // network error: keep current state, don't clobber selection
+      });
+    return () => controller.abort();
+  }, [settings, selectedZone, setSelectedZone]);
 
   if (!hydrated) {
     return null;
@@ -129,7 +178,11 @@ export function CartPageClient({ locale, labels }: Props) {
   const summary = calculateCartSummary({
     subtotal,
     settings: resolvedSettings,
+    resolvedZipFee,
   });
+
+  const isZipMode = resolvedSettings.deliveryMode === "ZIP_CODE";
+  const zipNotSelected = isZipMode && !selectedZone;
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -138,6 +191,10 @@ export function CartPageClient({ locale, labels }: Props) {
     if (!customerEmail.trim() || !customerEmail.includes("@"))
       errors.email = "Valid email required";
     if (!customerPhone.trim()) errors.phone = "Required";
+    if (isZipMode && !selectedZone) {
+      errors.zipcode =
+        labels.zipcodeRequired ?? "Selecciona un zipcode antes de continuar";
+    }
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
@@ -149,6 +206,8 @@ export function CartPageClient({ locale, labels }: Props) {
       customerEmail: customerEmail.trim(),
       customerPhone: customerPhone.trim(),
       deliveryAddress: deliveryAddress.trim(),
+      selectedCity: isZipMode && selectedZone ? selectedZone.city : null,
+      selectedZipCode: isZipMode && selectedZone ? selectedZone.zipCode : null,
       locale: locale === "es" ? "es" : "en",
       items: items.map((item) => ({
         productId: item.productId,
@@ -284,6 +343,44 @@ export function CartPageClient({ locale, labels }: Props) {
                       placeholder={labels.addressPlaceholder}
                     />
                   </div>
+                  {isZipMode && (
+                    <div className="space-y-1.5 sm:col-span-2">
+                      <Label>
+                        {labels.zipcodeLabel ?? "Ciudad y código postal"}
+                      </Label>
+                      <ZipcodeCombobox
+                        value={selectedZone}
+                        onChange={(zone, fee) => {
+                          setSelectedZone(zone);
+                          setResolvedZipFee(fee);
+                          setZipcodeStale(false);
+                        }}
+                        labels={{
+                          placeholder:
+                            labels.zipcodePlaceholder ??
+                            "Selecciona ciudad y zipcode",
+                          searchPlaceholder:
+                            labels.zipcodeSearchPlaceholder ??
+                            "Buscar ciudad o zipcode…",
+                          empty:
+                            labels.zipcodeEmpty ??
+                            "Aún no hacemos entregas a ese destino",
+                          loading: labels.zipcodeLoading ?? "Buscando…",
+                        }}
+                      />
+                      {zipcodeStale && (
+                        <p className="text-xs text-amber-600">
+                          {labels.zipcodeStale ??
+                            "Tu selección anterior ya no está disponible, escoge otra"}
+                        </p>
+                      )}
+                      {formErrors.zipcode && (
+                        <p className="text-xs text-red-500">
+                          {formErrors.zipcode}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -305,7 +402,14 @@ export function CartPageClient({ locale, labels }: Props) {
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-slate-600">{labels.deliveryFee}</span>
+                <span className="text-slate-600">
+                  {labels.deliveryFee}
+                  {isZipMode && selectedZone && (
+                    <span className="ml-1 text-xs text-muted-foreground">
+                      ({selectedZone.city} {selectedZone.zipCode})
+                    </span>
+                  )}
+                </span>
                 <span
                   className="font-medium"
                   data-testid="cart-summary-delivery"
@@ -368,10 +472,16 @@ export function CartPageClient({ locale, labels }: Props) {
               type="submit"
               size="lg"
               className="mt-6 w-full"
-              disabled={isPending || hasPastItems}
+              disabled={isPending || hasPastItems || zipNotSelected}
             >
               {isPending ? labels.processing : labels.confirmOrder}
             </Button>
+            {zipNotSelected && (
+              <p className="mt-2 text-xs text-muted-foreground">
+                {labels.zipcodeRequired ??
+                  "Selecciona un zipcode antes de continuar"}
+              </p>
+            )}
           </div>
         </div>
       </form>

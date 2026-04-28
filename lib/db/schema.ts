@@ -137,6 +137,8 @@ export const orders = pgTable("orders", {
   customerEmail: text("customer_email").notNull(),
   customerPhone: text("customer_phone").notNull(),
   deliveryAddress: text("delivery_address"),
+  city: text("city"),
+  zipCode: text("zip_code"),
   subtotal: numeric("subtotal", { precision: 10, scale: 2 }).notNull(),
   depositAmount: numeric("deposit_amount", {
     precision: 10,
@@ -259,10 +261,18 @@ export const zipDeliveryZones = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     storeId: text("store_id").notNull(),
+    city: text("city").notNull(),
     zipCode: text("zip_code").notNull(),
     fee: numeric("fee", { precision: 10, scale: 2 }).notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .$onUpdate(() => new Date()),
   },
-  (t) => [unique("idx_zip_store_code").on(t.storeId, t.zipCode)],
+  (t) => [
+    unique("idx_zip_store_city_code").on(t.storeId, t.city, t.zipCode),
+    index("idx_zip_store_zip").on(t.storeId, t.zipCode),
+  ],
 );
 
 export const aboutPageContents = pgTable(

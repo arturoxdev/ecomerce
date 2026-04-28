@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useState } from "react";
 
 import { Field } from "@/components/admin/field";
@@ -17,21 +18,32 @@ import {
   type FormState,
 } from "@/lib/types/form-state";
 
+type DeliveryMode = "INCLUDED" | "FIXED_FEE" | "ZIP_CODE";
+
+const DELIVERY_LABELS: Record<DeliveryMode, string> = {
+  INCLUDED: "Gratis (incluida)",
+  FIXED_FEE: "Tarifa fija",
+  ZIP_CODE: "Por código postal",
+};
+
 type Props = {
   action: (prev: FormState, formData: FormData) => Promise<FormState>;
   defaultValues: {
     paymentMode: "SPLIT_50_50" | "FULL_ONLINE";
-    deliveryMode: "INCLUDED" | "FIXED_FEE";
+    deliveryMode: DeliveryMode;
     deliveryFee?: string | null;
     depositPercent: string;
   };
+  hasZipcodes: boolean;
 };
 
-export function SettingsForm({ action, defaultValues }: Props) {
+export function SettingsForm({ action, defaultValues, hasZipcodes }: Props) {
   const [state, formAction, pending] = useActionState(action, {} as FormState);
   const fieldErrors = getFieldErrors(state);
   const [paymentMode, setPaymentMode] = useState(defaultValues.paymentMode);
-  const [deliveryMode, setDeliveryMode] = useState(defaultValues.deliveryMode);
+  const [deliveryMode, setDeliveryMode] = useState<DeliveryMode>(
+    defaultValues.deliveryMode,
+  );
   const success = !isFormError(state) && "success" in state;
 
   return (
@@ -73,18 +85,48 @@ export function SettingsForm({ action, defaultValues }: Props) {
         <input type="hidden" name="deliveryMode" value={deliveryMode} />
         <Select
           value={deliveryMode}
-          onValueChange={(v) =>
-            setDeliveryMode((v ?? "INCLUDED") as "INCLUDED" | "FIXED_FEE")
-          }
+          onValueChange={(v) => {
+            const next = (v ?? "INCLUDED") as DeliveryMode;
+            if (next === "ZIP_CODE" && !hasZipcodes) return;
+            setDeliveryMode(next);
+          }}
         >
           <SelectTrigger className="w-full">
-            {deliveryMode === "FIXED_FEE" ? "Tarifa fija" : "Gratis (incluida)"}
+            {DELIVERY_LABELS[deliveryMode]}
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="INCLUDED">Gratis (incluida)</SelectItem>
-            <SelectItem value="FIXED_FEE">Tarifa fija</SelectItem>
+            <SelectItem value="INCLUDED">{DELIVERY_LABELS.INCLUDED}</SelectItem>
+            <SelectItem value="FIXED_FEE">{DELIVERY_LABELS.FIXED_FEE}</SelectItem>
+            <SelectItem value="ZIP_CODE" disabled={!hasZipcodes}>
+              {DELIVERY_LABELS.ZIP_CODE}
+              {!hasZipcodes && " — configura zipcodes primero"}
+            </SelectItem>
           </SelectContent>
         </Select>
+        {deliveryMode === "ZIP_CODE" && (
+          <p className="text-xs text-muted-foreground">
+            Administra tu catálogo de zipcodes en{" "}
+            <Link
+              href="/admin/zipcodes"
+              className="font-medium underline underline-offset-2 hover:text-foreground"
+            >
+              /admin/zipcodes
+            </Link>
+            .
+          </p>
+        )}
+        {!hasZipcodes && deliveryMode !== "ZIP_CODE" && (
+          <p className="text-xs text-muted-foreground">
+            Para activar “Por código postal”, primero{" "}
+            <Link
+              href="/admin/zipcodes"
+              className="font-medium underline underline-offset-2 hover:text-foreground"
+            >
+              registra zipcodes
+            </Link>
+            .
+          </p>
+        )}
       </Field>
 
       {deliveryMode === "FIXED_FEE" && (
