@@ -5,8 +5,7 @@ import { ProblemType } from "@/lib/types/problem-detail";
 import type { ProblemDetail } from "@/lib/types/problem-detail";
 
 export const manualBlockSchema = z.object({
-  startDate: z.coerce.date(),
-  endDate: z.coerce.date(),
+  date: z.coerce.date(),
   reason: z.string().max(255).optional(),
 });
 
@@ -18,45 +17,26 @@ const defaultClock: Clock = { now: () => new Date() };
 
 export function parseManualBlockForm(formData: FormData) {
   return manualBlockSchema.safeParse({
-    startDate: formData.get("startDate"),
-    endDate: formData.get("endDate"),
+    date: formData.get("date"),
     reason: formData.get("reason") || undefined,
   });
 }
 
-/**
- * Validates rental window semantics (not-in-past, end-after-start).
- * Kept separate from the schema so it can be tested with an injectable
- * clock instead of relying on `new Date()` at module load.
- */
 export function validateManualBlockDates(
   input: ManualBlockInput,
   clock: Clock = defaultClock,
 ): { ok: true } | { ok: false; problem: ProblemDetail } {
   const today = new Date(clock.now().toDateString());
 
-  if (input.startDate < today) {
+  if (input.date < today) {
     return {
       ok: false,
       problem: {
         type: ProblemType.VALIDATION_ERROR,
         status: 422,
         title: "Validation failed",
-        detail: "Start date cannot be in the past",
-        fieldErrors: { startDate: ["Start date cannot be in the past"] },
-      },
-    };
-  }
-
-  if (input.endDate <= input.startDate) {
-    return {
-      ok: false,
-      problem: {
-        type: ProblemType.VALIDATION_ERROR,
-        status: 422,
-        title: "Validation failed",
-        detail: "End date must be after start date",
-        fieldErrors: { endDate: ["End date must be after start date"] },
+        detail: "Date cannot be in the past",
+        fieldErrors: { date: ["Date cannot be in the past"] },
       },
     };
   }
@@ -64,7 +44,6 @@ export function validateManualBlockDates(
   return { ok: true };
 }
 
-/** Convenience: parse + validate in one call. */
 export function parseAndValidateManualBlock(
   formData: FormData,
   clock: Clock = defaultClock,

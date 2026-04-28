@@ -94,7 +94,6 @@ test.describe("T2 availability guard", () => {
     });
 
     const blockedStart = daysFromToday(5);
-    const blockedEnd = daysFromToday(7);
     await seed.createOrder({
       items: [
         {
@@ -102,7 +101,7 @@ test.describe("T2 availability guard", () => {
           quantity: 1,
           unitPrice: 60,
           start: blockedStart,
-          end: blockedEnd,
+          end: blockedStart,
         },
       ],
     });
@@ -116,7 +115,7 @@ test.describe("T2 availability guard", () => {
 
     await page.goto("/en");
     await page.evaluate(
-      ({ product, startDate, endDate }) => {
+      ({ product, date }) => {
         const entry = {
           state: {
             items: [
@@ -131,20 +130,18 @@ test.describe("T2 availability guard", () => {
                 quantity: 1,
                 unitPrice: 60,
                 priceType: "FIXED",
-                startDate,
-                endDate,
+                date,
                 stock: 1,
               },
             ],
           },
-          version: 0,
+          version: 1,
         };
         localStorage.setItem("festejos-cart", JSON.stringify(entry));
       },
       {
         product: { id: product.id, name: product.name, slug: product.slug },
-        startDate: toIso(blockedStart),
-        endDate: toIso(blockedEnd),
+        date: toIso(blockedStart),
       },
     );
 

@@ -31,8 +31,7 @@ vi.mock("./availability-checker", () => ({
         type="button"
         onClick={() =>
           onAvailabilityConfirmed?.({
-            startDate: new Date(2026, 4, 10, 12),
-            endDate: new Date(2026, 4, 12, 12),
+            date: new Date(2099, 4, 10, 12),
             available: 4,
           })
         }
@@ -69,13 +68,11 @@ describe("AddToCartDialog", () => {
   const labels = {
     availability: {
       checkDates: "Check availability",
-      startDate: "Start",
-      endDate: "End",
+      selectDate: "Select a date",
       loading: "Loading",
       available: "Available",
       notAvailable: "Not available",
       unitsAvailable: "units",
-      invalidRange: "Invalid",
       errorFetch: "Error",
     },
     addToCart: "Add to cart",
@@ -144,8 +141,7 @@ describe("AddToCartDialog", () => {
           variantId: null,
           priceType: "PER_UNIT",
           quantity: 1,
-          startDate: "2026-05-10",
-          endDate: "2026-05-12",
+          date: "2099-05-10",
           stock: 4,
         }),
       );

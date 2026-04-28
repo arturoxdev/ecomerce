@@ -109,14 +109,13 @@
     },
     "availability": {
       "title": "Verificar Disponibilidad",
-      "startDate": "Fecha de inicio",
-      "endDate": "Fecha de fin",
+      "selectDate": "Selecciona una fecha",
       "loading": "Verificando disponibilidad...",
       "available": "Disponible",
-      "notAvailable": "No disponible para las fechas seleccionadas",
+      "notAvailable": "No disponible en esta fecha",
       "unitsAvailable": "unidades disponibles",
-      "invalidRange": "La fecha de fin debe ser posterior a la de inicio",
-      "errorFetch": "No se pudo verificar la disponibilidad. Intenta de nuevo."
+      "errorFetch": "No se pudo verificar la disponibilidad. Intenta de nuevo.",
+      "singleDayReservation": "Reserva por 1 día"
     }
   },
   "cart": {
@@ -125,7 +124,7 @@
     "emptyDescription": "Explora nuestro catálogo para encontrar artículos para tu evento.",
     "browseCatalog": "Ver Catálogo",
     "product": "Producto",
-    "dates": "Fechas",
+    "dates": "Fecha",
     "quantity": "Cant.",
     "price": "Precio",
     "subtotal": "Subtotal",
@@ -146,8 +145,10 @@
     "addToCart": "Agregar al Carrito",
     "addedToCart": "¡Agregado al carrito!",
     "itemUnavailable": "Algunos artículos ya no están disponibles",
-    "selectDatesFirst": "Selecciona fechas y verifica disponibilidad primero",
-    "perUnit": "por unidad"
+    "selectDatesFirst": "Selecciona una fecha y verifica disponibilidad primero",
+    "perUnit": "por unidad",
+    "pastDateBadge": "Fecha pasada",
+    "pastDateBlocking": "Algunos artículos tienen una fecha pasada. Elimínalos para continuar."
   },
   "payment": {
     "splitBadge": "50% ahora · 50% en entrega",

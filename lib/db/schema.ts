@@ -171,8 +171,7 @@ export const orderItems = pgTable("order_items", {
   quantity: integer("quantity").notNull(),
   unitPrice: numeric("unit_price", { precision: 10, scale: 2 }).notNull(),
   subtotal: numeric("subtotal", { precision: 10, scale: 2 }).notNull(),
-  rentStartDate: timestamp("rent_start_date", { precision: 6 }).notNull(),
-  rentEndDate: timestamp("rent_end_date", { precision: 6 }).notNull(),
+  rentDate: timestamp("rent_date", { precision: 6 }).notNull(),
 });
 
 export const availability = pgTable(
@@ -185,8 +184,7 @@ export const availability = pgTable(
     variantId: uuid("variant_id").references(() => productVariants.id, {
       onDelete: "set null",
     }),
-    startDate: timestamp("start_date", { precision: 6 }).notNull(),
-    endDate: timestamp("end_date", { precision: 6 }).notNull(),
+    date: timestamp("date", { precision: 6 }).notNull(),
     quantity: integer("quantity").notNull().default(1),
     reason: text("reason"),
     orderId: uuid("order_id").references(() => orders.id, {
@@ -194,7 +192,7 @@ export const availability = pgTable(
     }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
-  (t) => [index("idx_availability_lookup").on(t.productId, t.startDate, t.endDate)],
+  (t) => [index("idx_availability_lookup").on(t.productId, t.date)],
 );
 
 export const settings = pgTable("settings", {

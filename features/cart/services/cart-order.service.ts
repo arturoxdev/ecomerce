@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { getStoreId } from "@/lib/config/tenant";
 import * as settingRepo from "@/lib/data/settings";
+import { getMinBookableDate, parseDateOnly } from "@/lib/date";
 import { db, type Database } from "@/lib/db";
 import { availability, orderItems, orders } from "@/lib/db/schema";
 import { checkAvailability } from "@/lib/services/availability.service";
@@ -52,8 +53,7 @@ const placeOrderItemSchema = z.object({
   variantId: z.string().uuid().nullable(),
   quantity: z.number().int().positive(),
   unitPrice: z.number().positive(),
-  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 });
 
 const placeOrderSchema = z.object({
@@ -123,6 +123,8 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
 
     const storeSettings = await loadStoreSettings();
 
+    const minBookable = getMinBookableDate();
+
     return deps.db
       .transaction(async (tx) => {
         const unavailableItems: string[] = [];
@@ -131,8 +133,7 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
           variantId: string | null;
           quantity: number;
           unitPrice: number;
-          startDate: Date;
-          endDate: Date;
+          date: Date;
           productName: string;
         }> = [];
 
@@ -160,14 +161,17 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
           }
 
           const stock = variant ? variant.stock : product.stock ?? 1;
-          const startDate = new Date(`${item.startDate}T00:00:00`);
-          const endDate = new Date(`${item.endDate}T23:59:59`);
+          const date = parseDateOnly(item.date);
+
+          if (date < minBookable) {
+            unavailableItems.push(product.name);
+            continue;
+          }
 
           const availabilityCheck = await checkAvailability(tx, {
             productId: item.productId,
             variantId: item.variantId,
-            startDate,
-            endDate,
+            date,
             quantity: item.quantity,
             stock,
           });
@@ -181,8 +185,7 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
             variantId: item.variantId,
             quantity: item.quantity,
             unitPrice: item.unitPrice,
-            startDate,
-            endDate,
+            date,
             productName: product.name,
           });
         }
@@ -227,15 +230,13 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
             quantity: item.quantity,
             unitPrice: item.unitPrice.toFixed(2),
             subtotal: (item.unitPrice * item.quantity).toFixed(2),
-            rentStartDate: item.startDate,
-            rentEndDate: item.endDate,
+            rentDate: item.date,
           });
 
           await tx.insert(availability).values({
             productId: item.productId,
             variantId: item.variantId,
-            startDate: item.startDate,
-            endDate: item.endDate,
+            date: item.date,
             quantity: item.quantity,
             orderId: order.id,
           });

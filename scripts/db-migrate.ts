@@ -63,6 +63,15 @@ async function detectAppliedCount(pool: Pool) {
     exists(pool, `select exists(select 1 from information_schema.tables where table_schema = 'public' and table_name = 'faq_entries')`),
   ]).then((checks) => checks.every(Boolean));
 
+  const migration4 = migration3 && await Promise.all([
+    exists(pool, `select exists(select 1 from pg_type where typname = 'payment_mode')`),
+    exists(pool, `select exists(select 1 from information_schema.tables where table_schema = 'public' and table_name = 'audit_log')`),
+    exists(pool, `select exists(select 1 from information_schema.tables where table_schema = 'public' and table_name = 'rate_limits')`),
+    exists(pool, `select exists(select 1 from information_schema.tables where table_schema = 'public' and table_name = 'stripe_webhook_events')`),
+    exists(pool, `select exists(select 1 from information_schema.columns where table_schema = 'public' and table_name = 'orders' and column_name = 'stripe_session_id')`),
+  ]).then((checks) => checks.every(Boolean));
+
+  if (migration4) return 4;
   if (migration3) return 3;
   if (migration2) return 2;
   if (migration1) return 1;

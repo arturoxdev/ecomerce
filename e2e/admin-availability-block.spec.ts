@@ -30,16 +30,13 @@ test.describe("T3 admin manual availability block", () => {
     });
 
     const blockStart = daysFromToday(10);
-    const blockEnd = daysFromToday(12);
+    const blockEnd = blockStart;
 
     // Admin: create the block
     await page.goto(`/admin/products/${product.id}/availability`);
     await page
-      .locator('input[id="startDate"]')
+      .locator('input[id="date"]')
       .fill(toLocalDateString(blockStart));
-    await page
-      .locator('input[id="endDate"]')
-      .fill(toLocalDateString(blockEnd));
     await page.locator('input[id="reason"]').fill("e2e-maintenance");
     await page.getByRole("button", { name: /create block/i }).click();
 

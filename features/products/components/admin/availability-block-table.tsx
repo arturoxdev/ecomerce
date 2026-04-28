@@ -28,8 +28,7 @@ import { deleteManualBlock } from "../../actions";
 
 type Block = {
   id: string;
-  startDate: Date;
-  endDate: Date;
+  date: Date;
   quantity: number;
   reason: string | null;
   orderId: string | null;
@@ -81,8 +80,7 @@ export function AvailabilityBlockTable({ blocks }: Props) {
         <TableHeader>
           <TableRow>
             <TableHead>Type</TableHead>
-            <TableHead>Start</TableHead>
-            <TableHead>End</TableHead>
+            <TableHead>Date</TableHead>
             <TableHead>Qty</TableHead>
             <TableHead>Reason</TableHead>
             <TableHead className="w-16">Actions</TableHead>
@@ -102,8 +100,7 @@ export function AvailabilityBlockTable({ blocks }: Props) {
                   </span>
                 )}
               </TableCell>
-              <TableCell>{formatDate(block.startDate)}</TableCell>
-              <TableCell>{formatDate(block.endDate)}</TableCell>
+              <TableCell>{formatDate(block.date)}</TableCell>
               <TableCell>{block.quantity}</TableCell>
               <TableCell className="max-w-xs truncate text-sm text-gray-500">
                 {block.reason ?? "—"}

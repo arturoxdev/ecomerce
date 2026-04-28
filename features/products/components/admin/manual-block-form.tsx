@@ -38,20 +38,12 @@ export function ManualBlockForm({ productId }: Props) {
   }, [state]);
 
   return (
-    <form ref={formRef} action={formAction} className="grid gap-4 sm:grid-cols-3">
+    <form ref={formRef} action={formAction} className="grid gap-4 sm:grid-cols-2">
       <div className="space-y-1.5">
-        <Label htmlFor="startDate">Start date</Label>
-        <Input id="startDate" name="startDate" type="date" required />
-        {fieldErrors?.startDate && (
-          <p className="text-sm text-red-600">{fieldErrors.startDate[0]}</p>
-        )}
-      </div>
-
-      <div className="space-y-1.5">
-        <Label htmlFor="endDate">End date</Label>
-        <Input id="endDate" name="endDate" type="date" required />
-        {fieldErrors?.endDate && (
-          <p className="text-sm text-red-600">{fieldErrors.endDate[0]}</p>
+        <Label htmlFor="date">Date</Label>
+        <Input id="date" name="date" type="date" required />
+        {fieldErrors?.date && (
+          <p className="text-sm text-red-600">{fieldErrors.date[0]}</p>
         )}
       </div>
 
@@ -63,7 +55,7 @@ export function ManualBlockForm({ productId }: Props) {
         )}
       </div>
 
-      <div className="sm:col-span-3">
+      <div className="sm:col-span-2">
         <Button type="submit" disabled={isPending}>
           {isPending ? "Creating…" : "Create block"}
         </Button>

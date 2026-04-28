@@ -164,12 +164,7 @@ function AddToCartDialogBody({
           quantity: priceType === "FIXED" ? 1 : quantity,
           unitPrice,
           priceType,
-          startDate: availabilityResult
-            ? toDateString(availabilityResult.startDate)
-            : "",
-          endDate: availabilityResult
-            ? toDateString(availabilityResult.endDate)
-            : "",
+          date: availabilityResult ? toDateString(availabilityResult.date) : "",
           stock: maxQty,
         }}
         disabled={!isAvailable}

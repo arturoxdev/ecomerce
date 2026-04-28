@@ -1,12 +1,10 @@
 export type ScheduleEntry = {
-  type: "delivery" | "pickup";
   orderId: string;
   customerName: string;
   customerPhone: string;
   deliveryAddress: string | null;
   itemsSummary: string;
-  rentStartDate: string;
-  rentEndDate: string;
+  rentDate: string;
 };
 
 export type ScheduleSourceItem = {
@@ -20,8 +18,7 @@ export type ScheduleSourceItem = {
   product: { name: string };
   variant: { name: string | null } | null;
   quantity: number;
-  rentStartDate: Date;
-  rentEndDate: Date;
+  rentDate: Date;
 };
 
 export type ScheduleDay = {
@@ -37,17 +34,17 @@ export function buildScheduleDay(date: Date): ScheduleDay {
   return { start, end };
 }
 
-/**
- * Given the raw order items joined with their order rows, build the delivery
- * / pickup schedule for a specific calendar day. Kept pure so it can be
- * tested with fixture data, independent of Drizzle or the tenant context.
- */
 export function buildScheduleEntries(
   items: ScheduleSourceItem[],
   day: ScheduleDay,
   storeId: string,
 ): ScheduleEntry[] {
-  const storeItems = items.filter((item) => item.order.storeId === storeId);
+  const inRange = items.filter(
+    (item) =>
+      item.order.storeId === storeId &&
+      item.rentDate >= day.start &&
+      item.rentDate <= day.end,
+  );
 
   const orderGroups = new Map<
     string,
@@ -57,7 +54,7 @@ export function buildScheduleEntries(
     }
   >();
 
-  for (const item of storeItems) {
+  for (const item of inRange) {
     const group = orderGroups.get(item.order.id);
     if (group) {
       group.items.push(item);
@@ -78,38 +75,17 @@ export function buildScheduleEntries(
       })
       .join(", ");
 
-    const hasDelivery = group.items.some((item) => {
-      const start = new Date(item.rentStartDate);
-      return start >= day.start && start <= day.end;
-    });
-
-    const hasPickup = group.items.some((item) => {
-      const end = new Date(item.rentEndDate);
-      return end >= day.start && end <= day.end;
-    });
-
-    const baseEntry = {
+    entries.push({
       orderId: group.order.id,
       customerName: group.order.customerName,
       customerPhone: group.order.customerPhone,
       deliveryAddress: group.order.deliveryAddress,
       itemsSummary,
-      rentStartDate: group.items[0].rentStartDate.toISOString(),
-      rentEndDate: group.items[0].rentEndDate.toISOString(),
-    };
-
-    if (hasDelivery) {
-      entries.push({ ...baseEntry, type: "delivery" });
-    }
-    if (hasPickup) {
-      entries.push({ ...baseEntry, type: "pickup" });
-    }
+      rentDate: group.items[0].rentDate.toISOString(),
+    });
   }
 
-  entries.sort((left, right) => {
-    if (left.type !== right.type) return left.type === "delivery" ? -1 : 1;
-    return 0;
-  });
+  entries.sort((left, right) => left.customerName.localeCompare(right.customerName));
 
   return entries;
 }

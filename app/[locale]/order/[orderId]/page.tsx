@@ -61,10 +61,7 @@ export default async function OrderConfirmationPage({ params }: Props) {
                 </p>
                 <div className="flex items-center gap-1.5 text-xs text-slate-500">
                   <CalendarDays className="size-3" />
-                  <span>
-                    {new Date(item.rentStartDate).toLocaleDateString()} →{" "}
-                    {new Date(item.rentEndDate).toLocaleDateString()}
-                  </span>
+                  <span>{new Date(item.rentDate).toLocaleDateString()}</span>
                 </div>
                 <p className="text-xs text-slate-500">
                   {item.quantity} × ${parseFloat(item.unitPrice).toFixed(2)}

@@ -232,8 +232,7 @@ export function makeFactories(
               quantity: item.quantity,
               unitPrice: item.unitPrice.toFixed(2),
               subtotal: (item.unitPrice * item.quantity).toFixed(2),
-              rentStartDate: item.start,
-              rentEndDate: item.end,
+              rentDate: item.start,
             })
             .returning();
           itemRows.push(itemRow);
@@ -243,8 +242,7 @@ export function makeFactories(
             .values({
               productId: item.productId,
               variantId: item.variantId ?? null,
-              startDate: item.start,
-              endDate: item.end,
+              date: item.start,
               quantity: item.quantity,
               orderId: order.id,
               reason: `${E2E_PREFIX}order-hold`,
@@ -263,8 +261,7 @@ export function makeFactories(
         .values({
           productId,
           variantId: opts.variantId ?? null,
-          startDate: opts.start,
-          endDate: opts.end,
+          date: opts.start,
           quantity: opts.quantity ?? 1,
           reason: opts.reason ?? `${E2E_PREFIX}manual-block`,
           orderId: null,

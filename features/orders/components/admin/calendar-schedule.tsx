@@ -2,10 +2,9 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { format } from "date-fns";
-import { CalendarDays, Truck, RotateCcw } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import Link from "next/link";
 
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -62,12 +61,11 @@ export function CalendarSchedule() {
         </p>
       </div>
 
-      {/* Schedule table */}
       {entries.length === 0 && !isPending ? (
         <div className="flex flex-col items-center justify-center gap-2 py-16">
           <CalendarDays className="size-8 text-muted-foreground" />
           <p className="text-sm text-muted-foreground">
-            No deliveries or pickups for this date.
+            No reservations for this date.
           </p>
         </div>
       ) : (
@@ -76,32 +74,17 @@ export function CalendarSchedule() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[120px]">Type</TableHead>
                   <TableHead>Order</TableHead>
                   <TableHead>Customer</TableHead>
                   <TableHead>Phone</TableHead>
                   <TableHead>Items</TableHead>
-                  <TableHead>Start Date</TableHead>
-                  <TableHead>End Date</TableHead>
+                  <TableHead>Date</TableHead>
                   <TableHead>Address</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {entries.map((entry, idx) => (
-                  <TableRow key={`${entry.orderId}-${entry.type}-${idx}`}>
-                    <TableCell>
-                      {entry.type === "delivery" ? (
-                        <Badge className="gap-1 bg-green-100 text-green-800 hover:bg-green-100">
-                          <Truck className="size-3" />
-                          Entrega
-                        </Badge>
-                      ) : (
-                        <Badge className="gap-1 bg-orange-100 text-orange-800 hover:bg-orange-100">
-                          <RotateCcw className="size-3" />
-                          Recolección
-                        </Badge>
-                      )}
-                    </TableCell>
+                {entries.map((entry) => (
+                  <TableRow key={entry.orderId}>
                     <TableCell>
                       <Link
                         href={`/admin/orders/${entry.orderId}`}
@@ -120,10 +103,7 @@ export function CalendarSchedule() {
                       {entry.itemsSummary}
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">
-                      {format(new Date(entry.rentStartDate), "MMM d, yyyy")}
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">
-                      {format(new Date(entry.rentEndDate), "MMM d, yyyy")}
+                      {format(new Date(entry.rentDate), "MMM d, yyyy")}
                     </TableCell>
                     <TableCell className="max-w-[150px] truncate text-xs text-muted-foreground">
                       {entry.deliveryAddress || "—"}

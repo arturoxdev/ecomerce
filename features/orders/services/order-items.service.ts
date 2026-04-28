@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, gte, lte } from "drizzle-orm";
 
 import { db, type Database } from "@/lib/db";
 import { orderItems } from "@/lib/db/schema";
@@ -12,10 +12,6 @@ export type OrderItemsServiceDeps = {
 export function createOrderItemsService(deps: OrderItemsServiceDeps) {
   const { db: dbx } = deps;
 
-  /**
-   * Find order items whose rental period starts or ends on a given date.
-   * Used by the admin calendar/delivery schedule.
-   */
   function findByDate(date: Date) {
     const dayStart = new Date(date);
     dayStart.setHours(0, 0, 0, 0);
@@ -24,8 +20,8 @@ export function createOrderItemsService(deps: OrderItemsServiceDeps) {
 
     return dbx.query.orderItems.findMany({
       where: and(
-        sql`(${orderItems.rentStartDate} >= ${dayStart} AND ${orderItems.rentStartDate} <= ${dayEnd})
-          OR (${orderItems.rentEndDate} >= ${dayStart} AND ${orderItems.rentEndDate} <= ${dayEnd})`,
+        gte(orderItems.rentDate, dayStart),
+        lte(orderItems.rentDate, dayEnd),
       ),
       with: {
         order: {

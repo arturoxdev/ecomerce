@@ -1,31 +1,26 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CalendarDays, ArrowRight } from "lucide-react";
-import { format, differenceInCalendarDays } from "date-fns";
-import type { DateRange } from "react-day-picker";
+import { format } from "date-fns";
 
-import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useUnavailableDates } from "../../hooks/use-unavailable-dates";
 import { fetchAvailability } from "../../services/availability.client-service";
 
 export type AvailabilityLabels = {
   checkDates: string;
-  startDate: string;
-  endDate: string;
+  selectDate: string;
   loading: string;
   available: string;
   notAvailable: string;
   unitsAvailable: string;
-  invalidRange: string;
   errorFetch: string;
 };
 
 export type AvailabilityResult = {
-  startDate: Date;
-  endDate: Date;
+  date: Date;
   available: number;
 };
 
@@ -44,21 +39,13 @@ type AvailabilityStatus =
   | "loading"
   | "available"
   | "unavailable"
-  | "error"
-  | "invalid";
-
-type ActiveField = "start" | "end";
+  | "error";
 
 function toDateString(date: Date): string {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
   const d = String(date.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
-}
-
-function countDays(from: Date, to: Date): number {
-  const diff = differenceInCalendarDays(to, from);
-  return Math.max(1, diff);
 }
 
 export function AvailabilityCheckerBody({
@@ -69,65 +56,26 @@ export function AvailabilityCheckerBody({
   onAvailabilityConfirmed,
   onUnavailable,
 }: AvailabilityCheckerProps) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const tomorrow = (() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() + 1);
+    return d;
+  })();
 
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
-  const [activeField, setActiveField] = useState<ActiveField>("start");
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+  const [visibleMonth, setVisibleMonth] = useState<Date>(tomorrow);
   const [status, setStatus] = useState<AvailabilityStatus>("idle");
   const [available, setAvailable] = useState(0);
 
-  const startDate = dateRange?.from;
-  const endDate = dateRange?.to;
-  const hasValidRange = Boolean(startDate && endDate && endDate >= startDate);
-
-  function handleStartClick() {
-    setDateRange(undefined);
-    setActiveField("start");
-    onUnavailable?.();
-  }
-
-  function handleEndClick() {
-    setActiveField("end");
-  }
-
-  function handleSelect(range: DateRange | undefined) {
-    if (!range) {
-      setDateRange(undefined);
-      onUnavailable?.();
-      return;
-    }
-
-    if (activeField === "start") {
-      if (range.from) {
-        setDateRange({ from: range.from, to: undefined });
-        setActiveField("end");
-        onUnavailable?.();
-      }
-    } else {
-      if (range.from && range.to) {
-        if (range.to < range.from) {
-          setDateRange({ from: range.to, to: range.from });
-        } else {
-          setDateRange(range);
-        }
-      } else if (range.from && !range.to && startDate) {
-        const clicked = range.from;
-        if (clicked < startDate) {
-          setDateRange({ from: clicked, to: startDate });
-        } else {
-          setDateRange({ from: startDate, to: clicked });
-        }
-      } else {
-        setDateRange(range);
-      }
-    }
-  }
+  const { unavailableDates } = useUnavailableDates({
+    productId,
+    variantId,
+    visibleMonth,
+  });
 
   useEffect(() => {
-    if (!hasValidRange || !startDate || !endDate) {
-      return;
-    }
+    if (!selectedDate) return;
 
     const timer = setTimeout(async () => {
       setStatus("loading");
@@ -135,8 +83,7 @@ export function AvailabilityCheckerBody({
         const response = await fetchAvailability({
           productId,
           variantId,
-          startDate: toDateString(startDate),
-          endDate: toDateString(endDate),
+          date: toDateString(selectedDate),
         });
         if (!response.ok) {
           setStatus("error");
@@ -147,8 +94,7 @@ export function AvailabilityCheckerBody({
         setStatus(response.available > 0 ? "available" : "unavailable");
         if (response.available > 0 && onAvailabilityConfirmed) {
           onAvailabilityConfirmed({
-            startDate,
-            endDate,
+            date: selectedDate,
             available: response.available,
           });
         } else if (response.available <= 0) {
@@ -162,16 +108,18 @@ export function AvailabilityCheckerBody({
 
     return () => clearTimeout(timer);
   }, [
-    endDate,
-    hasValidRange,
     onAvailabilityConfirmed,
     onUnavailable,
     productId,
-    startDate,
+    selectedDate,
     variantId,
   ]);
 
-  const dayCount = startDate && endDate ? countDays(startDate, endDate) : null;
+  function handleSelect(date: Date | undefined) {
+    setSelectedDate(date);
+    setStatus("idle");
+    if (!date) onUnavailable?.();
+  }
 
   function renderStatus() {
     switch (status) {
@@ -210,96 +158,36 @@ export function AvailabilityCheckerBody({
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Date pills — always visible, clickable to toggle active field */}
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={handleStartClick}
-          className={cn(
-            "flex flex-1 flex-col gap-0.5 rounded-lg border px-3 py-2 text-left transition-colors",
-            activeField === "start"
-              ? "border-secondary bg-background-light"
-              : "border-border bg-card"
-          )}
-        >
-          <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-            {labels.startDate}
-          </span>
-          <span
-            className={cn(
-              "flex items-center gap-1.5 text-sm font-semibold",
-              startDate ? "text-foreground" : "text-muted-foreground"
-            )}
-          >
-            <CalendarDays className="size-3.5" />
-            {startDate ? format(startDate, "MMM d, yyyy") : "—"}
-          </span>
-        </button>
-        <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
-        <button
-          type="button"
-          onClick={handleEndClick}
-          className={cn(
-            "flex flex-1 flex-col gap-0.5 rounded-lg border px-3 py-2 text-left transition-colors",
-            activeField === "end"
-              ? "border-secondary bg-background-light"
-              : "border-border bg-card"
-          )}
-        >
-          <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-            {labels.endDate}
-          </span>
-          <span
-            className={cn(
-              "flex items-center gap-1.5 text-sm font-semibold",
-              endDate ? "text-foreground" : "text-muted-foreground"
-            )}
-          >
-            <CalendarDays className="size-3.5" />
-            {endDate ? format(endDate, "MMM d, yyyy") : "—"}
-          </span>
-        </button>
+      <div className="flex items-center justify-between text-sm">
+        <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          {labels.selectDate}
+        </span>
+        <span className="font-semibold">
+          {selectedDate ? format(selectedDate, "MMM d, yyyy") : "—"}
+        </span>
       </div>
 
-      {/* Calendar */}
       <div className="w-full overflow-x-auto">
         <Calendar
-          mode="range"
-          selected={dateRange}
+          mode="single"
+          selected={selectedDate}
           onSelect={handleSelect}
-          disabled={{ before: today }}
+          month={visibleMonth}
+          onMonthChange={setVisibleMonth}
+          disabled={[{ before: tomorrow }, ...unavailableDates]}
           className="w-full"
         />
       </div>
 
-      {/* Day counter + status */}
-      {dayCount !== null && (
-        <>
-          <Separator />
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-muted-foreground">
-              {dayCount} {dayCount === 1 ? "day" : "days"}
-            </span>
-            <div
-              role="status"
-              aria-live="polite"
-              data-testid="availability-status"
-            >
-              {renderStatus()}
-            </div>
-          </div>
-        </>
-      )}
-
-      {dayCount === null && (
-        <div
-          role="status"
-          aria-live="polite"
-          data-testid="availability-status"
-        >
-          {renderStatus()}
-        </div>
-      )}
+      <Separator />
+      <div
+        role="status"
+        aria-live="polite"
+        data-testid="availability-status"
+        className="min-h-5"
+      >
+        {renderStatus()}
+      </div>
     </div>
   );
 }

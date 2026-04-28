@@ -3,6 +3,7 @@ import "server-only";
 import { NextResponse } from "next/server";
 
 import { problemResponse } from "@/lib/api/problem-response";
+import { getMinBookableDate, parseDateOnly } from "@/lib/date";
 import { internalProblem, notFoundProblem } from "@/lib/problems";
 import {
   calculateAvailableQuantity,
@@ -19,8 +20,7 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 export type AvailabilityRequestParams = {
   productId: string | null;
   variantId: string | null;
-  start: string | null;
-  end: string | null;
+  date: string | null;
 };
 
 type AvailabilityHandlerProduct = {
@@ -56,27 +56,23 @@ export async function handleAvailabilityRequest(
   params: AvailabilityRequestParams,
   deps: AvailabilityHandlerDeps,
 ): Promise<Response> {
-  const { productId, variantId, start, end } = params;
+  const { productId, variantId, date } = params;
 
   if (!productId) return badRequest("productId is required");
-  if (!start) return badRequest("start is required");
-  if (!end) return badRequest("end is required");
+  if (!date) return badRequest("date is required");
 
   if (!UUID_RE.test(productId)) return badRequest("productId must be a valid UUID");
   if (variantId && !UUID_RE.test(variantId))
     return badRequest("variantId must be a valid UUID");
 
-  if (!DATE_RE.test(start))
-    return badRequest("Invalid date format for start. Use YYYY-MM-DD");
-  if (!DATE_RE.test(end))
-    return badRequest("Invalid date format for end. Use YYYY-MM-DD");
+  if (!DATE_RE.test(date))
+    return badRequest("Invalid date format for date. Use YYYY-MM-DD");
 
-  const startDate = new Date(start);
-  const endDate = new Date(end);
+  const parsed = parseDateOnly(date);
+  if (isNaN(parsed.getTime())) return badRequest("Invalid date");
 
-  if (isNaN(startDate.getTime())) return badRequest("Invalid start date");
-  if (isNaN(endDate.getTime())) return badRequest("Invalid end date");
-  if (endDate <= startDate) return badRequest("end must be after start");
+  if (parsed < getMinBookableDate())
+    return badRequest("date must be tomorrow or later");
 
   const product = await deps.findProductById(productId);
   if (!product || !product.isActive)
@@ -93,8 +89,7 @@ export async function handleAvailabilityRequest(
   try {
     const occupied = await findOccupiedQuantity(deps.db, {
       productId,
-      startDate,
-      endDate,
+      date: parsed,
       variantId,
     });
 

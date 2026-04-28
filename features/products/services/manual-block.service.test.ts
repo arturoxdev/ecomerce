@@ -22,186 +22,110 @@ function buildFormData(entries: Record<string, string>): FormData {
 
 describe("manual-block service", () => {
   describe("parseManualBlockForm", () => {
-    it("valid dates -> parsed Date objects", () => {
-      // Arrange
+    it("valid date -> parsed Date object", () => {
       const fd = buildFormData({
-        startDate: "2026-05-01",
-        endDate: "2026-05-03",
+        date: "2026-05-01",
         reason: "Maintenance",
       });
 
-      // Act
       const result = parseManualBlockForm(fd);
 
-      // Assert
       expect(result.success).toBe(true);
       if (!result.success) return;
-      expect(result.data.startDate).toBeInstanceOf(Date);
+      expect(result.data.date).toBeInstanceOf(Date);
       expect(result.data.reason).toBe("Maintenance");
     });
 
     it("invalid date -> validation error", () => {
-      // Arrange
       const fd = buildFormData({
-        startDate: "not-a-date",
-        endDate: "2026-05-03",
+        date: "not-a-date",
       });
 
-      // Act
       const result = parseManualBlockForm(fd);
 
-      // Assert
       expect(result.success).toBe(false);
     });
 
     it("reason over 255 chars -> validation error", () => {
-      // Arrange
       const fd = buildFormData({
-        startDate: "2026-05-01",
-        endDate: "2026-05-03",
+        date: "2026-05-01",
         reason: "x".repeat(256),
       });
 
-      // Act
       const result = parseManualBlockForm(fd);
 
-      // Assert
       expect(result.success).toBe(false);
     });
   });
 
   describe("validateManualBlockDates", () => {
-    it("start in the past with fixed clock -> validation problem", () => {
-      // Arrange
+    it("date in the past with fixed clock -> validation problem", () => {
       const clock = fixedClock("2026-06-15T10:00:00Z");
-      const input = {
-        startDate: new Date("2026-06-01"),
-        endDate: new Date("2026-06-05"),
-      };
+      const input = { date: new Date("2026-06-01") };
 
-      // Act
       const result = validateManualBlockDates(input, clock);
 
-      // Assert
       expect(result.ok).toBe(false);
       if (result.ok) return;
-      expect(result.problem.fieldErrors?.startDate?.[0]).toBe(
-        "Start date cannot be in the past",
+      expect(result.problem.fieldErrors?.date?.[0]).toBe(
+        "Date cannot be in the past",
       );
     });
 
-    it("start today with fixed clock -> accepted", () => {
-      // Arrange
-      const clock = fixedClock("2026-06-15T23:00:00Z");
-      const input = {
-        startDate: new Date("2026-06-16"),
-        endDate: new Date("2026-06-18"),
-      };
+    it("date today with fixed clock -> accepted (admin can block today)", () => {
+      const clock = fixedClock("2026-06-15T12:00:00Z");
+      const input = { date: new Date(2026, 5, 16) };
 
-      // Act
       const result = validateManualBlockDates(input, clock);
 
-      // Assert
       expect(result.ok).toBe(true);
     });
 
-    it("end before start -> validation problem on endDate", () => {
-      // Arrange
+    it("future date -> ok", () => {
       const clock = fixedClock("2026-06-01T00:00:00Z");
-      const input = {
-        startDate: new Date("2026-06-20"),
-        endDate: new Date("2026-06-15"),
-      };
+      const input = { date: new Date("2026-06-10") };
 
-      // Act
       const result = validateManualBlockDates(input, clock);
 
-      // Assert
-      expect(result.ok).toBe(false);
-      if (result.ok) return;
-      expect(result.problem.fieldErrors?.endDate?.[0]).toBe(
-        "End date must be after start date",
-      );
-    });
-
-    it("end equal to start -> validation problem", () => {
-      // Arrange
-      const clock = fixedClock("2026-06-01T00:00:00Z");
-      const input = {
-        startDate: new Date("2026-06-10"),
-        endDate: new Date("2026-06-10"),
-      };
-
-      // Act
-      const result = validateManualBlockDates(input, clock);
-
-      // Assert
-      expect(result.ok).toBe(false);
-    });
-
-    it("valid range -> ok true", () => {
-      // Arrange
-      const clock = fixedClock("2026-06-01T00:00:00Z");
-      const input = {
-        startDate: new Date("2026-06-10"),
-        endDate: new Date("2026-06-12"),
-      };
-
-      // Act
-      const result = validateManualBlockDates(input, clock);
-
-      // Assert
       expect(result.ok).toBe(true);
     });
   });
 
   describe("parseAndValidateManualBlock", () => {
     it("parse error -> returns validationProblem shape", () => {
-      // Arrange
       const fd = buildFormData({
-        startDate: "invalid",
-        endDate: "2026-06-15",
+        date: "invalid",
       });
 
-      // Act
       const result = parseAndValidateManualBlock(fd);
 
-      // Assert
       expect(result.ok).toBe(false);
       if (result.ok) return;
       expect(result.problem.status).toBe(422);
     });
 
-    it("valid parse but semantic invalid -> returns validation problem", () => {
-      // Arrange
+    it("valid parse but date in past -> returns validation problem", () => {
       const clock = fixedClock("2026-06-15T00:00:00Z");
       const fd = buildFormData({
-        startDate: "2026-06-20",
-        endDate: "2026-06-20",
+        date: "2026-06-10",
       });
 
-      // Act
       const result = parseAndValidateManualBlock(fd, clock);
 
-      // Assert
       expect(result.ok).toBe(false);
       if (result.ok) return;
-      expect(result.problem.fieldErrors?.endDate).toBeDefined();
+      expect(result.problem.fieldErrors?.date).toBeDefined();
     });
 
-    it("valid and semantic ok -> returns parsed data", () => {
-      // Arrange
+    it("valid and ok -> returns parsed data", () => {
       const clock = fixedClock("2026-06-01T00:00:00Z");
       const fd = buildFormData({
-        startDate: "2026-06-10",
-        endDate: "2026-06-12",
+        date: "2026-06-10",
         reason: "Event",
       });
 
-      // Act
       const result = parseAndValidateManualBlock(fd, clock);
 
-      // Assert
       expect(result.ok).toBe(true);
       if (!result.ok) return;
       expect(result.data.reason).toBe("Event");

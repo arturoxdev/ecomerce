@@ -16,7 +16,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { getCartSubtotal, useCartStore } from "@/lib/stores/cart-store";
+import {
+  getCartSubtotal,
+  isCartItemPastDue,
+  useCartStore,
+} from "@/lib/stores/cart-store";
 import { calculateCartSummary } from "../services/cart-pricing.service";
 import { CartItem } from "./cart-item";
 import {
@@ -50,6 +54,8 @@ type Labels = {
   splitNotice: string;
   payNow: string;
   balanceOnDelivery: string;
+  pastDateBadge: string;
+  pastDateBlocking: string;
 };
 
 type Props = {
@@ -112,6 +118,7 @@ export function CartPageClient({ locale, labels }: Props) {
   }
 
   const subtotal = getCartSubtotal(items);
+  const hasPastItems = items.some((item) => isCartItemPastDue(item));
   const resolvedSettings = settings ?? {
     deliveryMode: "INCLUDED",
     deliveryFee: 0,
@@ -148,8 +155,7 @@ export function CartPageClient({ locale, labels }: Props) {
         variantId: item.variantId,
         quantity: item.quantity,
         unitPrice: item.unitPrice,
-        startDate: item.startDate,
-        endDate: item.endDate,
+        date: item.date,
       })),
     };
 
@@ -199,9 +205,22 @@ export function CartPageClient({ locale, labels }: Props) {
                 item={item}
                 onRemove={removeItem}
                 onQuantityChange={updateQuantity}
-                labels={{ remove: labels.remove, quantity: labels.quantity }}
+                labels={{
+                  remove: labels.remove,
+                  quantity: labels.quantity,
+                  pastDateBadge: labels.pastDateBadge,
+                }}
               />
             ))}
+
+            {hasPastItems && (
+              <p
+                className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+                data-testid="cart-past-date-notice"
+              >
+                {labels.pastDateBlocking}
+              </p>
+            )}
 
             {/* Customer info */}
             <Card className="mt-6">
@@ -349,7 +368,7 @@ export function CartPageClient({ locale, labels }: Props) {
               type="submit"
               size="lg"
               className="mt-6 w-full"
-              disabled={isPending}
+              disabled={isPending || hasPastItems}
             >
               {isPending ? labels.processing : labels.confirmOrder}
             </Button>
