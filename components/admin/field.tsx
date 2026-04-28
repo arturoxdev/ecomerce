@@ -13,7 +13,7 @@ export function Field({
 }) {
   return (
     <div className={className ?? "flex flex-col gap-1.5"}>
-      <Label>{label}</Label>
+      <Label className="text-xs font-semibold text-foreground">{label}</Label>
       {children}
       {error && <p className="text-xs text-destructive">{error}</p>}
     </div>

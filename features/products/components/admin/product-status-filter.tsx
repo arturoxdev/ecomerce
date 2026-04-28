@@ -57,15 +57,19 @@ export function ProductFilters({ categories }: Props) {
     inactive: "Inactive",
   };
 
+  const labelCn = "text-xs font-semibold text-foreground";
+
   return (
-    <div className="flex flex-wrap items-end gap-3">
+    <div className="flex flex-wrap items-end gap-3.5">
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="product-search">Search</Label>
-        <div className="relative w-64">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Label htmlFor="product-search" className={labelCn}>
+          Search
+        </Label>
+        <div className="relative w-[300px]">
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-subtle" />
           <Input
             id="product-search"
-            placeholder="Search by name..."
+            placeholder="Search by name…"
             defaultValue={currentSearch}
             onChange={(e) => {
               const value = e.target.value;
@@ -78,14 +82,12 @@ export function ProductFilters({ categories }: Props) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label>Category</Label>
+        <Label className={labelCn}>Category</Label>
         <Select
           value={currentCategory}
           onValueChange={(value) => updateParams("category", value ?? "all")}
         >
-          <SelectTrigger className="w-48">
-            {categoryLabel}
-          </SelectTrigger>
+          <SelectTrigger className="w-[210px]">{categoryLabel}</SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All categories</SelectItem>
             {categories.map((cat) => (
@@ -98,12 +100,12 @@ export function ProductFilters({ categories }: Props) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label>Status</Label>
+        <Label className={labelCn}>Status</Label>
         <Select
           value={currentStatus}
           onValueChange={(value) => updateParams("status", value ?? "all")}
         >
-          <SelectTrigger className="w-36">
+          <SelectTrigger className="w-[150px]">
             {statusLabels[currentStatus] ?? "All"}
           </SelectTrigger>
           <SelectContent>

@@ -2,24 +2,38 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
 type Props = {
-  title: string;
+  title: React.ReactNode;
+  subtitle?: React.ReactNode;
   actions?: React.ReactNode;
 };
 
-export function SiteHeader({ title, actions }: Props) {
+export function SiteHeader({ title, subtitle, actions }: Props) {
   return (
-    <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
-      <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
-        <SidebarTrigger className="-ml-1" />
-        <Separator
-          orientation="vertical"
-          className="mx-2 data-[orientation=vertical]:h-4"
-        />
-        <h1 className="text-base font-medium">{title}</h1>
-        {actions && (
-          <div className="ml-auto flex items-center gap-2">{actions}</div>
+    <header className="flex min-h-(--header-height) shrink-0 items-center gap-3 border-b border-border bg-background px-7 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
+      <SidebarTrigger className="-ml-1" />
+      <Separator
+        orientation="vertical"
+        className="data-[orientation=vertical]:h-4"
+      />
+      <div className="flex min-w-0 flex-1 items-baseline gap-3">
+        {typeof title === "string" ? (
+          <h1 className="truncate text-[22px] font-bold tracking-tight text-foreground">
+            {title}
+          </h1>
+        ) : (
+          <div className="flex min-w-0 items-baseline gap-3 text-[13px]">
+            {title}
+          </div>
+        )}
+        {subtitle && (
+          <span className="truncate text-[12.5px] text-muted-foreground">
+            {subtitle}
+          </span>
         )}
       </div>
+      {actions && (
+        <div className="ml-auto flex items-center gap-2">{actions}</div>
+      )}
     </header>
   );
 }

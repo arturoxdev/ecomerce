@@ -16,9 +16,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { CountPill } from "@/components/admin/count-pill";
 import {
   Table,
   TableBody,
@@ -27,6 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 
 import { deleteCategory, updateCategoryOrder } from "../../actions";
 
@@ -44,17 +45,29 @@ type Props = {
   canWrite?: boolean;
 };
 
+const headCellCn =
+  "h-auto px-[22px] py-3 text-[11px] font-semibold uppercase tracking-[0.05em] text-muted-foreground";
+const bodyCellCn = "px-[22px] py-[13px]";
+
 export function CategoryTable({ categories, canWrite = true }: Props) {
-  const { targetId: deleteId, isPending, startTransition, openDialog: setDeleteId, closeDialog, confirmDelete } = useDeleteDialog();
+  const {
+    targetId: deleteId,
+    isPending,
+    startTransition,
+    openDialog: setDeleteId,
+    closeDialog,
+    confirmDelete,
+  } = useDeleteDialog();
 
   function handleReorder(index: number, direction: "up" | "down") {
-    const newCategories = [...categories];
     const swapIndex = direction === "up" ? index - 1 : index + 1;
-    if (swapIndex < 0 || swapIndex >= newCategories.length) return;
+    if (swapIndex < 0 || swapIndex >= categories.length) return;
 
-    const items = newCategories.map((c, i) => {
-      if (i === index) return { id: c.id, sortOrder: newCategories[swapIndex].sortOrder };
-      if (i === swapIndex) return { id: c.id, sortOrder: newCategories[index].sortOrder };
+    const items = categories.map((c, i) => {
+      if (i === index)
+        return { id: c.id, sortOrder: categories[swapIndex].sortOrder };
+      if (i === swapIndex)
+        return { id: c.id, sortOrder: categories[index].sortOrder };
       return { id: c.id, sortOrder: c.sortOrder };
     });
 
@@ -85,67 +98,114 @@ export function CategoryTable({ categories, canWrite = true }: Props) {
 
   return (
     <>
-      <Card>
+      <Card className="gap-0 py-0">
         <CardContent className="p-0">
           <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Slug</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Products</TableHead>
-                {canWrite && <TableHead className="w-16">Order</TableHead>}
-                {canWrite && <TableHead className="w-20">Actions</TableHead>}
+            <TableHeader className="bg-sidebar">
+              <TableRow className="border-b border-border hover:bg-transparent">
+                <TableHead className={cn(headCellCn, "w-[20%]")}>Name</TableHead>
+                <TableHead className={cn(headCellCn, "w-[18%]")}>Slug</TableHead>
+                <TableHead className={cn(headCellCn)}>Description</TableHead>
+                <TableHead className={cn(headCellCn, "w-[110px] text-center")}>
+                  Products
+                </TableHead>
+                {canWrite && (
+                  <TableHead className={cn(headCellCn, "w-[90px] text-center")}>
+                    Order
+                  </TableHead>
+                )}
+                {canWrite && (
+                  <TableHead className={cn(headCellCn, "w-[110px] text-right")}>
+                    Actions
+                  </TableHead>
+                )}
               </TableRow>
             </TableHeader>
             <TableBody>
               {categories.map((category, index) => (
-                <TableRow key={category.id}>
-                  <TableCell className="font-medium">{category.name}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{category.slug}</TableCell>
-                  <TableCell className="max-w-xs truncate text-sm text-muted-foreground">
+                <TableRow
+                  key={category.id}
+                  className="border-b border-border last:border-b-0 hover:bg-transparent"
+                >
+                  <TableCell
+                    className={cn(
+                      bodyCellCn,
+                      "text-[13px] font-semibold text-foreground",
+                    )}
+                  >
+                    {category.name}
+                  </TableCell>
+                  <TableCell
+                    className={cn(
+                      bodyCellCn,
+                      "font-mono text-xs text-muted-foreground",
+                    )}
+                  >
+                    {category.slug}
+                  </TableCell>
+                  <TableCell
+                    className={cn(
+                      bodyCellCn,
+                      "max-w-0 truncate text-[13px] text-muted-foreground",
+                    )}
+                  >
                     {category.description ?? "—"}
                   </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">{category._count.products}</Badge>
+                  <TableCell className={cn(bodyCellCn, "text-center")}>
+                    <CountPill value={category._count.products} />
                   </TableCell>
                   {canWrite && (
-                    <TableCell>
-                      <div className="flex items-center gap-0.5">
+                    <TableCell className={cn(bodyCellCn, "py-2")}>
+                      <div className="flex items-center justify-center gap-1">
                         <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-7"
+                          variant="outline"
+                          size="icon-sm"
+                          className="text-muted-foreground"
                           onClick={() => handleReorder(index, "up")}
                           disabled={index === 0 || isPending}
+                          aria-label="Move up"
                         >
-                          <ChevronUp className="size-4" />
+                          <ChevronUp className="size-3.5" />
                         </Button>
                         <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-7"
+                          variant="outline"
+                          size="icon-sm"
+                          className="text-muted-foreground"
                           onClick={() => handleReorder(index, "down")}
-                          disabled={index === categories.length - 1 || isPending}
+                          disabled={
+                            index === categories.length - 1 || isPending
+                          }
+                          aria-label="Move down"
                         >
-                          <ChevronDown className="size-4" />
+                          <ChevronDown className="size-3.5" />
                         </Button>
                       </div>
                     </TableCell>
                   )}
                   {canWrite && (
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" className="size-7" render={<Link href={`/admin/categories/${category.id}/edit`} />}>
-                          <Pencil className="size-4" />
+                    <TableCell className={cn(bodyCellCn, "py-2")}>
+                      <div className="flex items-center justify-end gap-1.5">
+                        <Button
+                          variant="outline"
+                          size="icon-sm"
+                          className="text-muted-foreground"
+                          render={
+                            <Link
+                              href={`/admin/categories/${category.id}/edit`}
+                            />
+                          }
+                          aria-label="Edit"
+                        >
+                          <Pencil className="size-3.5" />
                         </Button>
                         <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-7 text-muted-foreground hover:text-destructive"
+                          variant="outline"
+                          size="icon-sm"
+                          className="text-muted-foreground hover:text-destructive"
                           onClick={() => setDeleteId(category.id)}
+                          aria-label="Delete"
                         >
-                          <Trash2 className="size-4" />
+                          <Trash2 className="size-3.5" />
                         </Button>
                       </div>
                     </TableCell>
@@ -171,7 +231,7 @@ export function CategoryTable({ categories, canWrite = true }: Props) {
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isPending}
-              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive/30"
             >
               {isPending ? "Deleting…" : "Delete"}
             </AlertDialogAction>
