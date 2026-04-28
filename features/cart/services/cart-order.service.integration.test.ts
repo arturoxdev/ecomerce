@@ -108,8 +108,7 @@ describe("cart-order service — integration", () => {
           variantId: null,
           quantity: 1,
           unitPrice: 50,
-          startDate: "2026-06-01",
-          endDate: "2026-06-03",
+          date: "2099-06-01",
         },
       ],
     });
@@ -155,8 +154,7 @@ describe("cart-order service — integration", () => {
           variantId: null,
           quantity: 1,
           unitPrice: 50,
-          startDate: "2026-06-01",
-          endDate: "2026-06-03",
+          date: "2099-06-01",
         },
       ],
     });
@@ -195,8 +193,7 @@ describe("cart-order service — integration", () => {
           variantId: null,
           quantity: 1,
           unitPrice: 1,
-          startDate: "2026-06-01",
-          endDate: "2026-06-03",
+          date: "2099-06-01",
         },
       ],
     });

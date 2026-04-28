@@ -4,8 +4,12 @@ import { CalendarDays, Trash2 } from "lucide-react";
 import Image from "next/image";
 
 import { QuantitySelector } from "@/components/quantity-selector";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { CartItem as CartItemType } from "@/lib/stores/cart-store";
+import {
+  isCartItemPastDue,
+  type CartItem as CartItemType,
+} from "@/lib/stores/cart-store";
 
 type Props = {
   item: CartItemType;
@@ -14,11 +18,13 @@ type Props = {
   labels: {
     remove: string;
     quantity: string;
+    pastDateBadge: string;
   };
 };
 
 export function CartItem({ item, onRemove, onQuantityChange, labels }: Props) {
   const lineSubtotal = item.unitPrice * item.quantity;
+  const isPast = isCartItemPastDue(item);
 
   return (
     <div className="flex gap-4 rounded-lg border border-slate-200 bg-white p-4">
@@ -55,12 +61,14 @@ export function CartItem({ item, onRemove, onQuantityChange, labels }: Props) {
           </p>
         </div>
 
-        {/* Dates */}
         <div className="flex items-center gap-1.5 text-xs text-slate-500">
           <CalendarDays className="size-3.5" />
-          <span>{item.startDate}</span>
-          <span>→</span>
-          <span>{item.endDate}</span>
+          <span>{item.date}</span>
+          {isPast && (
+            <Badge variant="destructive" className="ml-1">
+              {labels.pastDateBadge}
+            </Badge>
+          )}
         </div>
 
         {/* Quantity + Remove */}

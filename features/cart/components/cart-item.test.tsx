@@ -26,8 +26,7 @@ function buildItem(partial: Partial<CartItemType> = {}): CartItemType {
     quantity: 1,
     unitPrice: 10,
     priceType: "PER_UNIT",
-    startDate: "2026-06-01",
-    endDate: "2026-06-02",
+    date: "2099-06-01",
     stock: 5,
     ...partial,
   };
@@ -36,7 +35,7 @@ function buildItem(partial: Partial<CartItemType> = {}): CartItemType {
 describe("CartItem", () => {
   afterEach(() => cleanup());
 
-  const labels = { remove: "Remove", quantity: "Qty" };
+  const labels = { remove: "Remove", quantity: "Qty", pastDateBadge: "Past date" };
 
   it("PER_UNIT item with quantity 2 -> shows subtotal 20.00", () => {
     // Arrange / Act
@@ -90,7 +89,6 @@ describe("CartItem", () => {
   });
 
   it("variant name present -> rendered below product name", () => {
-    // Arrange / Act
     render(
       <CartItem
         item={buildItem({ variantName: "Red" })}
@@ -100,7 +98,19 @@ describe("CartItem", () => {
       />,
     );
 
-    // Assert
     expect(screen.getByText("Red")).toBeInTheDocument();
+  });
+
+  it("date in the past -> renders past date badge", () => {
+    render(
+      <CartItem
+        item={buildItem({ date: "2020-01-01" })}
+        onRemove={() => {}}
+        onQuantityChange={() => {}}
+        labels={labels}
+      />,
+    );
+
+    expect(screen.getByText("Past date")).toBeInTheDocument();
   });
 });

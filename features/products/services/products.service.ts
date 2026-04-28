@@ -169,7 +169,7 @@ export function createProductsService(deps: ProductsServiceDeps) {
   function findBlocksByProduct(productId: string) {
     return dbx.query.availability.findMany({
       where: eq(availability.productId, productId),
-      orderBy: [desc(availability.startDate)],
+      orderBy: [desc(availability.date)],
       with: { order: { columns: { id: true, customerName: true } } },
     });
   }
@@ -180,16 +180,14 @@ export function createProductsService(deps: ProductsServiceDeps) {
     });
   }
 
-  function findByDateRange(
+  function findByDate(
     productId: string,
-    startDate: Date,
-    endDate: Date,
+    date: Date,
     variantId?: string | null,
   ) {
     return findOccupiedQuantity(dbx, {
       productId,
-      startDate,
-      endDate,
+      date,
       variantId,
     }).then((occupied) => ({ rows: [{ occupied }] }));
   }
@@ -208,7 +206,7 @@ export function createProductsService(deps: ProductsServiceDeps) {
     findVariantById,
     findBlocksByProduct,
     findBlockById,
-    findByDateRange,
+    findByDate,
   };
 }
 
@@ -235,4 +233,4 @@ export const findAllVariantsByProductId =
 export const findVariantById = defaultService.findVariantById;
 export const findBlocksByProduct = defaultService.findBlocksByProduct;
 export const findBlockById = defaultService.findBlockById;
-export const findByDateRange = defaultService.findByDateRange;
+export const findByDate = defaultService.findByDate;

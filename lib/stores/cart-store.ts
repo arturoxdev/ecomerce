@@ -12,8 +12,7 @@ export type CartItem = {
   quantity: number;
   unitPrice: number;
   priceType: "FIXED" | "PER_UNIT";
-  startDate: string; // "YYYY-MM-DD"
-  endDate: string; // "YYYY-MM-DD"
+  date: string; // "YYYY-MM-DD"
   stock: number;
 };
 
@@ -35,8 +34,7 @@ export const useCartStore = create<CartStore>()(
           (i) =>
             i.productId === item.productId &&
             i.variantId === item.variantId &&
-            i.startDate === item.startDate &&
-            i.endDate === item.endDate,
+            i.date === item.date,
         );
 
         if (existing && item.priceType === "PER_UNIT") {
@@ -68,7 +66,11 @@ export const useCartStore = create<CartStore>()(
         set({ items: [] });
       },
     }),
-    { name: "festejos-cart" },
+    {
+      name: "festejos-cart",
+      version: 1,
+      migrate: () => ({ items: [] }),
+    },
   ),
 );
 
@@ -78,4 +80,12 @@ export function getCartSubtotal(items: CartItem[]): number {
 
 export function getItemCount(items: CartItem[]): number {
   return items.reduce((sum, item) => sum + item.quantity, 0);
+}
+
+export function isCartItemPastDue(item: CartItem, now: Date = new Date()): boolean {
+  const today = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+  );
+  const itemDate = new Date(`${item.date}T00:00:00.000Z`);
+  return itemDate < today;
 }

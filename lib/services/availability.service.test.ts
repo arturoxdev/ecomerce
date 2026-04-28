@@ -18,8 +18,7 @@ describe("availability service", () => {
       const result = await findOccupiedQuantity(executor, {
         productId: "11111111-1111-1111-1111-111111111111",
         variantId: "22222222-2222-2222-2222-222222222222",
-        startDate: new Date("2026-04-20T00:00:00.000Z"),
-        endDate: new Date("2026-04-22T00:00:00.000Z"),
+        date: new Date("2026-04-20T00:00:00.000Z"),
       });
 
       // Assert
@@ -37,8 +36,7 @@ describe("availability service", () => {
       // Act
       const result = await checkAvailability(executor, {
         productId: "11111111-1111-1111-1111-111111111111",
-        startDate: new Date("2026-04-20T00:00:00.000Z"),
-        endDate: new Date("2026-04-22T00:00:00.000Z"),
+        date: new Date("2026-04-20T00:00:00.000Z"),
         quantity: 2,
         stock: 4,
       });

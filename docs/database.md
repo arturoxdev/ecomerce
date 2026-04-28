@@ -92,8 +92,6 @@ Table orders {
   customer_email   text [not null]
   customer_phone   text [not null]
   delivery_address text
-  rent_start_date  timestamp [not null]
-  rent_end_date    timestamp [not null]
   subtotal         decimal(10,2) [not null]
   deposit_amount   decimal(10,2) [not null]
   delivery_fee     decimal(10,2) [default: 0]
@@ -114,21 +112,21 @@ Table order_items {
   quantity   int [not null]
   unit_price decimal(10,2) [not null]
   subtotal   decimal(10,2) [not null]
+  rent_date  timestamp [not null]
 }
 
 Table availability {
   id         uuid [pk]
   product_id uuid [not null, ref: > products.id]
   variant_id uuid [ref: > product_variants.id]
-  start_date timestamp [not null]
-  end_date   timestamp [not null]
+  date       timestamp [not null]
   quantity   int [not null, default: 1]
   reason     text
   order_id   uuid [ref: > orders.id, note: 'NULL = bloqueo manual por admin']
   created_at timestamp [default: `now()`]
 
   indexes {
-    (product_id, start_date, end_date) [name: 'idx_availability_lookup']
+    (product_id, date) [name: 'idx_availability_lookup']
   }
 }
 
@@ -321,9 +319,9 @@ Enum content_locale {
 
 ## Decisiones de Diseno
 
-**Fechas compartidas por orden, no por item:** Todos los `order_items` de una misma orden comparten `rent_start_date` / `rent_end_date` definidos en `orders`. Simplifica el modelo y es suficiente para el negocio actual (el cliente siempre renta todo para el mismo evento).
+**Reserva por un solo dia (single-day rental):** Cada `order_item` y cada bloqueo de `availability` tiene una unica fecha (`rent_date` / `date`). El negocio opera por evento de un dia y el carrito permite items con fechas distintas. Ver ADR-006.
 
-**`availability.quantity` para PER_UNIT:** En lugar de crear un registro por unidad, se guarda la cantidad comprometida en un solo registro por rango de fechas. Esto hace el `SUM(quantity) FOR UPDATE` eficiente y el indice compuesto en `(product_id, start_date, end_date)` lo acelera.
+**`availability.quantity` para PER_UNIT:** En lugar de crear un registro por unidad, se guarda la cantidad comprometida en un solo registro por dia. Esto hace el `SUM(quantity) FOR UPDATE` eficiente y el indice compuesto en `(product_id, date)` lo acelera.
 
 **`order_id = NULL` en availability:** Permite que el admin bloquee fechas manualmente sin crear una orden (ej. equipo en mantenimiento).
 
@@ -335,6 +333,6 @@ Enum content_locale {
 
 **Indice critico en `availability`:**
 ```sql
-INDEX idx_availability_lookup ON availability(product_id, start_date, end_date)
+INDEX idx_availability_lookup ON availability(product_id, date)
 ```
 Sin este indice, el `FOR UPDATE` haria full table scan en checkout.

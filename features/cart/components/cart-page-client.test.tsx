@@ -18,8 +18,7 @@ const mocks = vi.hoisted(() => {
       variantId: string | null;
       quantity: number;
       unitPrice: number;
-      startDate: string;
-      endDate: string;
+      date: string;
     }>,
     removeItem,
     updateQuantity,
@@ -72,6 +71,7 @@ vi.mock("@/lib/stores/cart-store", () => ({
   useCartStore: mocks.useCartStore,
   getCartSubtotal: (items: Array<{ quantity: number; unitPrice: number }>) =>
     items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0),
+  isCartItemPastDue: () => false,
 }));
 
 vi.mock("./cart-item", () => ({
@@ -110,6 +110,8 @@ describe("CartPageClient", () => {
     splitNotice: "50% online, 50% on delivery",
     payNow: "Pay now (50%)",
     balanceOnDelivery: "Balance on delivery (50%)",
+    pastDateBadge: "Past date",
+    pastDateBlocking: "Some items have a past date.",
   };
 
   beforeEach(() => {
@@ -129,8 +131,7 @@ describe("CartPageClient", () => {
         variantId: null,
         quantity: 2,
         unitPrice: 30,
-        startDate: "2026-05-10",
-        endDate: "2026-05-12",
+        date: "2099-05-10",
       },
     ];
 
@@ -195,8 +196,7 @@ describe("CartPageClient", () => {
               variantId: null,
               quantity: 2,
               unitPrice: 30,
-              startDate: "2026-05-10",
-              endDate: "2026-05-12",
+              date: "2099-05-10",
             },
           ],
         });

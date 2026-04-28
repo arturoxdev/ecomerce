@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, desc, eq, gt, lt, SQL } from "drizzle-orm";
+import { and, desc, eq, gte, lte, SQL } from "drizzle-orm";
 
 import { reconcileStripeOrder } from "@/features/checkout";
 import { getStoreId } from "@/lib/config/tenant";
@@ -105,8 +105,8 @@ export function createOrdersService(deps: OrdersServiceDeps) {
       with: {
         orderItems: {
           where: and(
-            lt(orderItems.rentStartDate, endDate),
-            gt(orderItems.rentEndDate, startDate),
+            gte(orderItems.rentDate, startDate),
+            lte(orderItems.rentDate, endDate),
           ),
         },
       },

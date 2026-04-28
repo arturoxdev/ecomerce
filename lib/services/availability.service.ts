@@ -2,8 +2,7 @@ import { sql } from "drizzle-orm";
 
 export type AvailabilityWindowInput = {
   productId: string;
-  startDate: Date;
-  endDate: Date;
+  date: Date;
   variantId?: string | null;
 };
 
@@ -27,16 +26,14 @@ export async function findOccupiedQuantity(
         FROM availability
         WHERE product_id = ${input.productId}::uuid
           AND variant_id = ${input.variantId}::uuid
-          AND start_date < ${input.endDate}::timestamp
-          AND end_date > ${input.startDate}::timestamp
+          AND date = ${input.date}::timestamp
       `)
     : await executor.execute(sql`
         SELECT COALESCE(SUM(quantity), 0)::int AS occupied
         FROM availability
         WHERE product_id = ${input.productId}::uuid
           AND variant_id IS NULL
-          AND start_date < ${input.endDate}::timestamp
-          AND end_date > ${input.startDate}::timestamp
+          AND date = ${input.date}::timestamp
       `);
 
   return Number(result.rows[0]?.occupied ?? 0);

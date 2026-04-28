@@ -40,19 +40,15 @@ async function seedProduct(stock = 2) {
 describe("products-admin service — integration", () => {
   describe("checkOverlapAndCreate", () => {
     it("first block within stock -> ok true and row inserted", async () => {
-      // Arrange
       const product = await seedProduct(2);
 
-      // Act
       const result = await checkOverlapAndCreate(
         product.id,
-        new Date("2026-06-10"),
-        new Date("2026-06-15"),
+        new Date("2099-06-10"),
         1,
         product.stock,
       );
 
-      // Assert
       expect(result.ok).toBe(true);
       const rows = await testDb.query.availability.findMany({
         where: eq(schema.availability.productId, product.id),
@@ -60,28 +56,22 @@ describe("products-admin service — integration", () => {
       expect(rows).toHaveLength(1);
     });
 
-    it("stock exhausted -> ok false and no new row", async () => {
-      // Arrange
+    it("stock exhausted on same day -> ok false and no new row", async () => {
       const product = await seedProduct(1);
 
-      // Seed existing block that fully occupies stock
       await testDb.insert(schema.availability).values({
         productId: product.id,
-        startDate: new Date("2026-06-10"),
-        endDate: new Date("2026-06-15"),
+        date: new Date("2099-06-10"),
         quantity: 1,
       });
 
-      // Act
       const result = await checkOverlapAndCreate(
         product.id,
-        new Date("2026-06-12"),
-        new Date("2026-06-14"),
+        new Date("2099-06-10"),
         1,
         product.stock,
       );
 
-      // Assert
       expect(result.ok).toBe(false);
 
       const rows = await testDb.query.availability.findMany({
@@ -90,26 +80,21 @@ describe("products-admin service — integration", () => {
       expect(rows).toHaveLength(1);
     });
 
-    it("overlap with stock > 1 allowing parallel block -> ok true", async () => {
-      // Arrange
+    it("same-day with stock > 1 allowing parallel block -> ok true", async () => {
       const product = await seedProduct(2);
       await testDb.insert(schema.availability).values({
         productId: product.id,
-        startDate: new Date("2026-06-10"),
-        endDate: new Date("2026-06-15"),
+        date: new Date("2099-06-10"),
         quantity: 1,
       });
 
-      // Act
       const result = await checkOverlapAndCreate(
         product.id,
-        new Date("2026-06-12"),
-        new Date("2026-06-14"),
+        new Date("2099-06-10"),
         1,
         product.stock,
       );
 
-      // Assert
       expect(result.ok).toBe(true);
       const rows = await testDb.query.availability.findMany({
         where: eq(schema.availability.productId, product.id),

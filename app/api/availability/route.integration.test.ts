@@ -7,6 +7,13 @@ import { GET } from "./route";
 
 const STORE_ID = process.env.STORE_ID ?? "test-store";
 
+function futureDate(daysFromNow: number): string {
+  const d = new Date();
+  d.setUTCHours(0, 0, 0, 0);
+  d.setUTCDate(d.getUTCDate() + daysFromNow);
+  return d.toISOString().slice(0, 10);
+}
+
 async function seedProduct(priceType: "FIXED" | "PER_UNIT" = "PER_UNIT") {
   const [category] = await testDb
     .insert(schema.categories)
@@ -38,50 +45,41 @@ function buildRequest(params: Record<string, string>): Request {
 
 describe("/api/availability — integration", () => {
   it("valid request with no occupied -> 200 with available=stock", async () => {
-    // Arrange
     const product = await seedProduct();
 
-    // Act
     const res = await GET(
       buildRequest({
         productId: product.id,
-        start: "2026-06-10",
-        end: "2026-06-12",
+        date: futureDate(5),
       }) as never,
     );
 
-    // Assert
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body).toEqual({ available: 4, pricingModel: "PER_UNIT" });
   });
 
   it("occupied reduces availability -> available reflects subtraction", async () => {
-    // Arrange
     const product = await seedProduct();
+    const date = new Date(`${futureDate(5)}T00:00:00.000Z`);
     await testDb.insert(schema.availability).values({
       productId: product.id,
-      startDate: new Date("2026-06-10"),
-      endDate: new Date("2026-06-12"),
+      date,
       quantity: 3,
     });
 
-    // Act
     const res = await GET(
       buildRequest({
         productId: product.id,
-        start: "2026-06-10",
-        end: "2026-06-12",
+        date: futureDate(5),
       }) as never,
     );
 
-    // Assert
     const body = await res.json();
     expect(body.available).toBe(1);
   });
 
   it("inactive product -> 404 problem+json", async () => {
-    // Arrange
     const product = await seedProduct();
     const { eq } = await import("drizzle-orm");
     await testDb
@@ -89,30 +87,37 @@ describe("/api/availability — integration", () => {
       .set({ isActive: false })
       .where(eq(schema.products.id, product.id));
 
-    // Act
     const res = await GET(
       buildRequest({
         productId: product.id,
-        start: "2026-06-10",
-        end: "2026-06-12",
+        date: futureDate(5),
       }) as never,
     );
 
-    // Assert
     expect(res.status).toBe(404);
   });
 
   it("invalid UUID -> 400 problem+json", async () => {
-    // Act
     const res = await GET(
       buildRequest({
         productId: "not-a-uuid",
-        start: "2026-06-10",
-        end: "2026-06-12",
+        date: futureDate(5),
       }) as never,
     );
 
-    // Assert
+    expect(res.status).toBe(400);
+  });
+
+  it("date in the past -> 400 problem+json", async () => {
+    const product = await seedProduct();
+
+    const res = await GET(
+      buildRequest({
+        productId: product.id,
+        date: futureDate(-1),
+      }) as never,
+    );
+
     expect(res.status).toBe(400);
   });
 });

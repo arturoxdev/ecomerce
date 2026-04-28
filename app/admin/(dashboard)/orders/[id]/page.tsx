@@ -86,8 +86,7 @@ export default async function AdminOrderDetailPage({ params }: Props) {
                       <TableCell>
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <CalendarDays className="size-3" />
-                          {format(new Date(item.rentStartDate), "MMM d, yyyy")} →{" "}
-                          {format(new Date(item.rentEndDate), "MMM d, yyyy")}
+                          {format(new Date(item.rentDate), "MMM d, yyyy")}
                         </div>
                       </TableCell>
                       <TableCell className="text-right">{item.quantity}</TableCell>

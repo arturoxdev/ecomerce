@@ -316,8 +316,7 @@ export async function getProductVariants(productId: string) {
 
 export function checkOverlapAndCreate(
   productId: string,
-  startDate: Date,
-  endDate: Date,
+  date: Date,
   quantity: number,
   stock: number,
   extra?: { reason?: string; variantId?: string | null; orderId?: string | null },
@@ -327,8 +326,7 @@ export function checkOverlapAndCreate(
   return db.transaction(async (tx) => {
     const availabilityCheck = await checkAvailability(tx, {
       productId,
-      startDate,
-      endDate,
+      date,
       quantity,
       stock,
       variantId,
@@ -342,8 +340,7 @@ export function checkOverlapAndCreate(
       .insert(availability)
       .values({
         productId,
-        startDate,
-        endDate,
+        date,
         quantity,
         orderId: extra?.orderId ?? null,
         ...(variantId ? { variantId } : {}),
@@ -367,7 +364,7 @@ export async function createManualBlock(
     return check.problem;
   }
 
-  const { startDate, endDate, reason } = check.data;
+  const { date, reason } = check.data;
 
   const product = await findProductById(productId);
   if (!product) {
@@ -376,15 +373,14 @@ export async function createManualBlock(
 
   const result = await checkOverlapAndCreate(
     productId,
-    startDate,
-    endDate,
+    date,
     1,
     product.stock,
     { reason },
   );
 
   if (!result.ok) {
-    return internalProblem("No stock available for the selected dates");
+    return internalProblem("No stock available for the selected date");
   }
 
   revalidatePath(`/admin/products/${productId}/availability`);

@@ -30,8 +30,7 @@ describe("AddToCartButton", () => {
     quantity: 1,
     unitPrice: 10,
     priceType: "FIXED" as const,
-    startDate: "2026-06-01",
-    endDate: "2026-06-02",
+    date: "2099-06-01",
     stock: 5,
   };
 

@@ -109,14 +109,13 @@
     },
     "availability": {
       "title": "Check Availability",
-      "startDate": "Start Date",
-      "endDate": "End Date",
+      "selectDate": "Select a date",
       "loading": "Checking availability...",
       "available": "Available",
-      "notAvailable": "Not available for selected dates",
+      "notAvailable": "Not available on this date",
       "unitsAvailable": "units available",
-      "invalidRange": "End date must be after start date",
-      "errorFetch": "Could not check availability. Please try again."
+      "errorFetch": "Could not check availability. Please try again.",
+      "singleDayReservation": "Single-day reservation"
     }
   },
   "cart": {
@@ -125,7 +124,7 @@
     "emptyDescription": "Browse our catalog to find items for your event.",
     "browseCatalog": "Browse Catalog",
     "product": "Product",
-    "dates": "Dates",
+    "dates": "Date",
     "quantity": "Qty",
     "price": "Price",
     "subtotal": "Subtotal",
@@ -146,8 +145,10 @@
     "addToCart": "Add to Cart",
     "addedToCart": "Added to cart!",
     "itemUnavailable": "Some items are no longer available",
-    "selectDatesFirst": "Select dates and check availability first",
-    "perUnit": "per unit"
+    "selectDatesFirst": "Select a date and check availability first",
+    "perUnit": "per unit",
+    "pastDateBadge": "Past date",
+    "pastDateBlocking": "Some items have a past date. Remove them to continue."
   },
   "payment": {
     "splitBadge": "50% now · 50% on delivery",

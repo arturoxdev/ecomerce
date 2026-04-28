@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 
-import { handleAvailabilityRequest } from "@/features/products/services/availability.handler";
+import { handleAvailabilityMonthRequest } from "@/features/products/services/availability-month.handler";
 import {
   findProductById,
   findVariantById,
@@ -12,7 +12,7 @@ import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function GET(request: NextRequest) {
   const rate = await checkRateLimit(
-    `avail:ip:${getClientIp(request.headers)}`,
+    `avail-month:ip:${getClientIp(request.headers)}`,
     60,
     60,
   );
@@ -21,11 +21,11 @@ export async function GET(request: NextRequest) {
   }
 
   const sp = new URL(request.url).searchParams;
-  return handleAvailabilityRequest(
+  return handleAvailabilityMonthRequest(
     {
       productId: sp.get("productId"),
       variantId: sp.get("variantId"),
-      date: sp.get("date"),
+      month: sp.get("month"),
     },
     { db, findProductById, findVariantById },
   );
