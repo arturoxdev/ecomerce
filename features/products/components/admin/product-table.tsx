@@ -1,24 +1,13 @@
 "use client";
 
-import { CalendarX2, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 import { toast } from "sonner";
 
-import { useDeleteDialog } from "@/hooks/use-delete-dialog";
-
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { StatusBadge } from "@/components/admin/status-badge";
+import { cn } from "@/lib/utils";
 import {
   Pagination,
   PaginationContent,
@@ -35,8 +24,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 
-import { deleteProduct, toggleProductActive } from "../../actions";
+import { toggleProductActive } from "../../actions";
 
 type Product = {
   id: string;
@@ -52,6 +42,7 @@ type Props = {
   products: Product[];
   page: number;
   totalPages: number;
+  total?: number;
   status?: string;
   category?: string;
   search?: string;
@@ -67,14 +58,25 @@ function paginationHref(page: number, filters?: { status?: string; category?: st
   return `/admin/products?${params.toString()}`;
 }
 
-export function ProductTable({ products, page, totalPages, status, category, search, canWrite = true }: Props) {
-  const { targetId: deleteId, isPending, startTransition, openDialog: setDeleteId, closeDialog, confirmDelete } = useDeleteDialog();
+const headCellCn =
+  "h-auto px-[22px] py-3 text-[11px] font-semibold uppercase tracking-[0.05em] text-muted-foreground";
+const bodyCellCn = "px-[22px] py-[13px]";
 
-  function handleDelete() {
-    confirmDelete(deleteProduct, "Product deleted");
-  }
+export function ProductTable({
+  products,
+  page,
+  totalPages,
+  total,
+  status,
+  category,
+  search,
+  canWrite = true,
+}: Props) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
-  function handleToggle(productId: string) {
+  function handleToggle(productId: string, e: React.MouseEvent) {
+    e.stopPropagation();
     startTransition(async () => {
       const result = await toggleProductActive(productId);
       if ("type" in result) {
@@ -83,14 +85,20 @@ export function ProductTable({ products, page, totalPages, status, category, sea
     });
   }
 
+  function rowClick(productId: string) {
+    return () => router.push(`/admin/products/${productId}/edit`);
+  }
+
   if (products.length === 0) {
     return (
       <Card>
         <CardContent className="flex flex-col items-center gap-4 py-16 text-center">
           <p className="text-muted-foreground">No products yet.</p>
-          <Button render={<Link href="/admin/products/new" />}>
-            Create product
-          </Button>
+          {canWrite && (
+            <Button render={<Link href="/admin/products/new" />}>
+              Create product
+            </Button>
+          )}
         </CardContent>
       </Card>
     );
@@ -98,87 +106,114 @@ export function ProductTable({ products, page, totalPages, status, category, sea
 
   return (
     <>
-      <Card>
+      <Card className="py-0 gap-0">
         <CardContent className="p-0">
           <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Stock</TableHead>
-                <TableHead>Status</TableHead>
-                {canWrite && <TableHead className="w-20">Actions</TableHead>}
+            <TableHeader className="bg-sidebar">
+              <TableRow className="hover:bg-transparent border-b border-border">
+                <TableHead className={cn(headCellCn, "w-[34%]")}>Name</TableHead>
+                <TableHead className={cn(headCellCn, "w-[30%]")}>
+                  Category
+                </TableHead>
+                <TableHead className={cn(headCellCn, "w-[120px] text-right")}>
+                  Price
+                </TableHead>
+                <TableHead className={cn(headCellCn, "w-[100px] text-right")}>
+                  Stock
+                </TableHead>
+                <TableHead className={cn(headCellCn, "w-[140px]")}>
+                  Status
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {products.map((product) => (
-                <TableRow
-                  key={product.id}
-                  className={!product.isActive ? "opacity-60" : ""}
-                >
-                  <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell>{product.category.name}</TableCell>
-                  <TableCell>
-                    ${product.basePrice.toString()}{" "}
-                    <span className="text-xs text-muted-foreground">
-                      {product.priceType === "PER_UNIT" ? "/unit" : ""}
-                    </span>
-                  </TableCell>
-                  <TableCell>{product.stock}</TableCell>
-                  <TableCell>
-                    {canWrite ? (
-                      <button
-                        onClick={() => handleToggle(product.id)}
-                        disabled={isPending}
-                        className="cursor-pointer"
-                      >
-                        <Badge
-                          variant="outline"
-                          className={product.isActive ? "border-green-200 bg-green-50 text-green-700" : ""}
-                        >
-                          {product.isActive ? "Active" : "Inactive"}
-                        </Badge>
-                      </button>
-                    ) : (
-                      <Badge
-                        variant="outline"
-                        className={product.isActive ? "border-green-200 bg-green-50 text-green-700" : ""}
-                      >
-                        {product.isActive ? "Active" : "Inactive"}
-                      </Badge>
+              {products.map((product) => {
+                const stockLow = product.stock < 5;
+                const editHref = `/admin/products/${product.id}/edit`;
+                return (
+                  <TableRow
+                    key={product.id}
+                    onClick={rowClick(product.id)}
+                    className={cn(
+                      "cursor-pointer border-b border-border transition-colors hover:bg-muted/30",
+                      !product.isActive && "opacity-60",
                     )}
-                  </TableCell>
-                  {canWrite && (
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" className="size-7" title="Manage availability" render={<Link href={`/admin/products/${product.id}/availability`} />}>
-                          <CalendarX2 className="size-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="size-7" render={<Link href={`/admin/products/${product.id}/edit`} />}>
-                          <Pencil className="size-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-7 text-muted-foreground hover:text-destructive"
-                          onClick={() => setDeleteId(product.id)}
-                        >
-                          <Trash2 className="size-4" />
-                        </Button>
-                      </div>
+                  >
+                    <TableCell
+                      className={cn(
+                        bodyCellCn,
+                        "text-[13px] font-semibold text-foreground",
+                      )}
+                    >
+                      <Link
+                        href={editHref}
+                        onClick={(e) => e.stopPropagation()}
+                        className="outline-none focus-visible:underline"
+                      >
+                        {product.name}
+                      </Link>
                     </TableCell>
-                  )}
-                </TableRow>
-              ))}
+                    <TableCell
+                      className={cn(bodyCellCn, "text-[13px] text-muted-foreground")}
+                    >
+                      {product.category.name}
+                    </TableCell>
+                    <TableCell
+                      className={cn(
+                        bodyCellCn,
+                        "text-right font-mono text-[12.5px] font-medium text-foreground",
+                      )}
+                    >
+                      ${product.basePrice.toString()}
+                      <span className="ml-1 text-muted-foreground">
+                        {product.priceType === "PER_UNIT" ? "/unit" : ""}
+                      </span>
+                    </TableCell>
+                    <TableCell
+                      className={cn(
+                        bodyCellCn,
+                        "text-right font-mono text-[12.5px]",
+                        stockLow
+                          ? "font-semibold text-warning"
+                          : "text-foreground",
+                      )}
+                    >
+                      {product.stock}
+                    </TableCell>
+                    <TableCell className={bodyCellCn}>
+                      {canWrite ? (
+                        <button
+                          type="button"
+                          onClick={(e) => handleToggle(product.id, e)}
+                          disabled={isPending}
+                          className="cursor-pointer disabled:opacity-60"
+                        >
+                          <StatusBadge
+                            state={product.isActive ? "active" : "inactive"}
+                          />
+                        </button>
+                      ) : (
+                        <StatusBadge
+                          state={product.isActive ? "active" : "inactive"}
+                        />
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
 
       {totalPages > 1 && (
-        <div className="mt-4">
-          <Pagination>
+        <div className="mt-3.5 flex items-center justify-between text-xs text-muted-foreground">
+          <span>
+            {typeof total === "number"
+              ? `Showing ${products.length} of ${total} products`
+              : `Showing ${products.length} products`}
+          </span>
+          <Pagination className="mx-0 w-fit">
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
@@ -214,28 +249,6 @@ export function ProductTable({ products, page, totalPages, status, category, sea
           </Pagination>
         </div>
       )}
-
-      <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && closeDialog()}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete product?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. Products with associated orders
-              cannot be deleted.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              disabled={isPending}
-              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
-            >
-              {isPending ? "Deleting…" : "Delete"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 }

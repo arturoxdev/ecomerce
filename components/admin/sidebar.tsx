@@ -7,7 +7,7 @@ import {
   FolderOpen,
   LogOut,
   Package,
-  PartyPopper,
+  Sparkles,
   Settings,
   ShoppingBag,
   Users,
@@ -22,7 +22,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -59,13 +58,20 @@ const secondaryNavItems: NavItem[] = [
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
+const groupLabelClass =
+  "px-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground";
+
 type Props = {
   userRole?: UserRole;
   userName?: string;
   userEmail?: string;
 };
 
-export function AdminSidebar({ userRole = "EMPLOYEE", userName, userEmail }: Props) {
+export function AdminSidebar({
+  userRole = "EMPLOYEE",
+  userName,
+  userEmail,
+}: Props) {
   const pathname = usePathname();
   const logoutFormRef = useRef<HTMLFormElement>(null);
 
@@ -82,29 +88,36 @@ export function AdminSidebar({ userRole = "EMPLOYEE", userName, userEmail }: Pro
         .slice(0, 2)
     : "U";
 
+  const adminTitle = siteConfig.adminTitle;
+  const titleParts = adminTitle.split(/[·•]/);
+  const titleHead = titleParts[0]?.trim() ?? adminTitle;
+  const titleTail = titleParts[1]?.trim();
+
   return (
-    <Sidebar collapsible="offcanvas">
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
-              render={<Link href="/admin/products" />}
-            >
-              <PartyPopper className="size-5!" />
-              <span className="text-base font-semibold">
-                {siteConfig.adminTitle}
+    <Sidebar collapsible="offcanvas" className="border-r border-border">
+      <SidebarHeader className="px-3.5 pt-4 pb-5">
+        <div className="flex items-center gap-2.5 px-1">
+          <div className="grid size-[26px] place-items-center rounded-md bg-foreground text-background">
+            <Sparkles className="size-3.5" strokeWidth={2} />
+          </div>
+          <div className="text-[15px] font-bold tracking-tight text-foreground">
+            {titleHead}
+            {titleTail && (
+              <span className="font-medium text-muted-foreground">
+                {`·${titleTail}`}
               </span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+            )}
+          </div>
+        </div>
       </SidebarHeader>
 
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+      <SidebarContent className="px-2.5">
+        <SidebarGroup className="p-0 pb-2">
+          <SidebarGroupLabel className={groupLabelClass}>
+            Navigation
+          </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="gap-0.5">
               {visibleMainItems.map(({ href, label, icon: Icon }) => (
                 <SidebarMenuItem key={href}>
                   <SidebarMenuButton
@@ -121,10 +134,12 @@ export function AdminSidebar({ userRole = "EMPLOYEE", userName, userEmail }: Pro
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup className="mt-auto">
-          <SidebarGroupLabel>Support</SidebarGroupLabel>
+        <SidebarGroup className="mt-auto p-0">
+          <SidebarGroupLabel className={groupLabelClass}>
+            Support
+          </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="gap-0.5">
               {secondaryNavItems.map(({ href, label, icon: Icon }) => (
                 <SidebarMenuItem key={href}>
                   <SidebarMenuButton
@@ -142,29 +157,28 @@ export function AdminSidebar({ userRole = "EMPLOYEE", userName, userEmail }: Pro
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter>
+      <SidebarFooter className="border-t border-border px-3 pt-3 pb-3">
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger
-                className="w-full rounded-md ring-ring focus-visible:ring-2 data-[state=open]:bg-sidebar-accent"
+                className="w-full rounded-md focus-visible:ring-2 focus-visible:ring-ring data-[state=open]:bg-sidebar-accent"
                 render={
-                  <SidebarMenuButton
-                    size="lg"
-                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                  />
+                  <button className="flex w-full items-center gap-2.5 rounded-md p-1 text-left transition-colors hover:bg-sidebar-accent" />
                 }
               >
-                <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground text-xs font-medium">
+                <div className="grid size-7 shrink-0 place-items-center rounded-md bg-secondary text-[12px] font-bold text-secondary-foreground">
                   {initials}
                 </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{userName ?? "User"}</span>
-                  <span className="truncate text-xs text-muted-foreground">
+                <div className="grid min-w-0 flex-1 text-left leading-tight">
+                  <span className="truncate text-[12.5px] font-semibold text-foreground">
+                    {userName ?? "User"}
+                  </span>
+                  <span className="truncate text-[10.5px] text-muted-foreground">
                     {userEmail ?? ""}
                   </span>
                 </div>
-                <ChevronsUpDown className="ml-auto size-4" />
+                <ChevronsUpDown className="size-3.5 text-muted-foreground" />
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 className="min-w-56 rounded-lg"
@@ -181,7 +195,11 @@ export function AdminSidebar({ userRole = "EMPLOYEE", userName, userEmail }: Pro
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <form ref={logoutFormRef} action={logoutAdmin} className="hidden" />
+            <form
+              ref={logoutFormRef}
+              action={logoutAdmin}
+              className="hidden"
+            />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

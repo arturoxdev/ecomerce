@@ -5,25 +5,21 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar";
 import { getSessionUser } from "@/lib/services/auth";
-import { getThemeId } from "@/lib/data/settings";
-import { getThemeById, serializeTheme } from "@/lib/themes";
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [user, themeId] = await Promise.all([getSessionUser(), getThemeId()]);
-  const theme = getThemeById(themeId);
+  const user = await getSessionUser();
 
   return (
     <TooltipProvider>
-      <style dangerouslySetInnerHTML={{ __html: serializeTheme(theme) }} />
       <SidebarProvider
         style={
           {
-            "--sidebar-width": "calc(var(--spacing) * 56)",
-            "--header-height": "calc(var(--spacing) * 12)",
+            "--sidebar-width": "calc(var(--spacing) * 52)",
+            "--header-height": "calc(var(--spacing) * 14)",
           } as React.CSSProperties
         }
       >

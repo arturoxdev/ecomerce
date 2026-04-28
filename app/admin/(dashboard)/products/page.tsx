@@ -1,5 +1,6 @@
 import { asc, desc } from "drizzle-orm";
 import Link from "next/link";
+import { Plus } from "lucide-react";
 
 import { ProductFilters, ProductTable } from "@/features/products";
 import {
@@ -36,7 +37,7 @@ export default async function AdminProductsPage({ searchParams }: Props) {
   if (category && category !== "all") where.categoryId = category;
   if (search) where.search = search;
 
-  const [productList, total, categoryList] = await Promise.all([
+  const [productList, total, activeCount, categoryList] = await Promise.all([
     findAllWithCategory({
       offset: skip,
       limit: PAGE_SIZE,
@@ -44,6 +45,7 @@ export default async function AdminProductsPage({ searchParams }: Props) {
       orderBy: desc(products.createdAt),
     }),
     countProducts(where),
+    countProducts({ isActive: true }),
     findAllCategories({ orderBy: asc(categories.name) }),
   ]);
 
@@ -53,29 +55,32 @@ export default async function AdminProductsPage({ searchParams }: Props) {
     <>
       <SiteHeader
         title="Products"
+        subtitle={`${total} item${total === 1 ? "" : "s"} · ${activeCount} active`}
         actions={
           canWrite && (
-            <Button size="sm" render={<Link href="/admin/products/new" />}>
+            <Button
+              variant="cta"
+              className="h-8 gap-1.5 rounded-md px-3.5 text-[13px] font-semibold"
+              render={<Link href="/admin/products/new" />}
+            >
+              <Plus className="size-3.5" strokeWidth={2.4} />
               Add product
             </Button>
           )
         }
       />
-      <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-        <div className="px-4 lg:px-6">
-          <ProductFilters categories={categoryList} />
-        </div>
-        <div className="px-4 lg:px-6">
-          <ProductTable
-            products={productList}
-            page={page}
-            totalPages={totalPages}
-            status={status}
-            category={category}
-            search={search}
-            canWrite={canWrite}
-          />
-        </div>
+      <div className="flex flex-col gap-3.5 px-7 pt-5 pb-7">
+        <ProductFilters categories={categoryList} />
+        <ProductTable
+          products={productList}
+          page={page}
+          totalPages={totalPages}
+          total={total}
+          status={status}
+          category={category}
+          search={search}
+          canWrite={canWrite}
+        />
       </div>
     </>
   );

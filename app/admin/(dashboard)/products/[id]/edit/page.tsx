@@ -1,7 +1,6 @@
 import { asc } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
 
 import { createVariant, updateProduct, updateVariant, ProductForm } from "@/features/products";
 import {
@@ -10,7 +9,8 @@ import {
 } from "@/features/products/services/products.service";
 import { findAll as findAllCategories } from "@/features/categories/services/categories.service";
 import { categories } from "@/lib/db/schema";
-import { Separator } from "@/components/ui/separator";
+import { SiteHeader } from "@/components/admin/site-header";
+import { StatusBadge } from "@/components/admin/status-badge";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -34,50 +34,60 @@ export default async function EditProductPage({ params }: Props) {
   const boundCreateVariant = createVariant.bind(null, id);
 
   return (
-    <div className="w-full px-6 py-6">
-      <div className="flex flex-col gap-1">
-        <Link
-          href="/admin/products"
-          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors w-fit"
-        >
-          <ChevronLeft className="size-4" />
-          Products
-        </Link>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+    <>
+      <SiteHeader
+        title={
+          <nav className="flex items-center gap-2 text-[12.5px]">
+            <Link
+              href="/admin/products"
+              className="text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Products
+            </Link>
+            <span className="text-subtle">/</span>
+            <span className="font-semibold text-foreground">Edit product</span>
+          </nav>
+        }
+        actions={
+          <StatusBadge state={product.isActive ? "active" : "inactive"} />
+        }
+      />
+      <div className="w-full px-7 pt-6 pb-3">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
           {product.name}
         </h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="mt-1 text-[13px] text-muted-foreground">
           Edit product details, description, and variants.
         </p>
       </div>
+      <div className="w-full px-7 pb-7">
 
-      <Separator className="my-6" />
-
-      <ProductForm
-        action={boundAction}
-        categories={categoryList}
-        productId={id}
-        defaultValues={{
-          name: product.name,
-          slug: product.slug,
-          description: product.description ?? "",
-          about: product.about ?? "",
-          categoryId: product.categoryId,
-          basePrice: product.basePrice,
-          priceType: product.priceType,
-          stock: product.stock.toString(),
-          photos: product.photos.join("\n"),
-          isActive: product.isActive,
-        }}
-        variants={variants.map((v) => ({
-          id: v.id,
-          name: v.name,
-          price: v.price,
-          stock: v.stock,
-        }))}
-        createVariantAction={boundCreateVariant}
-        updateVariantAction={updateVariant}
-      />
-    </div>
+        <ProductForm
+          action={boundAction}
+          categories={categoryList}
+          productId={id}
+          defaultValues={{
+            name: product.name,
+            slug: product.slug,
+            description: product.description ?? "",
+            about: product.about ?? "",
+            categoryId: product.categoryId,
+            basePrice: product.basePrice,
+            priceType: product.priceType,
+            stock: product.stock.toString(),
+            photos: product.photos.join("\n"),
+            isActive: product.isActive,
+          }}
+          variants={variants.map((v) => ({
+            id: v.id,
+            name: v.name,
+            price: v.price,
+            stock: v.stock,
+          }))}
+          createVariantAction={boundCreateVariant}
+          updateVariantAction={updateVariant}
+        />
+      </div>
+    </>
   );
 }

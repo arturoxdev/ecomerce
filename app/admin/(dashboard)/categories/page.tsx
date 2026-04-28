@@ -1,37 +1,57 @@
 import Link from "next/link";
+import { Plus } from "lucide-react";
 
 import { CategoryTable } from "@/features/categories";
 import { findAllWithProductCount } from "@/features/categories/services/categories.service";
 import { canWriteData, getSessionUser } from "@/lib/services/auth";
 import { Button } from "@/components/ui/button";
+import { SearchFilter } from "@/components/admin/search-filter";
 import { SiteHeader } from "@/components/admin/site-header";
 
-export default async function AdminCategoriesPage() {
+export default async function AdminCategoriesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ search?: string }>;
+}) {
   const user = await getSessionUser();
   const canWrite = canWriteData(user.role);
-  const categoriesWithProducts = await findAllWithProductCount();
+  const { search } = await searchParams;
 
-  const categories = categoriesWithProducts.map((c) => ({
+  const categoriesWithProducts = await findAllWithProductCount();
+  const all = categoriesWithProducts.map((c) => ({
     ...c,
     _count: { products: c.products.length },
   }));
+
+  const filtered = search
+    ? all.filter(
+        (c) =>
+          c.name.toLowerCase().includes(search.toLowerCase()) ||
+          c.slug.toLowerCase().includes(search.toLowerCase()),
+      )
+    : all;
 
   return (
     <>
       <SiteHeader
         title="Categories"
+        subtitle={`${all.length} categor${all.length === 1 ? "y" : "ies"}`}
         actions={
           canWrite && (
-            <Button size="sm" render={<Link href="/admin/categories/new" />}>
+            <Button
+              variant="cta"
+              className="h-8 gap-1.5 rounded-md px-3.5 text-[13px] font-semibold"
+              render={<Link href="/admin/categories/new" />}
+            >
+              <Plus className="size-3.5" strokeWidth={2.4} />
               Add category
             </Button>
           )
         }
       />
-      <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-        <div className="px-4 lg:px-6">
-          <CategoryTable categories={categories} canWrite={canWrite} />
-        </div>
+      <div className="flex flex-col gap-3.5 px-7 pt-5 pb-7">
+        <SearchFilter placeholder="Search category…" width={320} />
+        <CategoryTable categories={filtered} canWrite={canWrite} />
       </div>
     </>
   );
