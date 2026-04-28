@@ -4,13 +4,13 @@ import { categories } from "@/lib/db/schema";
 import { toSlug } from "@/lib/utils";
 
 export const categorySchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  name: z.string().min(1, "El nombre es requerido"),
   slug: z
     .string()
-    .min(1, "Slug is required")
+    .min(1, "El slug es requerido")
     .regex(
       /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-      "Slug must be lowercase, no spaces or special characters",
+      "El slug debe estar en minúsculas, sin espacios ni caracteres especiales",
     ),
   description: z.string().optional(),
 });

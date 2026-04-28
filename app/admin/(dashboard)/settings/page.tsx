@@ -7,14 +7,14 @@ import { Card } from "@/components/ui/card";
 const sections = [
   {
     href: "/admin/settings/appearance",
-    label: "Appearance",
-    description: "Choose a theme for the admin panel and the storefront.",
+    label: "Apariencia",
+    description: "Elige un tema para el panel de administración y la tienda.",
     icon: Palette,
   },
   {
     href: "/admin/settings/payments",
-    label: "Payments & delivery",
-    description: "Payment mode, delivery, and deposit configuration.",
+    label: "Pagos y entrega",
+    description: "Configuración de modo de pago, entrega y anticipo.",
     icon: CreditCard,
   },
 ];
@@ -22,7 +22,7 @@ const sections = [
 export default function AdminSettingsPage() {
   return (
     <>
-      <SiteHeader title="Settings" />
+      <SiteHeader title="Ajustes" />
       <div className="grid gap-4 p-6 sm:grid-cols-2 lg:grid-cols-3">
         {sections.map((section) => {
           const Icon = section.icon;

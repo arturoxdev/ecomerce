@@ -30,7 +30,7 @@ const settingsSchema = z
       v.deliveryMode !== "FIXED_FEE" ||
       (typeof v.deliveryFee === "number" && v.deliveryFee >= 0),
     {
-      message: "Delivery fee is required when delivery mode is FIXED_FEE",
+      message: "La tarifa de entrega es requerida cuando el modo es Tarifa fija",
       path: ["deliveryFee"],
     },
   );
@@ -48,7 +48,7 @@ export async function updateSettings(
 ): Promise<SettingsFormState> {
   const user = await requireWriteAccess();
   if (user.role !== "ROOT" && user.role !== "ADMIN") {
-    return forbiddenProblem("Only admins can edit settings");
+    return forbiddenProblem("Solo los administradores pueden editar los ajustes");
   }
 
   const raw = {

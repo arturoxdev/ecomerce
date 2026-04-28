@@ -1,10 +1,15 @@
 "use client";
 
-import { format } from "date-fns";
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { ORDER_STATUS_LABEL } from "@/lib/admin/labels";
+import {
+  formatAdminCurrency,
+  formatAdminDateTime,
+} from "@/lib/admin/format";
+import type { OrderStatus } from "@/lib/db/schema";
 import {
   Pagination,
   PaginationContent,
@@ -54,7 +59,7 @@ export function OrderTable({ orders, total, page, pageSize }: Props) {
   if (orders.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-2 py-16">
-        <p className="text-sm text-muted-foreground">No orders yet.</p>
+        <p className="text-sm text-muted-foreground">Aún no hay órdenes.</p>
       </div>
     );
   }
@@ -65,13 +70,13 @@ export function OrderTable({ orders, total, page, pageSize }: Props) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Order</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Phone</TableHead>
-              <TableHead>Items</TableHead>
+              <TableHead>Orden</TableHead>
+              <TableHead>Cliente</TableHead>
+              <TableHead>Teléfono</TableHead>
+              <TableHead>Artículos</TableHead>
               <TableHead>Total</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Date</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead>Fecha</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -102,18 +107,18 @@ export function OrderTable({ orders, total, page, pageSize }: Props) {
                   {order.orderItems.length}
                 </TableCell>
                 <TableCell className="text-sm font-medium">
-                  ${parseFloat(order.total).toFixed(2)}
+                  {formatAdminCurrency(order.total)}
                 </TableCell>
                 <TableCell>
                   <Badge
                     variant="secondary"
                     className={statusColors[order.status] ?? ""}
                   >
-                    {order.status}
+                    {ORDER_STATUS_LABEL[order.status as OrderStatus] ?? order.status}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-xs text-muted-foreground">
-                  {format(new Date(order.createdAt), "MMM d, yyyy HH:mm")}
+                  {formatAdminDateTime(order.createdAt)}
                 </TableCell>
               </TableRow>
             ))}

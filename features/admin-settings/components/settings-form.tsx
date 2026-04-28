@@ -43,11 +43,11 @@ export function SettingsForm({ action, defaultValues }: Props) {
       )}
       {success && (
         <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">
-          Settings saved.
+          Ajustes guardados.
         </p>
       )}
 
-      <Field label="Payment mode" error={fieldErrors?.paymentMode?.[0]}>
+      <Field label="Modo de pago" error={fieldErrors?.paymentMode?.[0]}>
         <input type="hidden" name="paymentMode" value={paymentMode} />
         <Select
           value={paymentMode}
@@ -57,19 +57,19 @@ export function SettingsForm({ action, defaultValues }: Props) {
         >
           <SelectTrigger className="w-full">
             {paymentMode === "FULL_ONLINE"
-              ? "Full online (100%)"
-              : "Split 50/50 (50% online, 50% on delivery)"}
+              ? "Pago completo en línea (100%)"
+              : "50/50 (50% en línea, 50% al entregar)"}
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="SPLIT_50_50">
-              Split 50/50 (50% online, 50% on delivery)
+              50/50 (50% en línea, 50% al entregar)
             </SelectItem>
-            <SelectItem value="FULL_ONLINE">Full online (100%)</SelectItem>
+            <SelectItem value="FULL_ONLINE">Pago completo en línea (100%)</SelectItem>
           </SelectContent>
         </Select>
       </Field>
 
-      <Field label="Delivery mode" error={fieldErrors?.deliveryMode?.[0]}>
+      <Field label="Modo de entrega" error={fieldErrors?.deliveryMode?.[0]}>
         <input type="hidden" name="deliveryMode" value={deliveryMode} />
         <Select
           value={deliveryMode}
@@ -78,17 +78,17 @@ export function SettingsForm({ action, defaultValues }: Props) {
           }
         >
           <SelectTrigger className="w-full">
-            {deliveryMode === "FIXED_FEE" ? "Fixed fee" : "Free (included)"}
+            {deliveryMode === "FIXED_FEE" ? "Tarifa fija" : "Gratis (incluida)"}
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="INCLUDED">Free (included)</SelectItem>
-            <SelectItem value="FIXED_FEE">Fixed fee</SelectItem>
+            <SelectItem value="INCLUDED">Gratis (incluida)</SelectItem>
+            <SelectItem value="FIXED_FEE">Tarifa fija</SelectItem>
           </SelectContent>
         </Select>
       </Field>
 
       {deliveryMode === "FIXED_FEE" && (
-        <Field label="Delivery fee (USD)" error={fieldErrors?.deliveryFee?.[0]}>
+        <Field label="Tarifa de entrega" error={fieldErrors?.deliveryFee?.[0]}>
           <Input
             type="number"
             name="deliveryFee"
@@ -101,7 +101,7 @@ export function SettingsForm({ action, defaultValues }: Props) {
       )}
 
       <Field
-        label="Deposit percent (0 - 1)"
+        label="Porcentaje de anticipo (0 - 1)"
         error={fieldErrors?.depositPercent?.[0]}
       >
         <Input
@@ -117,7 +117,7 @@ export function SettingsForm({ action, defaultValues }: Props) {
 
       <div className="flex gap-3 pt-2">
         <Button type="submit" disabled={pending}>
-          {pending ? "Saving…" : "Save settings"}
+          {pending ? "Guardando…" : "Guardar ajustes"}
         </Button>
       </div>
     </form>

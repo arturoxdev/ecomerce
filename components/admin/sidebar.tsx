@@ -46,16 +46,16 @@ type NavItem = {
 };
 
 const mainNavItems: NavItem[] = [
-  { href: "/admin/products", label: "Products", icon: Package },
-  { href: "/admin/categories", label: "Categories", icon: FolderOpen },
-  { href: "/admin/users", label: "Users", icon: Users, roles: ["ROOT", "ADMIN"] },
-  { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
-  { href: "/admin/calendar", label: "Calendar", icon: Calendar },
-  { href: "/admin/pages", label: "Pages", icon: FileText },
+  { href: "/admin/products", label: "Productos", icon: Package },
+  { href: "/admin/categories", label: "Categorías", icon: FolderOpen },
+  { href: "/admin/users", label: "Usuarios", icon: Users, roles: ["ROOT", "ADMIN"] },
+  { href: "/admin/orders", label: "Órdenes", icon: ShoppingBag },
+  { href: "/admin/calendar", label: "Calendario", icon: Calendar },
+  { href: "/admin/pages", label: "Páginas", icon: FileText },
 ];
 
 const secondaryNavItems: NavItem[] = [
-  { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/admin/settings", label: "Ajustes", icon: Settings },
 ];
 
 const groupLabelClass =
@@ -114,7 +114,7 @@ export function AdminSidebar({
       <SidebarContent className="px-2.5">
         <SidebarGroup className="p-0 pb-2">
           <SidebarGroupLabel className={groupLabelClass}>
-            Navigation
+            Navegación
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="gap-0.5">
@@ -136,7 +136,7 @@ export function AdminSidebar({
 
         <SidebarGroup className="mt-auto p-0">
           <SidebarGroupLabel className={groupLabelClass}>
-            Support
+            Soporte
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="gap-0.5">
@@ -172,7 +172,7 @@ export function AdminSidebar({
                 </div>
                 <div className="grid min-w-0 flex-1 text-left leading-tight">
                   <span className="truncate text-[12.5px] font-semibold text-foreground">
-                    {userName ?? "User"}
+                    {userName ?? "Usuario"}
                   </span>
                   <span className="truncate text-[10.5px] text-muted-foreground">
                     {userEmail ?? ""}
@@ -191,7 +191,7 @@ export function AdminSidebar({
                   onSelect={() => logoutFormRef.current?.requestSubmit()}
                 >
                   <LogOut />
-                  Log out
+                  Cerrar sesión
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

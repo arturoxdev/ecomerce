@@ -35,7 +35,7 @@ export function CategoryForm({ action, defaultValues }: Props) {
       )}
 
       <div className="grid gap-5 sm:grid-cols-2">
-        <Field label="Name" error={fieldErrors?.name?.[0]}>
+        <Field label="Nombre" error={fieldErrors?.name?.[0]}>
           <Input name="name" value={name} onChange={handleNameChange} required />
         </Field>
 
@@ -44,7 +44,7 @@ export function CategoryForm({ action, defaultValues }: Props) {
         </Field>
       </div>
 
-      <Field label="Description" error={fieldErrors?.description?.[0]}>
+      <Field label="Descripción" error={fieldErrors?.description?.[0]}>
         <textarea
           name="description"
           defaultValue={defaultValues?.description}
@@ -54,10 +54,10 @@ export function CategoryForm({ action, defaultValues }: Props) {
 
       <div className="flex gap-3 pt-2">
         <Button type="submit" disabled={pending}>
-          {pending ? "Saving…" : "Save category"}
+          {pending ? "Guardando…" : "Guardar categoría"}
         </Button>
         <Button type="button" variant="outline" onClick={() => history.back()}>
-          Cancel
+          Cancelar
         </Button>
       </div>
     </form>

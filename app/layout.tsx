@@ -30,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="es"
       className={cn("font-sans", poppins.variable, firaCode.variable)}
     >
       <body className="antialiased">

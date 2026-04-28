@@ -1,4 +1,5 @@
 import type { UserRole } from "@/lib/db/schema";
+import { USER_ROLE_LABEL } from "@/lib/admin/labels";
 import { cn } from "@/lib/utils";
 
 const config: Record<UserRole, string> = {
@@ -23,7 +24,7 @@ export function RoleBadge({ role, className }: Props) {
         className,
       )}
     >
-      {role}
+      {USER_ROLE_LABEL[role] ?? role}
     </span>
   );
 }

@@ -151,7 +151,7 @@ export function createManualOrderService(deps: ManualOrderServiceDeps) {
                   {
                     code: z.ZodIssueCode.custom,
                     path: ["items"],
-                    message: "date must be today or later",
+                    message: "la fecha debe ser hoy o posterior",
                   },
                 ]),
               ),

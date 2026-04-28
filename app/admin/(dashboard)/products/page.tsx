@@ -54,8 +54,8 @@ export default async function AdminProductsPage({ searchParams }: Props) {
   return (
     <>
       <SiteHeader
-        title="Products"
-        subtitle={`${total} item${total === 1 ? "" : "s"} · ${activeCount} active`}
+        title="Productos"
+        subtitle={`${total} producto${total === 1 ? "" : "s"} · ${activeCount} activo${activeCount === 1 ? "" : "s"}`}
         actions={
           canWrite && (
             <Button
@@ -64,7 +64,7 @@ export default async function AdminProductsPage({ searchParams }: Props) {
               render={<Link href="/admin/products/new" />}
             >
               <Plus className="size-3.5" strokeWidth={2.4} />
-              Add product
+              Nuevo producto
             </Button>
           )
         }

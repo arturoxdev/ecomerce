@@ -9,6 +9,9 @@ import {
   searchActiveProducts,
   type ProductSearchSuggestion,
 } from "@/features/products/actions";
+import { formatAdminCurrency } from "@/lib/admin/format";
+import { PRICE_TYPE_LABEL } from "@/lib/admin/labels";
+import type { PriceType } from "@/lib/db/schema";
 
 type Props = {
   onPick: (product: ProductSearchSuggestion) => void;
@@ -76,7 +79,7 @@ export function ProductSearchInput({ onPick }: Props) {
             >
               <span className="font-medium">{p.name}</span>
               <span className="block text-xs text-muted-foreground">
-                ${parseFloat(p.basePrice).toFixed(2)} · {p.priceType}
+                {formatAdminCurrency(p.basePrice)} · {PRICE_TYPE_LABEL[p.priceType as PriceType] ?? p.priceType}
               </span>
             </li>
           ))}

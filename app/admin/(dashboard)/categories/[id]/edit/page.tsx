@@ -25,14 +25,14 @@ export default async function EditCategoryPage({ params }: Props) {
 
   return (
     <>
-      <SiteHeader title="Edit category" />
+      <SiteHeader title="Editar categoría" />
       <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
         <div className="mx-auto w-full max-w-2xl px-4 lg:px-6">
           <Card>
             <CardHeader>
-              <CardTitle>Category details</CardTitle>
+              <CardTitle>Detalles de la categoría</CardTitle>
               <CardDescription>
-                Name, slug, and description for this category.
+                Nombre, slug y descripción de esta categoría.
               </CardDescription>
             </CardHeader>
             <CardContent>

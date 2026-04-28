@@ -42,10 +42,10 @@ export default async function EditProductPage({ params }: Props) {
               href="/admin/products"
               className="text-muted-foreground transition-colors hover:text-foreground"
             >
-              Products
+              Productos
             </Link>
             <span className="text-subtle">/</span>
-            <span className="font-semibold text-foreground">Edit product</span>
+            <span className="font-semibold text-foreground">Editar producto</span>
           </nav>
         }
         actions={
@@ -57,7 +57,7 @@ export default async function EditProductPage({ params }: Props) {
           {product.name}
         </h1>
         <p className="mt-1 text-[13px] text-muted-foreground">
-          Edit product details, description, and variants.
+          Edita los detalles, la descripción y las variantes del producto.
         </p>
       </div>
       <div className="w-full px-7 pb-7">

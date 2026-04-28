@@ -5,17 +5,17 @@ import { MAX_MEDIA_COUNT } from "@/lib/services/media";
 import { toSlug } from "@/lib/utils";
 
 export const productSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  slug: z.string().min(1, "Slug is required"),
+  name: z.string().min(1, "El nombre es requerido"),
+  slug: z.string().min(1, "El slug es requerido"),
   description: z
     .string()
-    .max(150, "Description must be 150 characters or less")
+    .max(150, "La descripción debe tener 150 caracteres o menos")
     .optional(),
   about: z.string().optional(),
-  categoryId: z.string().min(1, "Category is required"),
-  basePrice: z.coerce.number().positive("Price must be positive"),
+  categoryId: z.string().min(1, "La categoría es requerida"),
+  basePrice: z.coerce.number().positive("El precio debe ser positivo"),
   priceType: z.enum(priceTypeEnum.enumValues),
-  stock: z.coerce.number().int().min(0, "Stock must be 0 or more"),
+  stock: z.coerce.number().int().min(0, "Las existencias deben ser 0 o mayor"),
   photos: z
     .string()
     .optional()
@@ -25,7 +25,7 @@ export const productSchema = z.object({
         const urls = val.split("\n").filter(Boolean);
         return urls.length <= MAX_MEDIA_COUNT;
       },
-      `Maximum ${MAX_MEDIA_COUNT} files allowed`,
+      `Máximo ${MAX_MEDIA_COUNT} archivos permitidos`,
     ),
   isActive: z.boolean().default(true),
 });
@@ -33,9 +33,9 @@ export const productSchema = z.object({
 export type ProductInput = z.infer<typeof productSchema>;
 
 export const variantSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  price: z.coerce.number().positive("Price must be positive"),
-  stock: z.coerce.number().int().min(0, "Stock must be 0 or more"),
+  name: z.string().min(1, "El nombre es requerido"),
+  price: z.coerce.number().positive("El precio debe ser positivo"),
+  stock: z.coerce.number().int().min(0, "Las existencias deben ser 0 o mayor"),
 });
 
 export type VariantInput = z.infer<typeof variantSchema>;

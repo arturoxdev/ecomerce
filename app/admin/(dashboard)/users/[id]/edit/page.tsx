@@ -27,10 +27,10 @@ export default async function EditUserPage({ params }: Props) {
   if (user.role === "ROOT") {
     return (
       <>
-        <SiteHeader title="Edit User" />
+        <SiteHeader title="Editar usuario" />
         <div className="flex flex-1 flex-col items-center justify-center py-24">
-          <h2 className="text-lg font-medium">Cannot Edit</h2>
-          <p className="mt-2 text-sm text-muted-foreground">The ROOT user cannot be modified.</p>
+          <h2 className="text-lg font-medium">No editable</h2>
+          <p className="mt-2 text-sm text-muted-foreground">El usuario ROOT no se puede modificar.</p>
         </div>
       </>
     );
@@ -40,14 +40,14 @@ export default async function EditUserPage({ params }: Props) {
 
   return (
     <>
-      <SiteHeader title={`Edit User — ${user.name ?? user.email}`} />
+      <SiteHeader title={`Editar usuario — ${user.name ?? user.email}`} />
       <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
         <div className="mx-auto w-full max-w-lg px-4 lg:px-6">
           <Card>
             <CardHeader>
-              <CardTitle>User details</CardTitle>
+              <CardTitle>Datos del usuario</CardTitle>
               <CardDescription>
-                Update this user&apos;s information and permissions.
+                Actualiza la información y los permisos de este usuario.
               </CardDescription>
             </CardHeader>
             <CardContent>

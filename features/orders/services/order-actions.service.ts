@@ -52,14 +52,14 @@ export function createOrderActionsService(deps: OrderActionsServiceDeps) {
     });
 
     if (!order) {
-      return { success: false, problem: notFoundProblem("Order not found") };
+      return { success: false, problem: notFoundProblem("Orden no encontrada") };
     }
 
     if (order.stripeSessionId) {
       return {
         success: false,
         problem: forbiddenProblem(
-          "Stripe orders are reconciled via webhooks, cannot be marked paid manually",
+          "Las órdenes de Stripe se reconcilian por webhooks; no se pueden marcar como pagadas manualmente",
         ),
       };
     }
@@ -68,7 +68,7 @@ export function createOrderActionsService(deps: OrderActionsServiceDeps) {
       return {
         success: false,
         problem: forbiddenProblem(
-          `Cannot mark as paid: order is ${order.paymentStatus}`,
+          `No se puede marcar como pagada: la orden está ${order.paymentStatus}`,
         ),
       };
     }
@@ -113,7 +113,7 @@ export function createOrderActionsService(deps: OrderActionsServiceDeps) {
     });
 
     if (!order) {
-      return { success: false, problem: notFoundProblem("Order not found") };
+      return { success: false, problem: notFoundProblem("Orden no encontrada") };
     }
 
     if (
@@ -124,7 +124,7 @@ export function createOrderActionsService(deps: OrderActionsServiceDeps) {
       return {
         success: false,
         problem: forbiddenProblem(
-          `Cannot cancel: order is already ${order.status}`,
+          `No se puede cancelar: la orden ya está ${order.status}`,
         ),
       };
     }

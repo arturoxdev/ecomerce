@@ -24,12 +24,12 @@ export default async function ProductAvailabilityPage({ params }: Props) {
 
   return (
     <>
-      <SiteHeader title={`Availability — ${product.name}`} />
+      <SiteHeader title={`Disponibilidad — ${product.name}`} />
       <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
         <div className="px-4 lg:px-6">
           <Card>
             <CardHeader>
-              <CardTitle>Create manual block</CardTitle>
+              <CardTitle>Crear bloqueo manual</CardTitle>
             </CardHeader>
             <CardContent>
               <ManualBlockForm productId={id} />
@@ -40,7 +40,7 @@ export default async function ProductAvailabilityPage({ params }: Props) {
         <div className="px-4 lg:px-6">
           <Card>
             <CardHeader>
-              <CardTitle>Blocks & reservations</CardTitle>
+              <CardTitle>Bloqueos y reservaciones</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <AvailabilityBlockTable blocks={blocks} />

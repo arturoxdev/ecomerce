@@ -29,7 +29,7 @@ export function ManualBlockForm({ productId }: Props) {
 
   useEffect(() => {
     if ("success" in state && state.success) {
-      toast.success("Block created successfully");
+      toast.success("Bloqueo creado");
       formRef.current?.reset();
     }
     if (isFormError(state)) {
@@ -40,7 +40,7 @@ export function ManualBlockForm({ productId }: Props) {
   return (
     <form ref={formRef} action={formAction} className="grid gap-4 sm:grid-cols-2">
       <div className="space-y-1.5">
-        <Label htmlFor="date">Date</Label>
+        <Label htmlFor="date">Fecha</Label>
         <Input id="date" name="date" type="date" required />
         {fieldErrors?.date && (
           <p className="text-sm text-red-600">{fieldErrors.date[0]}</p>
@@ -48,7 +48,7 @@ export function ManualBlockForm({ productId }: Props) {
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="reason">Reason (optional)</Label>
+        <Label htmlFor="reason">Motivo (opcional)</Label>
         <Input id="reason" name="reason" type="text" maxLength={255} />
         {fieldErrors?.reason && (
           <p className="text-sm text-red-600">{fieldErrors.reason[0]}</p>
@@ -57,7 +57,7 @@ export function ManualBlockForm({ productId }: Props) {
 
       <div className="sm:col-span-2">
         <Button type="submit" disabled={isPending}>
-          {isPending ? "Creating…" : "Create block"}
+          {isPending ? "Creando…" : "Crear bloqueo"}
         </Button>
       </div>
     </form>

@@ -75,15 +75,14 @@ export function SlugField({
               className="text-[11.5px] font-semibold text-muted-foreground"
             >
               <Pencil data-icon="inline-start" className="size-3" />
-              Edit
+              Editar
             </Button>
           </div>
         </>
       )}
 
       <p className="text-[11px] leading-relaxed text-muted-foreground">
-        Changing the slug affects SEO and existing links. Edit only if you know
-        what you&apos;re doing.
+        Cambiar el slug afecta el SEO y los enlaces existentes. Edítalo solo si sabes lo que haces.
       </p>
 
       {error && <p className="text-xs text-destructive">{error}</p>}

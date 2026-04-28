@@ -24,15 +24,15 @@ export function MarkdownForm({ action, defaultValues, canWrite }: Props) {
   const [state, formAction, pending] = useActionState(action, {} as StaticPageFormState);
   const fieldErrors = getFieldErrors(state);
   const [body, setBody] = useState(defaultValues.body);
-  useFormActionToast(state, "Document updated");
+  useFormActionToast(state, "Documento actualizado");
 
   return (
     <form action={formAction} className="space-y-6">
       <div className="grid gap-5 md:grid-cols-2">
-        <Field label="Title" error={fieldErrors?.title?.[0]} className="space-y-2">
+        <Field label="Título" error={fieldErrors?.title?.[0]} className="space-y-2">
           <Input name="title" defaultValue={defaultValues.title} disabled={!canWrite} />
         </Field>
-        <Field label="Subtitle" error={fieldErrors?.subtitle?.[0]} className="space-y-2">
+        <Field label="Subtítulo" error={fieldErrors?.subtitle?.[0]} className="space-y-2">
           <Input
             name="subtitle"
             defaultValue={defaultValues.subtitle}
@@ -41,7 +41,7 @@ export function MarkdownForm({ action, defaultValues, canWrite }: Props) {
         </Field>
       </div>
 
-      <Field label="Markdown content" error={fieldErrors?.body?.[0]} className="space-y-2">
+      <Field label="Contenido Markdown" error={fieldErrors?.body?.[0]} className="space-y-2">
         <MarkdownEditor
           value={body}
           onChange={setBody}
@@ -57,7 +57,7 @@ export function MarkdownForm({ action, defaultValues, canWrite }: Props) {
             disabled={pending}
             className="h-10 rounded-xl bg-secondary px-5 text-white hover:bg-green-800"
           >
-            {pending ? "Saving..." : "Save changes"}
+            {pending ? "Guardando..." : "Guardar cambios"}
           </Button>
         </div>
       ) : null}

@@ -48,13 +48,13 @@ export function ProductFilters({ categories }: Props) {
 
   const categoryLabel =
     currentCategory === "all"
-      ? "All categories"
-      : categories.find((c) => c.id === currentCategory)?.name ?? "All categories";
+      ? "Todas las categorías"
+      : categories.find((c) => c.id === currentCategory)?.name ?? "Todas las categorías";
 
   const statusLabels: Record<string, string> = {
-    all: "All",
-    active: "Active",
-    inactive: "Inactive",
+    all: "Todos",
+    active: "Activos",
+    inactive: "Inactivos",
   };
 
   const labelCn = "text-xs font-semibold text-foreground";
@@ -63,13 +63,13 @@ export function ProductFilters({ categories }: Props) {
     <div className="flex flex-wrap items-end gap-3.5">
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="product-search" className={labelCn}>
-          Search
+          Buscar
         </Label>
         <div className="relative w-[300px]">
           <Search className="pointer-events-none absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-subtle" />
           <Input
             id="product-search"
-            placeholder="Search by name…"
+            placeholder="Buscar por nombre…"
             defaultValue={currentSearch}
             onChange={(e) => {
               const value = e.target.value;
@@ -82,14 +82,14 @@ export function ProductFilters({ categories }: Props) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label className={labelCn}>Category</Label>
+        <Label className={labelCn}>Categoría</Label>
         <Select
           value={currentCategory}
           onValueChange={(value) => updateParams("category", value ?? "all")}
         >
           <SelectTrigger className="w-[210px]">{categoryLabel}</SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All categories</SelectItem>
+            <SelectItem value="all">Todas las categorías</SelectItem>
             {categories.map((cat) => (
               <SelectItem key={cat.id} value={cat.id}>
                 {cat.name}
@@ -100,18 +100,18 @@ export function ProductFilters({ categories }: Props) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label className={labelCn}>Status</Label>
+        <Label className={labelCn}>Estado</Label>
         <Select
           value={currentStatus}
           onValueChange={(value) => updateParams("status", value ?? "all")}
         >
           <SelectTrigger className="w-[150px]">
-            {statusLabels[currentStatus] ?? "All"}
+            {statusLabels[currentStatus] ?? "Todos"}
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="inactive">Inactive</SelectItem>
+            <SelectItem value="all">Todos</SelectItem>
+            <SelectItem value="active">Activos</SelectItem>
+            <SelectItem value="inactive">Inactivos</SelectItem>
           </SelectContent>
         </Select>
       </div>
