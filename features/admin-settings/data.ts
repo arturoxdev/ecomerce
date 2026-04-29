@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { requireWriteAccess } from "@/features/auth/session";
+import { countZipcodes } from "@/features/zipcodes/services/zipcodes.service";
 import { recordAudit } from "@/lib/audit";
 import { getStoreId } from "@/lib/config/tenant";
 import { db } from "@/lib/db";
@@ -21,7 +22,7 @@ export type SettingsFormState = FormState;
 const settingsSchema = z
   .object({
     paymentMode: z.enum(["SPLIT_50_50", "FULL_ONLINE"]),
-    deliveryMode: z.enum(["INCLUDED", "FIXED_FEE"]),
+    deliveryMode: z.enum(["INCLUDED", "FIXED_FEE", "ZIP_CODE"]),
     deliveryFee: z.coerce.number().min(0).optional(),
     depositPercent: z.coerce.number().gt(0).max(1),
   })
@@ -60,6 +61,22 @@ export async function updateSettings(
 
   const parsed = settingsSchema.safeParse(raw);
   if (!parsed.success) return validationProblem(parsed.error);
+
+  if (parsed.data.deliveryMode === "ZIP_CODE") {
+    const zipcodeCount = await countZipcodes();
+    if (zipcodeCount === 0) {
+      return validationProblem(
+        new z.ZodError([
+          {
+            code: "custom",
+            path: ["deliveryMode"],
+            message:
+              "Configura al menos un zipcode antes de activar el modo por código postal",
+          },
+        ]),
+      );
+    }
+  }
 
   const storeId = getStoreId();
   const before = await db.query.settings.findFirst({

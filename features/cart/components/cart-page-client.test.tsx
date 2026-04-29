@@ -189,6 +189,8 @@ describe("CartPageClient", () => {
           customerEmail: "jane@example.com",
           customerPhone: "555-1111",
           deliveryAddress: "Main Street 10",
+          selectedCity: null,
+          selectedZipCode: null,
           locale: "en",
           items: [
             {

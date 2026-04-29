@@ -148,7 +148,14 @@
     "selectDatesFirst": "Select a date and check availability first",
     "perUnit": "per unit",
     "pastDateBadge": "Past date",
-    "pastDateBlocking": "Some items have a past date. Remove them to continue."
+    "pastDateBlocking": "Some items have a past date. Remove them to continue.",
+    "zipcodeLabel": "City and zipcode",
+    "zipcodePlaceholder": "Select city and zipcode",
+    "zipcodeSearchPlaceholder": "Search city or zipcode…",
+    "zipcodeEmpty": "We don't yet deliver to that destination",
+    "zipcodeLoading": "Searching…",
+    "zipcodeRequired": "Select city and zipcode before continuing",
+    "zipcodeStale": "Your previous selection is no longer available, please pick another"
   },
   "payment": {
     "splitBadge": "50% now · 50% on delivery",

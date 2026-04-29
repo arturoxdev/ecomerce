@@ -4,9 +4,14 @@ import {
   getSettings,
   updateSettingsAction,
 } from "@/features/admin-settings";
+import { countZipcodes } from "@/features/zipcodes/services/zipcodes.service";
 
 export default async function AdminPaymentsSettingsPage() {
-  const current = await getSettings();
+  const [current, zipcodeCount] = await Promise.all([
+    getSettings(),
+    countZipcodes(),
+  ]);
+  const hasZipcodes = zipcodeCount > 0;
 
   return (
     <>
@@ -22,11 +27,11 @@ export default async function AdminPaymentsSettingsPage() {
           action={updateSettingsAction}
           defaultValues={{
             paymentMode: current?.paymentMode ?? "SPLIT_50_50",
-            deliveryMode:
-              current?.deliveryMode === "FIXED_FEE" ? "FIXED_FEE" : "INCLUDED",
+            deliveryMode: current?.deliveryMode ?? "INCLUDED",
             deliveryFee: current?.deliveryFee ?? null,
             depositPercent: current?.depositPercent ?? "0.10",
           }}
+          hasZipcodes={hasZipcodes}
         />
       </div>
     </>

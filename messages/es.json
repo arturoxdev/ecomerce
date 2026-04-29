@@ -148,7 +148,14 @@
     "selectDatesFirst": "Selecciona una fecha y verifica disponibilidad primero",
     "perUnit": "por unidad",
     "pastDateBadge": "Fecha pasada",
-    "pastDateBlocking": "Algunos artículos tienen una fecha pasada. Elimínalos para continuar."
+    "pastDateBlocking": "Algunos artículos tienen una fecha pasada. Elimínalos para continuar.",
+    "zipcodeLabel": "Ciudad y código postal",
+    "zipcodePlaceholder": "Selecciona ciudad y código postal",
+    "zipcodeSearchPlaceholder": "Buscar ciudad o código postal…",
+    "zipcodeEmpty": "Aún no hacemos entregas a ese destino",
+    "zipcodeLoading": "Buscando…",
+    "zipcodeRequired": "Selecciona ciudad y código postal antes de continuar",
+    "zipcodeStale": "Tu selección anterior ya no está disponible, escoge otra"
   },
   "payment": {
     "splitBadge": "50% ahora · 50% en entrega",

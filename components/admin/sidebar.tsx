@@ -6,6 +6,7 @@ import {
   FileText,
   FolderOpen,
   LogOut,
+  MapPin,
   Package,
   Sparkles,
   Settings,
@@ -52,6 +53,12 @@ const mainNavItems: NavItem[] = [
   { href: "/admin/orders", label: "Órdenes", icon: ShoppingBag },
   { href: "/admin/calendar", label: "Calendario", icon: Calendar },
   { href: "/admin/pages", label: "Páginas", icon: FileText },
+  {
+    href: "/admin/zipcodes",
+    label: "Códigos postales",
+    icon: MapPin,
+    roles: ["ROOT", "ADMIN"],
+  },
 ];
 
 const secondaryNavItems: NavItem[] = [

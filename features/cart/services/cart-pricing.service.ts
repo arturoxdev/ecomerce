@@ -11,11 +11,17 @@ export type CartStoreSettings = {
 export type CartSummaryInput = {
   subtotal: number;
   settings: CartStoreSettings;
+  resolvedZipFee?: number | null;
 };
 
 export function calculateCartSummary(input: CartSummaryInput) {
-  const deliveryFee =
-    input.settings.deliveryMode === "INCLUDED" ? 0 : input.settings.deliveryFee;
+  let deliveryFee = 0;
+  if (input.settings.deliveryMode === "FIXED_FEE") {
+    deliveryFee = input.settings.deliveryFee;
+  } else if (input.settings.deliveryMode === "ZIP_CODE") {
+    deliveryFee = input.resolvedZipFee ?? 0;
+  }
+
   const deposit = input.subtotal * input.settings.depositPercent;
   const total = input.subtotal + deliveryFee;
 

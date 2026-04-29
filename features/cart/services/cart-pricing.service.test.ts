@@ -26,12 +26,12 @@ describe("cart pricing service", () => {
       expect(result.total).toBe(250);
     });
 
-    it("paid delivery with 20 fee and 15% deposit -> total includes delivery", () => {
+    it("FIXED_FEE delivery with 20 fee and 15% deposit -> total includes delivery", () => {
       // Arrange
       const input = {
         subtotal: 100,
         settings: {
-          deliveryMode: "CUSTOM",
+          deliveryMode: "FIXED_FEE",
           deliveryFee: 20,
           depositPercent: 0.15,
           paymentMode: "SPLIT_50_50" as const,
@@ -46,6 +46,49 @@ describe("cart pricing service", () => {
       expect(result.deliveryFee).toBe(20);
       expect(result.deposit).toBe(15);
       expect(result.total).toBe(120);
+    });
+
+    it("ZIP_CODE without resolvedZipFee -> delivery 0 (no selection yet)", () => {
+      // Arrange
+      const input = {
+        subtotal: 100,
+        settings: {
+          deliveryMode: "ZIP_CODE",
+          deliveryFee: 0,
+          depositPercent: 0.1,
+          paymentMode: "SPLIT_50_50" as const,
+          currency: "USD",
+        },
+      };
+
+      // Act
+      const result = calculateCartSummary(input);
+
+      // Assert
+      expect(result.deliveryFee).toBe(0);
+      expect(result.total).toBe(100);
+    });
+
+    it("ZIP_CODE with resolvedZipFee 75 -> total includes the resolved fee", () => {
+      // Arrange
+      const input = {
+        subtotal: 100,
+        settings: {
+          deliveryMode: "ZIP_CODE",
+          deliveryFee: 0,
+          depositPercent: 0.1,
+          paymentMode: "SPLIT_50_50" as const,
+          currency: "USD",
+        },
+        resolvedZipFee: 75,
+      };
+
+      // Act
+      const result = calculateCartSummary(input);
+
+      // Assert
+      expect(result.deliveryFee).toBe(75);
+      expect(result.total).toBe(175);
     });
   });
 });

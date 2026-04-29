@@ -2,6 +2,7 @@ import "server-only";
 
 import { z } from "zod";
 
+import { findZipcodeByCityAndCode } from "@/features/zipcodes/services/zipcodes.service";
 import { getStoreId } from "@/lib/config/tenant";
 import * as settingRepo from "@/lib/data/settings";
 import { getMinBookableDate, parseDateOnly } from "@/lib/date";
@@ -13,6 +14,8 @@ import {
   calculateCartSummary,
   type CartStoreSettings,
 } from "./cart-pricing.service";
+
+const ZIPCODE_REGEX = /^[A-Za-z0-9]{1,8}$/;
 
 type ProductLookupResult =
   | {
@@ -61,6 +64,18 @@ const placeOrderSchema = z.object({
   customerEmail: z.string().email("Valid email is required"),
   customerPhone: z.string().min(1, "Phone is required"),
   deliveryAddress: z.string().optional().default(""),
+  selectedCity: z
+    .string()
+    .trim()
+    .min(1)
+    .max(80)
+    .optional()
+    .nullable(),
+  selectedZipCode: z
+    .string()
+    .regex(ZIPCODE_REGEX, "Invalid zipcode")
+    .optional()
+    .nullable(),
   locale: z.enum(["en", "es"]).optional().default("en"),
   items: z.array(placeOrderItemSchema).min(1, "Cart cannot be empty"),
 });
@@ -122,6 +137,31 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
     }
 
     const storeSettings = await loadStoreSettings();
+
+    let resolvedZipFee: number | null = null;
+    let resolvedZipCode: string | null = null;
+    let resolvedCity: string | null = null;
+    if (storeSettings.deliveryMode === "ZIP_CODE") {
+      if (!data.selectedCity || !data.selectedZipCode) {
+        return {
+          success: false,
+          error: "Selecciona ciudad y zipcode antes de continuar",
+        };
+      }
+      const zipRow = await findZipcodeByCityAndCode(
+        data.selectedCity,
+        data.selectedZipCode,
+      );
+      if (!zipRow) {
+        return {
+          success: false,
+          error: "Aún no hacemos entregas a ese destino",
+        };
+      }
+      resolvedZipFee = parseFloat(zipRow.fee);
+      resolvedZipCode = zipRow.zipCode;
+      resolvedCity = zipRow.city;
+    }
 
     const minBookable = getMinBookableDate();
 
@@ -201,6 +241,7 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
         const summary = calculateCartSummary({
           subtotal,
           settings: storeSettings,
+          resolvedZipFee,
         });
 
         const [order] = await tx
@@ -211,6 +252,8 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
             customerEmail: data.customerEmail,
             customerPhone: data.customerPhone,
             deliveryAddress: data.deliveryAddress || null,
+            city: resolvedCity,
+            zipCode: resolvedZipCode,
             subtotal: subtotal.toFixed(2),
             depositAmount: summary.deposit.toFixed(2),
             deliveryFee: summary.deliveryFee.toFixed(2),
