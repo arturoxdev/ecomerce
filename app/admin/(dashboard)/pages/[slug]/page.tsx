@@ -3,15 +3,19 @@ import { notFound } from "next/navigation";
 import {
   AboutForm,
   ContactForm,
+  HomeForm,
   MarkdownForm,
   FaqManager,
   EditorCard,
   PagesEditorShell,
   saveAboutPage,
   saveContactPage,
+  saveHomeMedia,
+  removeHomeMedia,
   saveLegalDocument,
   findAboutByLocale,
   findContactByLocale,
+  findHomeByStoreId,
   findLegalBySlugAndLocale,
 } from "@/features/pages";
 import { canWriteData, getSessionUser } from "@/lib/services/auth";
@@ -24,6 +28,7 @@ import {
 import {
   aboutPageFallbacks,
   contactPageFallbacks,
+  homePageFallbacks,
   legalPageFallbacks,
 } from "@/features/pages";
 import { isLocale, type Locale } from "@/lib/i18n/config";
@@ -51,6 +56,32 @@ export default async function AdminStaticPagePage({ params, searchParams }: Prop
   const definition = getStaticPageDefinition(slug);
   if (!definition) {
     notFound();
+  }
+
+  if (definition.editorType === "home") {
+    let heroMediaUrl: string | null = null;
+    try {
+      const row = await findHomeByStoreId();
+      heroMediaUrl = row?.heroMediaUrl ?? null;
+    } catch {}
+
+    return (
+      <PagesEditorShell
+        title={definition.title}
+        locale={locale}
+        showLocaleSwitcher={false}
+      >
+        <EditorCard>
+          <HomeForm
+            saveAction={saveHomeMedia}
+            removeAction={removeHomeMedia}
+            defaultMediaUrl={heroMediaUrl}
+            fallbackMediaUrl={homePageFallbacks.heroMediaUrl}
+            canWrite={canWrite}
+          />
+        </EditorCard>
+      </PagesEditorShell>
+    );
   }
 
   if (definition.editorType === "about") {

@@ -33,10 +33,15 @@ export const faqSchema = z.object({
   sortOrder: z.coerce.number().int().min(0, "El orden debe ser 0 o mayor"),
 });
 
+export const homeSchema = z.object({
+  heroMediaUrl: z.string().url("La URL del medio no es válida"),
+});
+
 export type AboutInput = z.infer<typeof aboutSchema>;
 export type MarkdownInput = z.infer<typeof markdownSchema>;
 export type ContactInput = z.infer<typeof contactSchema>;
 export type FaqInput = z.infer<typeof faqSchema>;
+export type HomeInput = z.infer<typeof homeSchema>;
 
 export function parseAboutForm(formData: FormData) {
   return aboutSchema.safeParse({
@@ -71,4 +76,10 @@ export function parseContactForm(formData: FormData) {
 
 export function parseFaqPayload(payload: unknown) {
   return faqSchema.safeParse(payload);
+}
+
+export function parseHomeForm(formData: FormData) {
+  return homeSchema.safeParse({
+    heroMediaUrl: formData.get("heroMediaUrl"),
+  });
 }

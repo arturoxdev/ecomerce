@@ -1,5 +1,11 @@
 export const staticPageCatalog = [
   {
+    slug: "home",
+    title: "Home",
+    description: "Hero media (foto o video) que se muestra en la página principal.",
+    editorType: "home",
+  },
+  {
     slug: "about",
     title: "About Us",
     description: "Storytelling page about the brand and service values.",

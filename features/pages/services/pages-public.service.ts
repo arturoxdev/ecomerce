@@ -8,6 +8,7 @@ import {
   aboutPageContents,
   contactPageContents,
   faqEntries,
+  homePageContents,
   legalPageDocuments,
 } from "@/lib/db/schema";
 import type { Locale } from "@/lib/i18n/config";
@@ -16,6 +17,7 @@ import {
   aboutPageFallbacks,
   contactPageFallbacks,
   faqFallbacks,
+  homePageFallbacks,
   legalPageFallbacks,
 } from "./pages-fallbacks.service";
 
@@ -131,6 +133,37 @@ export async function getLegalDocument(slug: LegalPageSlug, locale: Locale) {
   return {
     source: "fallback-bundled" as const,
     data: { slug, locale, ...legalPageFallbacks[slug][locale] },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Home Page — reads
+// ---------------------------------------------------------------------------
+
+function findHomeByStoreId() {
+  return db.query.homePageContents.findFirst({
+    where: and(
+      eq(homePageContents.storeId, getStoreId()),
+      eq(homePageContents.slug, "home"),
+    ),
+  });
+}
+
+export async function getHomeMedia(): Promise<{
+  source: "db" | "fallback-bundled";
+  data: { heroMediaUrl: string };
+}> {
+  try {
+    const current = await findHomeByStoreId();
+    if (current?.heroMediaUrl) {
+      return { source: "db", data: { heroMediaUrl: current.heroMediaUrl } };
+    }
+  } catch {
+    // tabla puede no existir antes de correr la migración — caemos al fallback
+  }
+  return {
+    source: "fallback-bundled",
+    data: { heroMediaUrl: homePageFallbacks.heroMediaUrl },
   };
 }
 

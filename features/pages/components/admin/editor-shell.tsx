@@ -8,10 +8,12 @@ import type { Locale } from "@/lib/i18n/config";
 export function PagesEditorShell({
   title,
   locale,
+  showLocaleSwitcher = true,
   children,
 }: {
   title: string;
   locale: Locale;
+  showLocaleSwitcher?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -19,19 +21,21 @@ export function PagesEditorShell({
       <SiteHeader
         title={title}
         actions={
-          <div className="inline-flex overflow-hidden rounded-lg border">
-            {(["en", "es"] as const).map((value) => (
-              <Button
-                key={value}
-                variant={locale === value ? "default" : "ghost"}
-                size="sm"
-                className="rounded-none"
-                render={<Link href={`?locale=${value}`} />}
-              >
-                {value.toUpperCase()}
-              </Button>
-            ))}
-          </div>
+          showLocaleSwitcher ? (
+            <div className="inline-flex overflow-hidden rounded-lg border">
+              {(["en", "es"] as const).map((value) => (
+                <Button
+                  key={value}
+                  variant={locale === value ? "default" : "ghost"}
+                  size="sm"
+                  className="rounded-none"
+                  render={<Link href={`?locale=${value}`} />}
+                >
+                  {value.toUpperCase()}
+                </Button>
+              ))}
+            </div>
+          ) : undefined
         }
       />
       <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">

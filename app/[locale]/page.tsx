@@ -11,6 +11,7 @@ import { asc } from "drizzle-orm";
 
 import { findAllWithCategory } from "@/features/products/services/products.service";
 import { findAll as findAllCategories } from "@/features/categories/services/categories.service";
+import { getHomeMedia, HeroMedia } from "@/features/pages";
 import { findThumbnail } from "@/lib/services/media";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
@@ -29,12 +30,13 @@ export default async function Home({ params }: HomeProps) {
   const typedLocale = locale as Locale;
   const m = getMessages(typedLocale);
 
-  const [dbCategories, dbProducts] = await Promise.all([
+  const [dbCategories, dbProducts, heroMedia] = await Promise.all([
     findAllCategories({ orderBy: asc(categoriesTable.sortOrder), limit: 6 }),
     findAllWithCategory({
       where: { isActive: true },
       limit: 6,
     }),
+    getHomeMedia(),
   ]);
 
   return (
@@ -87,13 +89,7 @@ export default async function Home({ params }: HomeProps) {
 
             <div className="relative w-full">
               <div className="relative h-[440px] w-full overflow-hidden rounded-2xl bg-slate-100 shadow-[0_25px_50px_rgba(0,0,0,0.24)]">
-                <div
-                  className="h-full w-full bg-cover bg-center"
-                  style={{
-                    backgroundImage:
-                      "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCWQyE9DMg-JDkm060LzSQqQ2STADSY1PSRyBso20F6UfgOrYYyfTGz0UYRmvgQilpWxSMynslYC6gXD48d6oFNC8-lC7FAHN0uQeizdgkJE4imQ6I4d-apMwbW8aiPU60-OFjPstMwtZi-fsmpiRD_6c59p4f7WNAUJU7lwYdyfsW-UYhr1-XH5NFAUVmB7P1D7Y5YOSjunk3Hy0ne5yzgtqcMQLcUpw04tr2K-_seDR3Xtv0lmhIx05dHSizEREp582Nk4xlQcDVA')",
-                  }}
-                />
+                <HeroMedia mediaUrl={heroMedia.data.heroMediaUrl} />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#0000001A] to-transparent" />
               </div>
               <div className="absolute -bottom-5 -left-5 hidden rounded-xl border border-slate-100 bg-white p-4 shadow-xl sm:block">
