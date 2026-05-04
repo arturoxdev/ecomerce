@@ -4,6 +4,8 @@ import {
   saveAboutPage as dalSaveAbout,
   saveLegalDocument as dalSaveLegal,
   saveContactPage as dalSaveContact,
+  saveHomeMedia as dalSaveHomeMedia,
+  removeHomeMedia as dalRemoveHomeMedia,
   createFaqEntry as dalCreateFaq,
   updateFaqEntry as dalUpdateFaq,
   deleteFaqEntry as dalDeleteFaq,
@@ -53,4 +55,15 @@ export async function updateFaqEntry(
 
 export async function deleteFaqEntry(id: string) {
   return dalDeleteFaq(id);
+}
+
+export async function saveHomeMedia(
+  _prev: StaticPageFormState,
+  formData: FormData,
+): Promise<StaticPageFormState> {
+  return dalSaveHomeMedia(_prev, formData);
+}
+
+export async function removeHomeMedia(): Promise<StaticPageFormState> {
+  return dalRemoveHomeMedia();
 }

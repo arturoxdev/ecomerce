@@ -1,5 +1,6 @@
 import "server-only";
 
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
@@ -8,6 +9,7 @@ import {
   parseAboutForm,
   parseContactForm,
   parseFaqPayload,
+  parseHomeForm,
   parseMarkdownForm,
 } from "./pages-admin.schemas";
 import { requireWriteAccess } from "@/lib/services/auth";
@@ -17,8 +19,11 @@ import {
   aboutPageContents,
   contactPageContents,
   faqEntries,
+  homePageContents,
   legalPageDocuments,
 } from "@/lib/db/schema";
+import { getObjectKeyFromPublicMediaUrl } from "@/lib/services/media-url.service";
+import { s3Bucket, s3Client, s3PublicUrl } from "@/lib/services/s3-client";
 import type { Locale } from "@/lib/i18n/config";
 import type { LegalPageSlug } from "./pages-catalog.service";
 import {
@@ -42,6 +47,24 @@ function revalidateStaticPage(slug: string) {
   revalidatePath(`/admin/pages/${slug}`);
   revalidatePath(`/en/${slug}`);
   revalidatePath(`/es/${slug}`);
+}
+
+function revalidateHomePage() {
+  revalidatePath("/admin/pages");
+  revalidatePath("/admin/pages/home");
+  revalidatePath("/", "layout");
+}
+
+async function deleteS3ObjectByUrl(url: string) {
+  const key = getObjectKeyFromPublicMediaUrl(url, s3PublicUrl);
+  if (!key) return;
+  try {
+    await s3Client.send(
+      new DeleteObjectCommand({ Bucket: s3Bucket, Key: key }),
+    );
+  } catch (err) {
+    console.error("[home] Failed to delete old S3 object:", err);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -74,6 +97,15 @@ export function findLegalBySlugAndLocale(slug: LegalPageSlug, locale: Locale) {
       eq(legalPageDocuments.storeId, getStoreId()),
       eq(legalPageDocuments.slug, slug),
       eq(legalPageDocuments.locale, locale),
+    ),
+  });
+}
+
+export function findHomeByStoreId() {
+  return db.query.homePageContents.findFirst({
+    where: and(
+      eq(homePageContents.storeId, getStoreId()),
+      eq(homePageContents.slug, "home"),
     ),
   });
 }
@@ -257,6 +289,78 @@ export async function updateFaqEntry(
   }
 
   revalidateStaticPage("faq");
+  return { success: true };
+}
+
+export async function saveHomeMedia(
+  _prev: StaticPageFormState,
+  formData: FormData,
+): Promise<StaticPageFormState> {
+  await requireWriteAccess();
+
+  const parsed = parseHomeForm(formData);
+  if (!parsed.success) {
+    return validationProblem(parsed.error);
+  }
+
+  const { heroMediaUrl } = parsed.data;
+
+  const ownsUrl =
+    getObjectKeyFromPublicMediaUrl(heroMediaUrl, s3PublicUrl) !== null;
+  if (!ownsUrl) {
+    return forbiddenProblem("La URL no pertenece al bucket de la tienda");
+  }
+
+  const storeId = getStoreId();
+  const previous = await findHomeByStoreId();
+  const previousUrl = previous?.heroMediaUrl ?? null;
+
+  try {
+    await db
+      .insert(homePageContents)
+      .values({ storeId, slug: "home", heroMediaUrl })
+      .onConflictDoUpdate({
+        target: [homePageContents.storeId, homePageContents.slug],
+        set: { heroMediaUrl },
+      });
+  } catch {
+    return internalProblem("No se pudo guardar el medio del Home");
+  }
+
+  if (previousUrl && previousUrl !== heroMediaUrl) {
+    await deleteS3ObjectByUrl(previousUrl);
+  }
+
+  revalidateHomePage();
+  return { success: true };
+}
+
+export async function removeHomeMedia(): Promise<StaticPageFormState> {
+  await requireWriteAccess();
+
+  const storeId = getStoreId();
+  const previous = await findHomeByStoreId();
+  const previousUrl = previous?.heroMediaUrl ?? null;
+
+  try {
+    await db
+      .update(homePageContents)
+      .set({ heroMediaUrl: null })
+      .where(
+        and(
+          eq(homePageContents.storeId, storeId),
+          eq(homePageContents.slug, "home"),
+        ),
+      );
+  } catch {
+    return internalProblem("No se pudo eliminar el medio del Home");
+  }
+
+  if (previousUrl) {
+    await deleteS3ObjectByUrl(previousUrl);
+  }
+
+  revalidateHomePage();
   return { success: true };
 }
 

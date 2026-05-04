@@ -64,6 +64,7 @@ export type ContentLocale = (typeof contentLocaleEnum.enumValues)[number];
 
 export const aboutPageSlugEnum = pgEnum("about_page_slug", ["about"]);
 export const contactPageSlugEnum = pgEnum("contact_page_slug", ["contact"]);
+export const homePageSlugEnum = pgEnum("home_page_slug", ["home"]);
 export const legalPageSlugEnum = pgEnum("legal_page_slug", [
   "terms",
   "privacy",
@@ -273,6 +274,21 @@ export const zipDeliveryZones = pgTable(
     unique("idx_zip_store_city_code").on(t.storeId, t.city, t.zipCode),
     index("idx_zip_store_zip").on(t.storeId, t.zipCode),
   ],
+);
+
+export const homePageContents = pgTable(
+  "home_page_contents",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    storeId: text("store_id").notNull(),
+    slug: homePageSlugEnum("slug").notNull().default("home"),
+    heroMediaUrl: text("hero_media_url"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [unique("idx_home_page_store_slug").on(t.storeId, t.slug)],
 );
 
 export const aboutPageContents = pgTable(

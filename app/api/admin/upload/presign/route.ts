@@ -15,6 +15,9 @@ import { s3Bucket, s3Client, s3PublicUrl } from "@/lib/services/s3-client";
 import { validationProblem } from "@/lib/problems";
 import { ProblemType } from "@/lib/types/problem-detail";
 
+const UPLOAD_PREFIXES = ["products", "home"] as const;
+type UploadPrefix = (typeof UPLOAD_PREFIXES)[number];
+
 const presignSchema = z.object({
   filename: z.string().min(1),
   contentType: z.string().refine(
@@ -22,6 +25,10 @@ const presignSchema = z.object({
     "Unsupported file type",
   ),
   fileSize: z.number().positive(),
+  prefix: z
+    .enum(UPLOAD_PREFIXES)
+    .optional()
+    .default("products" satisfies UploadPrefix),
 });
 
 export async function POST(request: NextRequest) {
@@ -32,7 +39,7 @@ export async function POST(request: NextRequest) {
     return problemResponse(validationProblem(parsed.error));
   }
 
-  const { filename, contentType, fileSize } = parsed.data;
+  const { filename, contentType, fileSize, prefix } = parsed.data;
 
   const maxSize = getMaxSizeForMime(contentType);
   if (fileSize > maxSize) {
@@ -48,7 +55,7 @@ export async function POST(request: NextRequest) {
 
   const ext = filename.split(".").pop()?.toLowerCase() ?? "bin";
   const storeId = getStoreId();
-  const objectName = `${storeId}/products/${randomUUID()}.${ext}`;
+  const objectName = `${storeId}/${prefix}/${randomUUID()}.${ext}`;
 
   const command = new PutObjectCommand({
     Bucket: s3Bucket,

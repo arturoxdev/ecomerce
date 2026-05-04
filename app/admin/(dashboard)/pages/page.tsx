@@ -57,13 +57,26 @@ export default async function AdminPagesIndexPage() {
                         EN / ES
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button
-                          variant={canWrite ? "default" : "outline"}
-                          size="sm"
-                          render={<Link href={`/admin/pages/${page.slug}`} />}
-                        >
-                          {canWrite ? "Editar página" : "Ver página"}
-                        </Button>
+                        <div className="flex items-center justify-end gap-2">
+                          {page.slug === "home" && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              render={
+                                <Link href="/" target="_blank" rel="noreferrer" />
+                              }
+                            >
+                              Ver en el sitio
+                            </Button>
+                          )}
+                          <Button
+                            variant={canWrite ? "default" : "outline"}
+                            size="sm"
+                            render={<Link href={`/admin/pages/${page.slug}`} />}
+                          >
+                            {canWrite ? "Editar página" : "Ver página"}
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

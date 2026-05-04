@@ -57,6 +57,13 @@
       "when": 1777419899372,
       "tag": "0007_handy_scrambler",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1777935175690,
+      "tag": "0008_loud_firedrake",
+      "breakpoints": true
     }
   ]
 }
