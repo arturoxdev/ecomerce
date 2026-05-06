@@ -1,5 +1,5 @@
 const ADMIN_LOCALE = "es";
-const ADMIN_CURRENCY = "MXN";
+const ADMIN_CURRENCY = "USD";
 
 const dateFormatter = new Intl.DateTimeFormat(ADMIN_LOCALE, {
   year: "numeric",
@@ -18,6 +18,7 @@ const dateTimeFormatter = new Intl.DateTimeFormat(ADMIN_LOCALE, {
 const currencyFormatter = new Intl.NumberFormat(ADMIN_LOCALE, {
   style: "currency",
   currency: ADMIN_CURRENCY,
+  currencyDisplay: "code",
 });
 
 export function formatAdminDate(date: Date | string | number): string {
