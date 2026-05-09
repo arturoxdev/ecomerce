@@ -120,7 +120,7 @@ export default async function Home({ params }: HomeProps) {
               </h2>
               <p className="mt-2 text-slate-600">{m.equipment.description}</p>
             </div>
-            <div className="no-scrollbar flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
+            <div className="flex flex-wrap items-center gap-2">
               <Link
                 href={`/${typedLocale}/catalog`}
                 className="whitespace-nowrap rounded-full bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm"
@@ -130,7 +130,7 @@ export default async function Home({ params }: HomeProps) {
               {dbCategories.map((cat) => (
                 <Link
                   key={cat.id}
-                  href={`/${typedLocale}/catalog/${cat.slug}`}
+                  href={`/${typedLocale}/${cat.slug}`}
                   className="whitespace-nowrap rounded-full bg-[#f1f5f9] px-5 py-2 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-200"
                 >
                   {cat.name}
