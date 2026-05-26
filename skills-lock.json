@@ -11,10 +11,22 @@
       "sourceType": "github",
       "computedHash": "6ba2c955bee6ab3e9c7781b2553e3574b4c9ec35e539437d0831bfe368de8550"
     },
+    "apply-prd": {
+      "source": "arturoxdev/skills",
+      "sourceType": "github",
+      "skillPath": "skills/apply-prd/SKILL.md",
+      "computedHash": "f2ce9afb11352a77b02049d0e4dcfe4a6e25e20dcd24fe741e83e82eaeafcc66"
+    },
     "dogfood": {
       "source": "vercel-labs/agent-browser",
       "sourceType": "github",
       "computedHash": "c1b1133e43d087a9f97de44c2b8abdd4b6c59364d3ac9c0456b01916d58a55b2"
+    },
+    "drizzle-migration": {
+      "source": "arturoxdev/skills",
+      "sourceType": "github",
+      "skillPath": "skills/drizzle-migration/SKILL.md",
+      "computedHash": "d6122d68230d5fb99b089f9b2f44477b59f324db2c3339dc3b1ab5f63c31e3e4"
     },
     "frontend-design": {
       "source": "anthropics/skills",

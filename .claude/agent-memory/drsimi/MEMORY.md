@@ -1,0 +1,2 @@
+- [Google Maps / Places autocomplete](project_google-maps-places.md) — el autocomplete usa Places API legacy; punto frágil de configuración en Google Cloud
+- [Componente PlaceAutocomplete compartido](reference_place-autocomplete.md) — un solo componente alimenta carrito y admin origen
