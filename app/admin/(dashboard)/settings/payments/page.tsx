@@ -1,37 +1,29 @@
 import { SiteHeader } from "@/components/admin/site-header";
 import {
-  SettingsForm,
+  PaymentsForm,
   getSettings,
-  updateSettingsAction,
+  updatePaymentSettingsAction,
 } from "@/features/admin-settings";
-import { countZipcodes } from "@/features/zipcodes/services/zipcodes.service";
 
 export default async function AdminPaymentsSettingsPage() {
-  const [current, zipcodeCount] = await Promise.all([
-    getSettings(),
-    countZipcodes(),
-  ]);
-  const hasZipcodes = zipcodeCount > 0;
+  const current = await getSettings();
 
   return (
     <>
-      <SiteHeader title="Pagos y entrega" />
+      <SiteHeader title="Pagos" />
       <div className="flex flex-1 flex-col gap-6 px-4 py-8">
         <div>
-          <h1 className="text-xl font-semibold">Pagos y entrega</h1>
+          <h1 className="text-xl font-semibold">Pagos</h1>
           <p className="text-sm text-muted-foreground">
-            Configuración de modo de pago, entrega y anticipo.
+            Configuración de modo de pago y anticipo.
           </p>
         </div>
-        <SettingsForm
-          action={updateSettingsAction}
+        <PaymentsForm
+          action={updatePaymentSettingsAction}
           defaultValues={{
             paymentMode: current?.paymentMode ?? "SPLIT_50_50",
-            deliveryMode: current?.deliveryMode ?? "INCLUDED",
-            deliveryFee: current?.deliveryFee ?? null,
             depositPercent: current?.depositPercent ?? "0.10",
           }}
-          hasZipcodes={hasZipcodes}
         />
       </div>
     </>

@@ -45,6 +45,7 @@ export const DELIVERY_MODE_LABEL: Record<DeliveryMode, string> = {
   INCLUDED: "Incluida",
   FIXED_FEE: "Tarifa fija",
   ZIP_CODE: "Por código postal",
+  DISTANCE_MILES: "Por distancia (millas)",
 };
 
 export const PRICE_TYPE_LABEL: Record<PriceType, string> = {

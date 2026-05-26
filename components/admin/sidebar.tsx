@@ -54,7 +54,7 @@ const mainNavItems: NavItem[] = [
   { href: "/admin/calendar", label: "Calendario", icon: Calendar },
   { href: "/admin/pages", label: "Páginas", icon: FileText },
   {
-    href: "/admin/zipcodes",
+    href: "/admin/settings/delivery/zipcodes",
     label: "Códigos postales",
     icon: MapPin,
     roles: ["ROOT", "ADMIN"],

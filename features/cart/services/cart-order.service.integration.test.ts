@@ -203,4 +203,107 @@ describe("cart-order service — integration", () => {
     if (result.success) return;
     expect(result.unavailableItems).toEqual(["Bouncy Castle"]);
   });
+
+  it("DISTANCE_MILES -> persists re-derived fee, miles and destination coords", async () => {
+    // Arrange
+    await seedSettings();
+    const { productId } = await seedCategoryAndProduct();
+    const service = createCartOrderService({
+      db: testDb,
+      storeId: STORE_ID,
+      findProductByIdWithVariants: buildFindProductByIdWithVariants(),
+      loadStoreSettings: async () => ({
+        deliveryMode: "DISTANCE_MILES",
+        deliveryFee: 0,
+        depositPercent: 0.1,
+        paymentMode: "SPLIT_50_50" as const,
+        currency: "USD",
+      }),
+      quoteDelivery: async () => ({ ok: true, miles: 7.2, fee: 35 }),
+    });
+
+    // Act — the client could send any fee; the server ignores it and uses
+    // the injected quote.
+    const result = await service.placeOrder({
+      customerName: "Jane",
+      customerEmail: "jane@example.com",
+      customerPhone: "555-1111",
+      deliveryAddress: "",
+      destLat: 32.85,
+      destLng: -96.85,
+      formattedAddress: "123 Main St, Dallas, TX",
+      items: [
+        {
+          productId,
+          variantId: null,
+          quantity: 1,
+          unitPrice: 50,
+          date: "2099-06-01",
+        },
+      ],
+    });
+
+    // Assert
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    const order = await testDb.query.orders.findFirst({
+      where: eq(schema.orders.id, result.orderId),
+    });
+    expect(order?.deliveryFee).toBe("35.00");
+    expect(order?.deliveryMiles).toBe("7.20");
+    expect(order?.deliveryDestinationLat).toBe("32.8500000");
+    expect(order?.deliveryDestinationLng).toBe("-96.8500000");
+    expect(order?.deliveryAddress).toBe("123 Main St, Dallas, TX");
+  });
+
+  it("DISTANCE_MILES out of cap -> rejects and inserts nothing", async () => {
+    // Arrange
+    await seedSettings();
+    const { productId } = await seedCategoryAndProduct();
+    const service = createCartOrderService({
+      db: testDb,
+      storeId: STORE_ID,
+      findProductByIdWithVariants: buildFindProductByIdWithVariants(),
+      loadStoreSettings: async () => ({
+        deliveryMode: "DISTANCE_MILES",
+        deliveryFee: 0,
+        depositPercent: 0.1,
+        paymentMode: "SPLIT_50_50" as const,
+        currency: "USD",
+      }),
+      quoteDelivery: async () => ({
+        ok: false as const,
+        error: "OUT_OF_CAP" as const,
+        miles: 20,
+        capMiles: 15,
+      }),
+    });
+
+    // Act
+    const result = await service.placeOrder({
+      customerName: "Jane",
+      customerEmail: "jane@example.com",
+      customerPhone: "555-1111",
+      deliveryAddress: "",
+      destLat: 40,
+      destLng: -90,
+      formattedAddress: "Far away",
+      items: [
+        {
+          productId,
+          variantId: null,
+          quantity: 1,
+          unitPrice: 50,
+          date: "2099-06-01",
+        },
+      ],
+    });
+
+    // Assert
+    expect(result.success).toBe(false);
+    const orders = await testDb.query.orders.findMany({
+      where: eq(schema.orders.storeId, STORE_ID),
+    });
+    expect(orders).toHaveLength(0);
+  });
 });

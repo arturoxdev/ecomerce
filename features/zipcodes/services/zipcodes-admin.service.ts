@@ -91,7 +91,7 @@ export async function createZipcode(
     return internalProblem("No se pudo crear el zipcode");
   }
 
-  revalidatePath("/admin/zipcodes");
+  revalidatePath("/admin/settings/delivery/zipcodes");
   return { success: true };
 }
 
@@ -157,7 +157,7 @@ export async function updateZipcode(
     return internalProblem("No se pudo actualizar el zipcode");
   }
 
-  revalidatePath("/admin/zipcodes");
+  revalidatePath("/admin/settings/delivery/zipcodes");
   return { success: true };
 }
 
@@ -198,7 +198,7 @@ export async function deleteZipcode(id: string): Promise<ZipcodeFormState> {
     return internalProblem("No se pudo eliminar el zipcode");
   }
 
-  revalidatePath("/admin/zipcodes");
+  revalidatePath("/admin/settings/delivery/zipcodes");
   return { success: true };
 }
 
@@ -329,7 +329,7 @@ export async function bulkImportZipcodes(
       after: summary,
     });
 
-    revalidatePath("/admin/zipcodes");
+    revalidatePath("/admin/settings/delivery/zipcodes");
     return { success: true, summary };
   } catch {
     return {

@@ -111,6 +111,8 @@ const TRUNCATE_TABLES = [
   "products",
   "categories",
   "zip_delivery_zones",
+  "delivery_distance_tiers",
+  "delivery_distance_cache",
   "about_page_contents",
   "legal_page_documents",
   "contact_page_contents",

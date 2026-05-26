@@ -1,11 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ShoppingBag } from "lucide-react";
+import { Loader2, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 
 import { ZipcodeCombobox } from "@/features/zipcodes/components/public/zipcode-combobox";
+import {
+  PlaceAutocomplete,
+  type SelectedPlace,
+} from "@/components/maps/place-autocomplete";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -64,6 +68,14 @@ type Labels = {
   zipcodeLoading?: string;
   zipcodeRequired?: string;
   zipcodeStale?: string;
+  distanceAddressLabel?: string;
+  distanceAddressPlaceholder?: string;
+  distanceQuoting?: string;
+  distanceMilesSuffix?: string;
+  distanceOutOfCap?: string;
+  distanceUnavailable?: string;
+  distanceContactCta?: string;
+  distanceRequired?: string;
 };
 
 type Props = {
@@ -92,6 +104,19 @@ export function CartPageClient({ locale, labels }: Props) {
   const [resolvedZipFee, setResolvedZipFee] = useState<number | null>(null);
   const [zipcodeStale, setZipcodeStale] = useState(false);
   const [isPending, setIsPending] = useState(false);
+
+  // DISTANCE_MILES state
+  const [addressText, setAddressText] = useState("");
+  const [selectedPlace, setSelectedPlace] = useState<SelectedPlace | null>(null);
+  const [distanceQuote, setDistanceQuote] = useState<{
+    miles: number;
+    fee: number;
+  } | null>(null);
+  const [isQuoting, setIsQuoting] = useState(false);
+  const [distanceError, setDistanceError] = useState<{
+    type: "OUT_OF_CAP" | "UNAVAILABLE";
+    message: string;
+  } | null>(null);
 
   // Customer form state
   const [customerName, setCustomerName] = useState("");
@@ -147,6 +172,71 @@ export function CartPageClient({ locale, labels }: Props) {
     return () => controller.abort();
   }, [settings, selectedZone, setSelectedZone]);
 
+  // DISTANCE_MILES: quote whenever the picked place is current (text matches the
+  // selected address — a divergence means the user is editing, so it's stale).
+  useEffect(() => {
+    if (settings?.deliveryMode !== "DISTANCE_MILES" || !selectedPlace) {
+      setDistanceQuote(null);
+      setDistanceError(null);
+      setIsQuoting(false);
+      return;
+    }
+    if (addressText.trim() !== selectedPlace.formattedAddress.trim()) {
+      setDistanceQuote(null);
+      setDistanceError(null);
+      return;
+    }
+
+    let cancelled = false;
+    const controller = new AbortController();
+    setIsQuoting(true);
+    setDistanceError(null);
+    fetch(
+      `/api/delivery/quote?destLat=${selectedPlace.lat}&destLng=${selectedPlace.lng}`,
+      { signal: controller.signal },
+    )
+      .then((res) => res.json())
+      .then(
+        (data: {
+          ok?: boolean;
+          error?: string;
+          miles?: number;
+          fee?: number;
+          capMiles?: number;
+        }) => {
+          if (cancelled) return;
+          if (data.ok && typeof data.fee === "number") {
+            setDistanceQuote({ miles: data.miles ?? 0, fee: data.fee });
+            setDistanceError(null);
+          } else if (data.error === "OUT_OF_CAP") {
+            setDistanceQuote(null);
+            setDistanceError({
+              type: "OUT_OF_CAP",
+              message: `${(data.miles ?? 0).toFixed(1)} mi · máximo ${
+                data.capMiles ?? 0
+              } mi`,
+            });
+          } else {
+            setDistanceQuote(null);
+            setDistanceError({ type: "UNAVAILABLE", message: "" });
+          }
+        },
+      )
+      .catch(() => {
+        if (cancelled) return;
+        setDistanceQuote(null);
+        setDistanceError({ type: "UNAVAILABLE", message: "" });
+      })
+      .finally(() => {
+        if (!cancelled) setIsQuoting(false);
+      });
+
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
+  }, [settings, selectedPlace, addressText]);
+
   if (!hydrated) {
     return null;
   }
@@ -179,10 +269,14 @@ export function CartPageClient({ locale, labels }: Props) {
     subtotal,
     settings: resolvedSettings,
     resolvedZipFee,
+    resolvedDistanceFee: distanceQuote?.fee ?? null,
   });
 
   const isZipMode = resolvedSettings.deliveryMode === "ZIP_CODE";
   const zipNotSelected = isZipMode && !selectedZone;
+  const isDistanceMode = resolvedSettings.deliveryMode === "DISTANCE_MILES";
+  const distanceNotReady =
+    isDistanceMode && (!selectedPlace || !distanceQuote || isQuoting);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -194,6 +288,10 @@ export function CartPageClient({ locale, labels }: Props) {
     if (isZipMode && !selectedZone) {
       errors.zipcode =
         labels.zipcodeRequired ?? "Selecciona un zipcode antes de continuar";
+    }
+    if (isDistanceMode && (!selectedPlace || !distanceQuote)) {
+      errors.distance =
+        labels.distanceRequired ?? "Selecciona tu dirección de entrega";
     }
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
@@ -208,6 +306,10 @@ export function CartPageClient({ locale, labels }: Props) {
       deliveryAddress: deliveryAddress.trim(),
       selectedCity: isZipMode && selectedZone ? selectedZone.city : null,
       selectedZipCode: isZipMode && selectedZone ? selectedZone.zipCode : null,
+      destLat: isDistanceMode && selectedPlace ? selectedPlace.lat : null,
+      destLng: isDistanceMode && selectedPlace ? selectedPlace.lng : null,
+      formattedAddress:
+        isDistanceMode && selectedPlace ? selectedPlace.formattedAddress : null,
       locale: locale === "es" ? "es" : "en",
       items: items.map((item) => ({
         productId: item.productId,
@@ -334,15 +436,17 @@ export function CartPageClient({ locale, labels }: Props) {
                       </p>
                     )}
                   </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="address">{labels.address}</Label>
-                    <Input
-                      id="address"
-                      value={deliveryAddress}
-                      onChange={(e) => setDeliveryAddress(e.target.value)}
-                      placeholder={labels.addressPlaceholder}
-                    />
-                  </div>
+                  {!isDistanceMode && (
+                    <div className="space-y-1.5">
+                      <Label htmlFor="address">{labels.address}</Label>
+                      <Input
+                        id="address"
+                        value={deliveryAddress}
+                        onChange={(e) => setDeliveryAddress(e.target.value)}
+                        placeholder={labels.addressPlaceholder}
+                      />
+                    </div>
+                  )}
                   {isZipMode && (
                     <div className="space-y-1.5 sm:col-span-2">
                       <Label>
@@ -381,6 +485,68 @@ export function CartPageClient({ locale, labels }: Props) {
                       )}
                     </div>
                   )}
+                  {isDistanceMode && (
+                    <div className="space-y-1.5 sm:col-span-2">
+                      <Label htmlFor="delivery-place">
+                        {labels.distanceAddressLabel ?? "Dirección de entrega"}
+                      </Label>
+                      <PlaceAutocomplete
+                        id="delivery-place"
+                        value={addressText}
+                        onValueChange={setAddressText}
+                        onPlaceSelected={(place) => {
+                          setSelectedPlace(place);
+                          setAddressText(place.formattedAddress);
+                          setDistanceError(null);
+                        }}
+                        placeholder={
+                          labels.distanceAddressPlaceholder ??
+                          "Escribe tu dirección…"
+                        }
+                      />
+                      {isQuoting && (
+                        <p
+                          className="flex items-center gap-1.5 text-xs text-muted-foreground"
+                          data-testid="cart-distance-quoting"
+                        >
+                          <Loader2 className="size-3 animate-spin" />
+                          {labels.distanceQuoting ?? "Calculando envío…"}
+                        </p>
+                      )}
+                      {!isQuoting && distanceError?.type === "OUT_OF_CAP" && (
+                        <p
+                          className="text-xs text-red-500"
+                          data-testid="cart-distance-out-of-cap"
+                        >
+                          {labels.distanceOutOfCap ??
+                            "Tu dirección está fuera de la zona de entrega"}
+                          {distanceError.message
+                            ? ` (${distanceError.message})`
+                            : ""}
+                        </p>
+                      )}
+                      {!isQuoting && distanceError?.type === "UNAVAILABLE" && (
+                        <p
+                          className="text-xs text-red-500"
+                          data-testid="cart-distance-unavailable"
+                        >
+                          {labels.distanceUnavailable ??
+                            "Por ahora no podemos completar la reserva, comunícate con nosotros"}{" "}
+                          <Link
+                            href={`/${locale}/contact`}
+                            className="font-medium underline underline-offset-2"
+                          >
+                            {labels.distanceContactCta ?? "Contáctanos"}
+                          </Link>
+                        </p>
+                      )}
+                      {formErrors.distance && (
+                        <p className="text-xs text-red-500">
+                          {formErrors.distance}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -407,6 +573,15 @@ export function CartPageClient({ locale, labels }: Props) {
                   {isZipMode && selectedZone && (
                     <span className="ml-1 text-xs text-muted-foreground">
                       ({selectedZone.city} {selectedZone.zipCode})
+                    </span>
+                  )}
+                  {isDistanceMode && distanceQuote && (
+                    <span
+                      className="ml-1 text-xs text-muted-foreground"
+                      data-testid="cart-summary-distance-miles"
+                    >
+                      ({distanceQuote.miles.toFixed(1)}{" "}
+                      {labels.distanceMilesSuffix ?? "mi"})
                     </span>
                   )}
                 </span>
@@ -472,7 +647,9 @@ export function CartPageClient({ locale, labels }: Props) {
               type="submit"
               size="lg"
               className="mt-6 w-full"
-              disabled={isPending || hasPastItems || zipNotSelected}
+              disabled={
+                isPending || hasPastItems || zipNotSelected || distanceNotReady
+              }
             >
               {isPending ? labels.processing : labels.confirmOrder}
             </Button>
@@ -480,6 +657,12 @@ export function CartPageClient({ locale, labels }: Props) {
               <p className="mt-2 text-xs text-muted-foreground">
                 {labels.zipcodeRequired ??
                   "Selecciona un zipcode antes de continuar"}
+              </p>
+            )}
+            {isDistanceMode && !selectedPlace && (
+              <p className="mt-2 text-xs text-muted-foreground">
+                {labels.distanceRequired ??
+                  "Selecciona tu dirección de entrega"}
               </p>
             )}
           </div>
