@@ -53,6 +53,7 @@ export const deliveryModeEnum = pgEnum("delivery_mode", [
   "INCLUDED",
   "FIXED_FEE",
   "ZIP_CODE",
+  "DISTANCE_MILES",
 ]);
 export type DeliveryMode = (typeof deliveryModeEnum.enumValues)[number];
 
@@ -148,6 +149,17 @@ export const orders = pgTable("orders", {
   deliveryFee: numeric("delivery_fee", { precision: 10, scale: 2 })
     .notNull()
     .default("0"),
+  // DISTANCE_MILES mode: persisted so the full quote is reconstructible after
+  // the fact (audit) and the delivery driver gets exact coordinates.
+  deliveryMiles: numeric("delivery_miles", { precision: 6, scale: 2 }),
+  deliveryDestinationLat: numeric("delivery_destination_lat", {
+    precision: 10,
+    scale: 7,
+  }),
+  deliveryDestinationLng: numeric("delivery_destination_lng", {
+    precision: 10,
+    scale: 7,
+  }),
   total: numeric("total", { precision: 10, scale: 2 }).notNull(),
   amountPaid: numeric("amount_paid", { precision: 10, scale: 2 }).notNull(),
   squarePaymentId: text("square_payment_id"),
@@ -210,6 +222,11 @@ export const settings = pgTable("settings", {
   storeId: text("store_id").primaryKey(),
   deliveryMode: deliveryModeEnum("delivery_mode").notNull().default("INCLUDED"),
   deliveryFee: numeric("delivery_fee", { precision: 10, scale: 2 }),
+  // DISTANCE_MILES mode: single operations origin per tenant. Captured via
+  // Places Autocomplete, so lat/lng come from the widget (no Geocoding call).
+  originAddress: text("origin_address"),
+  originLat: numeric("origin_lat", { precision: 10, scale: 7 }),
+  originLng: numeric("origin_lng", { precision: 10, scale: 7 }),
   depositPercent: numeric("deposit_percent", { precision: 5, scale: 4 })
     .notNull()
     .default("0.1"),
@@ -273,6 +290,67 @@ export const zipDeliveryZones = pgTable(
   (t) => [
     unique("idx_zip_store_city_code").on(t.storeId, t.city, t.zipCode),
     index("idx_zip_store_zip").on(t.storeId, t.zipCode),
+  ],
+);
+
+// DISTANCE_MILES delivery mode ──────────────────────────────────
+// Tiered pricing by road distance. Intervals are half-open
+// [minMiles, maxMiles). The cap is the maxMiles of the last tier — there is
+// no separate cap column. UNIQUE(store_id, min_miles) keeps tiers distinct.
+export const deliveryDistanceTiers = pgTable(
+  "delivery_distance_tiers",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    storeId: text("store_id").notNull(),
+    minMiles: numeric("min_miles", { precision: 6, scale: 2 }).notNull(),
+    maxMiles: numeric("max_miles", { precision: 6, scale: 2 }).notNull(),
+    fee: numeric("fee", { precision: 10, scale: 2 }).notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [unique("idx_distance_tiers_store_min").on(t.storeId, t.minMiles)],
+);
+
+// Server-side cache of road miles only, keyed by lat/lng rounded to 4 decimals
+// (~11 m). TTL 30 days enforced at the read site. The fee is re-evaluated
+// against the current tier table on every read, so admin tier edits take
+// effect immediately without invalidation.
+export const deliveryDistanceCache = pgTable(
+  "delivery_distance_cache",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    storeId: text("store_id").notNull(),
+    originLatRounded: numeric("origin_lat_rounded", {
+      precision: 7,
+      scale: 4,
+    }).notNull(),
+    originLngRounded: numeric("origin_lng_rounded", {
+      precision: 7,
+      scale: 4,
+    }).notNull(),
+    destLatRounded: numeric("dest_lat_rounded", {
+      precision: 7,
+      scale: 4,
+    }).notNull(),
+    destLngRounded: numeric("dest_lng_rounded", {
+      precision: 7,
+      scale: 4,
+    }).notNull(),
+    miles: numeric("miles", { precision: 6, scale: 2 }).notNull(),
+    computedAt: timestamp("computed_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    unique("idx_distance_cache_pair").on(
+      t.storeId,
+      t.originLatRounded,
+      t.originLngRounded,
+      t.destLatRounded,
+      t.destLngRounded,
+    ),
   ],
 );
 

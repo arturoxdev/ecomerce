@@ -9,6 +9,7 @@ import {
   type PlaceOrderResult as BaseResult,
 } from "@/features/cart/services/cart-order.service";
 import { createCheckoutSession } from "@/features/checkout";
+import { quoteDelivery } from "@/features/delivery-pricing/services/quote.service";
 import { findByIdWithVariants } from "@/features/products/services/products.service";
 import { logger } from "@/lib/logger";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
@@ -33,6 +34,7 @@ export async function placeOrder(
   const result: BaseResult = await placeOrderBase(input, {
     findProductByIdWithVariants: findByIdWithVariants,
     checkRateLimit,
+    quoteDelivery,
   });
 
   if (!result.success) {

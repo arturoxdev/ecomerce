@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useActionState, useState } from "react";
 
 import { Field } from "@/components/admin/field";
@@ -18,33 +17,40 @@ import {
   type FormState,
 } from "@/lib/types/form-state";
 
-type DeliveryMode = "INCLUDED" | "FIXED_FEE" | "ZIP_CODE";
+type DeliveryMode = "INCLUDED" | "FIXED_FEE" | "ZIP_CODE" | "DISTANCE_MILES";
 
 const DELIVERY_LABELS: Record<DeliveryMode, string> = {
   INCLUDED: "Gratis (incluida)",
   FIXED_FEE: "Tarifa fija",
   ZIP_CODE: "Por código postal",
+  DISTANCE_MILES: "Por distancia (millas)",
 };
 
 type Props = {
   action: (prev: FormState, formData: FormData) => Promise<FormState>;
   defaultValues: {
-    paymentMode: "SPLIT_50_50" | "FULL_ONLINE";
     deliveryMode: DeliveryMode;
     deliveryFee?: string | null;
-    depositPercent: string;
   };
   hasZipcodes: boolean;
+  hasOrigin: boolean;
+  hasTiers: boolean;
 };
 
-export function SettingsForm({ action, defaultValues, hasZipcodes }: Props) {
+export function DeliveryModeForm({
+  action,
+  defaultValues,
+  hasZipcodes,
+  hasOrigin,
+  hasTiers,
+}: Props) {
   const [state, formAction, pending] = useActionState(action, {} as FormState);
   const fieldErrors = getFieldErrors(state);
-  const [paymentMode, setPaymentMode] = useState(defaultValues.paymentMode);
   const [deliveryMode, setDeliveryMode] = useState<DeliveryMode>(
     defaultValues.deliveryMode,
   );
   const success = !isFormError(state) && "success" in state;
+  const distanceReady = hasOrigin && hasTiers;
 
   return (
     <form action={formAction} className="flex max-w-xl flex-col gap-5">
@@ -55,31 +61,9 @@ export function SettingsForm({ action, defaultValues, hasZipcodes }: Props) {
       )}
       {success && (
         <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">
-          Ajustes guardados.
+          Modo de entrega guardado.
         </p>
       )}
-
-      <Field label="Modo de pago" error={fieldErrors?.paymentMode?.[0]}>
-        <input type="hidden" name="paymentMode" value={paymentMode} />
-        <Select
-          value={paymentMode}
-          onValueChange={(v) =>
-            setPaymentMode((v ?? "SPLIT_50_50") as "SPLIT_50_50" | "FULL_ONLINE")
-          }
-        >
-          <SelectTrigger className="w-full">
-            {paymentMode === "FULL_ONLINE"
-              ? "Pago completo en línea (100%)"
-              : "50/50 (50% en línea, 50% al entregar)"}
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="SPLIT_50_50">
-              50/50 (50% en línea, 50% al entregar)
-            </SelectItem>
-            <SelectItem value="FULL_ONLINE">Pago completo en línea (100%)</SelectItem>
-          </SelectContent>
-        </Select>
-      </Field>
 
       <Field label="Modo de entrega" error={fieldErrors?.deliveryMode?.[0]}>
         <input type="hidden" name="deliveryMode" value={deliveryMode} />
@@ -88,6 +72,7 @@ export function SettingsForm({ action, defaultValues, hasZipcodes }: Props) {
           onValueChange={(v) => {
             const next = (v ?? "INCLUDED") as DeliveryMode;
             if (next === "ZIP_CODE" && !hasZipcodes) return;
+            if (next === "DISTANCE_MILES" && !distanceReady) return;
             setDeliveryMode(next);
           }}
         >
@@ -101,32 +86,12 @@ export function SettingsForm({ action, defaultValues, hasZipcodes }: Props) {
               {DELIVERY_LABELS.ZIP_CODE}
               {!hasZipcodes && " — configura zipcodes primero"}
             </SelectItem>
+            <SelectItem value="DISTANCE_MILES" disabled={!distanceReady}>
+              {DELIVERY_LABELS.DISTANCE_MILES}
+              {!distanceReady && " — configura origen y tramos primero"}
+            </SelectItem>
           </SelectContent>
         </Select>
-        {deliveryMode === "ZIP_CODE" && (
-          <p className="text-xs text-muted-foreground">
-            Administra tu catálogo de zipcodes en{" "}
-            <Link
-              href="/admin/zipcodes"
-              className="font-medium underline underline-offset-2 hover:text-foreground"
-            >
-              /admin/zipcodes
-            </Link>
-            .
-          </p>
-        )}
-        {!hasZipcodes && deliveryMode !== "ZIP_CODE" && (
-          <p className="text-xs text-muted-foreground">
-            Para activar “Por código postal”, primero{" "}
-            <Link
-              href="/admin/zipcodes"
-              className="font-medium underline underline-offset-2 hover:text-foreground"
-            >
-              registra zipcodes
-            </Link>
-            .
-          </p>
-        )}
       </Field>
 
       {deliveryMode === "FIXED_FEE" && (
@@ -142,24 +107,9 @@ export function SettingsForm({ action, defaultValues, hasZipcodes }: Props) {
         </Field>
       )}
 
-      <Field
-        label="Porcentaje de anticipo (0 - 1)"
-        error={fieldErrors?.depositPercent?.[0]}
-      >
-        <Input
-          type="number"
-          name="depositPercent"
-          step="0.01"
-          min="0.01"
-          max="1"
-          defaultValue={defaultValues.depositPercent}
-          required
-        />
-      </Field>
-
       <div className="flex gap-3 pt-2">
         <Button type="submit" disabled={pending}>
-          {pending ? "Guardando…" : "Guardar ajustes"}
+          {pending ? "Guardando…" : "Guardar modo de entrega"}
         </Button>
       </div>
     </form>

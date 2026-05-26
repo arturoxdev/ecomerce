@@ -1,11 +1,21 @@
 "use server";
 
-import { updateSettings as dalUpdate } from "./data";
+import {
+  updateDeliverySettings as dalUpdateDelivery,
+  updatePaymentSettings as dalUpdatePayment,
+} from "./data";
 import type { SettingsFormState } from "./data";
 
-export async function updateSettingsAction(
+export async function updatePaymentSettingsAction(
   prev: SettingsFormState,
   formData: FormData,
 ): Promise<SettingsFormState> {
-  return dalUpdate(prev, formData);
+  return dalUpdatePayment(prev, formData);
+}
+
+export async function updateDeliverySettingsAction(
+  prev: SettingsFormState,
+  formData: FormData,
+): Promise<SettingsFormState> {
+  return dalUpdateDelivery(prev, formData);
 }

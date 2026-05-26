@@ -22,6 +22,22 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    // Zipcodes admin moved under the consolidated delivery settings section.
+    // 301 keeps old bookmarks and external references working.
+    return [
+      {
+        source: "/admin/zipcodes",
+        destination: "/admin/settings/delivery/zipcodes",
+        permanent: true,
+      },
+      {
+        source: "/admin/zipcodes/:path*",
+        destination: "/admin/settings/delivery/zipcodes/:path*",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

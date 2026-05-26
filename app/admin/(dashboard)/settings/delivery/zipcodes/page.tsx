@@ -8,7 +8,7 @@ import { canWriteData, getSessionUser } from "@/lib/services/auth";
 
 const PAGE_SIZE = 25;
 
-export default async function AdminZipcodesPage({
+export default async function AdminDeliveryZipcodesPage({
   searchParams,
 }: {
   searchParams: Promise<{ q?: string; page?: string }>;

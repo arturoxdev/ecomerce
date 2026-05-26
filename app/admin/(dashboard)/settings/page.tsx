@@ -1,4 +1,4 @@
-import { CreditCard, Palette } from "lucide-react";
+import { CreditCard, Palette, Truck } from "lucide-react";
 import Link from "next/link";
 
 import { SiteHeader } from "@/components/admin/site-header";
@@ -13,9 +13,16 @@ const sections = [
   },
   {
     href: "/admin/settings/payments",
-    label: "Pagos y entrega",
-    description: "Configuración de modo de pago, entrega y anticipo.",
+    label: "Pagos",
+    description: "Configuración de modo de pago y anticipo.",
     icon: CreditCard,
+  },
+  {
+    href: "/admin/settings/delivery",
+    label: "Entrega",
+    description:
+      "Modo de entrega, códigos postales, origen y tramos por distancia.",
+    icon: Truck,
   },
 ];
 

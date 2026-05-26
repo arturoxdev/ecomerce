@@ -139,6 +139,18 @@ export default async function AdminOrderDetailPage({ params }: Props) {
                     {order.deliveryAddress}
                   </p>
                 )}
+                {order.deliveryMiles && (
+                  <p className="text-xs text-muted-foreground">
+                    {parseFloat(order.deliveryMiles).toFixed(1)} mi por carretera
+                  </p>
+                )}
+                {order.deliveryDestinationLat &&
+                  order.deliveryDestinationLng && (
+                    <p className="text-xs text-muted-foreground">
+                      Lat/Lng: {order.deliveryDestinationLat},{" "}
+                      {order.deliveryDestinationLng}
+                    </p>
+                  )}
               </CardContent>
             </Card>
 

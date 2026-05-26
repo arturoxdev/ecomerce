@@ -90,5 +90,48 @@ describe("cart pricing service", () => {
       expect(result.deliveryFee).toBe(75);
       expect(result.total).toBe(175);
     });
+
+    it("DISTANCE_MILES without resolvedDistanceFee -> delivery 0 (not quoted yet)", () => {
+      // Arrange
+      const input = {
+        subtotal: 100,
+        settings: {
+          deliveryMode: "DISTANCE_MILES",
+          deliveryFee: 0,
+          depositPercent: 0.1,
+          paymentMode: "SPLIT_50_50" as const,
+          currency: "USD",
+        },
+      };
+
+      // Act
+      const result = calculateCartSummary(input);
+
+      // Assert
+      expect(result.deliveryFee).toBe(0);
+      expect(result.total).toBe(100);
+    });
+
+    it("DISTANCE_MILES with resolvedDistanceFee 35 -> total includes the resolved fee", () => {
+      // Arrange
+      const input = {
+        subtotal: 100,
+        settings: {
+          deliveryMode: "DISTANCE_MILES",
+          deliveryFee: 0,
+          depositPercent: 0.1,
+          paymentMode: "SPLIT_50_50" as const,
+          currency: "USD",
+        },
+        resolvedDistanceFee: 35,
+      };
+
+      // Act
+      const result = calculateCartSummary(input);
+
+      // Assert
+      expect(result.deliveryFee).toBe(35);
+      expect(result.total).toBe(135);
+    });
   });
 });

@@ -43,12 +43,27 @@ export type RateLimitCheck = (
   windowSeconds: number,
 ) => Promise<{ allowed: boolean }>;
 
+// Structural shape of the delivery-pricing quote. Defined locally (not imported
+// from `@/features/delivery-pricing`) because features must not import each
+// other — the real `quoteDelivery` is injected from the app/action layer.
+export type DeliveryQuoteOutcome =
+  | { ok: true; miles: number; fee: number }
+  | { ok: false; error: "OUT_OF_CAP"; miles: number; capMiles: number }
+  | { ok: false; error: "UNAVAILABLE" };
+
+export type QuoteDeliveryFn = (input: {
+  storeId: string;
+  destLat: number;
+  destLng: number;
+}) => Promise<DeliveryQuoteOutcome>;
+
 export type CartOrderServiceDeps = {
   db: Database;
   storeId: string;
   findProductByIdWithVariants: FindProductByIdWithVariants;
   loadStoreSettings?: () => Promise<CartStoreSettings>;
   checkRateLimit?: RateLimitCheck;
+  quoteDelivery?: QuoteDeliveryFn;
 };
 
 const placeOrderItemSchema = z.object({
@@ -76,6 +91,11 @@ const placeOrderSchema = z.object({
     .regex(ZIPCODE_REGEX, "Invalid zipcode")
     .optional()
     .nullable(),
+  // DISTANCE_MILES: the form submits only the picked place. The server NEVER
+  // trusts a client-sent fee or miles — it re-derives both from these coords.
+  destLat: z.coerce.number().gte(-90).lte(90).optional().nullable(),
+  destLng: z.coerce.number().gte(-180).lte(180).optional().nullable(),
+  formattedAddress: z.string().max(500).optional().nullable(),
   locale: z.enum(["en", "es"]).optional().default("en"),
   items: z.array(placeOrderItemSchema).min(1, "Cart cannot be empty"),
 });
@@ -141,6 +161,11 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
     let resolvedZipFee: number | null = null;
     let resolvedZipCode: string | null = null;
     let resolvedCity: string | null = null;
+    let resolvedDistanceFee: number | null = null;
+    let resolvedDistanceMiles: number | null = null;
+    let resolvedDestLat: number | null = null;
+    let resolvedDestLng: number | null = null;
+    let resolvedDistanceAddress: string | null = null;
     if (storeSettings.deliveryMode === "ZIP_CODE") {
       if (!data.selectedCity || !data.selectedZipCode) {
         return {
@@ -161,6 +186,50 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
       resolvedZipFee = parseFloat(zipRow.fee);
       resolvedZipCode = zipRow.zipCode;
       resolvedCity = zipRow.city;
+    } else if (storeSettings.deliveryMode === "DISTANCE_MILES") {
+      if (!deps.quoteDelivery) {
+        return {
+          success: false,
+          error: "Por ahora no podemos completar la reserva, comunícate con nosotros",
+        };
+      }
+      if (
+        data.destLat === null ||
+        data.destLat === undefined ||
+        data.destLng === null ||
+        data.destLng === undefined
+      ) {
+        return {
+          success: false,
+          error: "Selecciona tu dirección de entrega antes de continuar",
+        };
+      }
+      // Re-derive miles + fee server-side from the destination coordinates and
+      // the CURRENT tier table; never trust the cart's number.
+      const quote = await deps.quoteDelivery({
+        storeId: deps.storeId,
+        destLat: data.destLat,
+        destLng: data.destLng,
+      });
+      if (!quote.ok) {
+        if (quote.error === "OUT_OF_CAP") {
+          return {
+            success: false,
+            error: `Tu dirección está fuera de la zona de entrega (${quote.miles.toFixed(
+              1,
+            )} mi · máximo ${quote.capMiles} mi)`,
+          };
+        }
+        return {
+          success: false,
+          error: "Por ahora no podemos completar la reserva, comunícate con nosotros",
+        };
+      }
+      resolvedDistanceFee = quote.fee;
+      resolvedDistanceMiles = quote.miles;
+      resolvedDestLat = data.destLat;
+      resolvedDestLng = data.destLng;
+      resolvedDistanceAddress = data.formattedAddress ?? null;
     }
 
     const minBookable = getMinBookableDate();
@@ -242,6 +311,7 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
           subtotal,
           settings: storeSettings,
           resolvedZipFee,
+          resolvedDistanceFee,
         });
 
         const [order] = await tx
@@ -251,9 +321,18 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
             customerName: data.customerName,
             customerEmail: data.customerEmail,
             customerPhone: data.customerPhone,
-            deliveryAddress: data.deliveryAddress || null,
+            deliveryAddress:
+              resolvedDistanceAddress ?? (data.deliveryAddress || null),
             city: resolvedCity,
             zipCode: resolvedZipCode,
+            deliveryMiles:
+              resolvedDistanceMiles !== null
+                ? resolvedDistanceMiles.toFixed(2)
+                : null,
+            deliveryDestinationLat:
+              resolvedDestLat !== null ? resolvedDestLat.toFixed(7) : null,
+            deliveryDestinationLng:
+              resolvedDestLng !== null ? resolvedDestLng.toFixed(7) : null,
             subtotal: subtotal.toFixed(2),
             depositAmount: summary.deposit.toFixed(2),
             deliveryFee: summary.deliveryFee.toFixed(2),
@@ -325,6 +404,7 @@ export async function placeOrder(
   dependencies: {
     findProductByIdWithVariants: FindProductByIdWithVariants;
     checkRateLimit?: RateLimitCheck;
+    quoteDelivery?: QuoteDeliveryFn;
   },
 ): Promise<PlaceOrderResult> {
   const service = createCartOrderService({
@@ -332,6 +412,7 @@ export async function placeOrder(
     storeId: getStoreId(),
     findProductByIdWithVariants: dependencies.findProductByIdWithVariants,
     checkRateLimit: dependencies.checkRateLimit,
+    quoteDelivery: dependencies.quoteDelivery,
   });
   return service.placeOrder(input);
 }

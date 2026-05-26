@@ -78,11 +78,48 @@ vi.mock("./cart-item", () => ({
   CartItem: ({ item }: { item: { productId: string } }) => <div>{item.productId}</div>,
 }));
 
+vi.mock("@/components/maps/place-autocomplete", () => ({
+  PlaceAutocomplete: ({
+    value,
+    onValueChange,
+    onPlaceSelected,
+  }: {
+    value: string;
+    onValueChange: (v: string) => void;
+    onPlaceSelected: (p: {
+      formattedAddress: string;
+      lat: number;
+      lng: number;
+    }) => void;
+  }) => (
+    <div>
+      <input
+        aria-label="Delivery address"
+        value={value}
+        onChange={(e) => onValueChange(e.target.value)}
+      />
+      <button
+        type="button"
+        onClick={() =>
+          onPlaceSelected({
+            formattedAddress: "123 Main St, Dallas, TX",
+            lat: 32.78,
+            lng: -96.8,
+          })
+        }
+      >
+        stub-select-place
+      </button>
+    </div>
+  ),
+}));
+
 import { CartPageClient } from "./cart-page-client";
 
 describe("CartPageClient", () => {
   afterEach(() => {
     cleanup();
+    vi.unstubAllGlobals();
   });
 
   const labels = {
@@ -191,6 +228,9 @@ describe("CartPageClient", () => {
           deliveryAddress: "Main Street 10",
           selectedCity: null,
           selectedZipCode: null,
+          destLat: null,
+          destLng: null,
+          formattedAddress: null,
           locale: "en",
           items: [
             {
@@ -249,6 +289,47 @@ describe("CartPageClient", () => {
         configurable: true,
         value: originalLocation,
       });
+    });
+  });
+
+  describe("📍 DISTANCE_MILES", () => {
+    it("selecting a place quotes the fee and renders the miles + fee in the summary", async () => {
+      // Arrange
+      const user = userEvent.setup();
+      mocks.getStoreSettings.mockResolvedValue({
+        deliveryMode: "DISTANCE_MILES",
+        deliveryFee: 0,
+        depositPercent: 0.1,
+        paymentMode: "SPLIT_50_50",
+        currency: "USD",
+      });
+      const fetchMock = vi.fn().mockResolvedValue({
+        json: async () => ({ ok: true, miles: 7.2, fee: 35 }),
+      });
+      vi.stubGlobal("fetch", fetchMock);
+      render(<CartPageClient locale="en" labels={labels} />);
+
+      // Act: the autocomplete stub appears once settings resolve
+      const selectButton = await screen.findByRole("button", {
+        name: "stub-select-place",
+      });
+      await user.click(selectButton);
+
+      // Assert: summary shows "Delivery (7.2 mi): $35.00"
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("cart-summary-distance-miles"),
+        ).toHaveTextContent("7.2 mi");
+      });
+      expect(screen.getByTestId("cart-summary-delivery")).toHaveTextContent(
+        "$35.00",
+      );
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining(
+          "/api/delivery/quote?destLat=32.78&destLng=-96.8",
+        ),
+        expect.anything(),
+      );
     });
   });
 });
