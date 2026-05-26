@@ -8,7 +8,7 @@ Guía para dejar lista la infraestructura de Google que necesita el modo de deli
 | Recurso | Para qué |
 |---------|----------|
 | **Maps JavaScript API** | Carga el widget de autocompletado en el navegador |
-| **Places API** | Sugerencias de direcciones (autocomplete) |
+| **Places API (New)** | Sugerencias de direcciones (autocomplete) |
 | **Distance Matrix API** | Millas reales por carretera (origen → destino), **solo server** |
 | **Llave pública** (`NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`) | Navegador, restringida por dominio |
 | **Llave servidor** (`GOOGLE_MAPS_SERVER_API_KEY`) | Backend, restringida solo a Distance Matrix |
@@ -42,8 +42,12 @@ Guía para dejar lista la infraestructura de Google que necesita el modo de deli
 maps-api: AIzaSyBsZJe6LdEn4BiuvyM6QHXyVZix7NWAdao
 
 - ✅ **Maps JavaScript API**
-- ✅ **Places API**
+- ✅ **Places API (New)**
 - ✅ **Distance Matrix API**
+
+> ⚠️ Habilita **Places API (New)**, no la "Places API" legacy. El autocompletado
+> del navegador usa la New (`AutocompleteSuggestion` / `Place`); la legacy te
+> devolvería `REQUEST_DENIED` y no saldrían sugerencias.
 
 ### 4. Crear la llave PÚBLICA (navegador)
 
@@ -58,7 +62,7 @@ maps-api: AIzaSyBsZJe6LdEn4BiuvyM6QHXyVZix7NWAdao
    ```
 3. **API restrictions → Restrict key →** marca solo:
    - Maps JavaScript API
-   - Places API
+   - Places API (New)
 4. Guarda y **copia la llave** → va en `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`.
 
 > Esta llave viaja al navegador (es pública). La restricción por referer evita que otro
@@ -114,9 +118,9 @@ GOOGLE_MAPS_SERVER_API_KEY="AIza...llave-servidor"
 
 - [ ] Facturación activa en el proyecto.
 - [ ] Alerta de presupuesto en **$50/mes** con email.
-- [ ] 3 APIs habilitadas (Maps JavaScript, Places, Distance Matrix).
+- [ ] 3 APIs habilitadas (Maps JavaScript, Places API (New), Distance Matrix).
 - [ ] Llave pública restringida **por referer** a tu dominio + `localhost` en dev.
-- [ ] Llave pública limitada a **Maps JavaScript API + Places API**.
+- [ ] Llave pública limitada a **Maps JavaScript API + Places API (New)**.
 - [ ] Llave servidor restringida **solo a Distance Matrix API**.
 - [ ] Las 2 variables en `.env` local y en Vercel (Production).
 - [ ] `NEXT_PUBLIC_APP_URL` coincide con el dominio del referer.
