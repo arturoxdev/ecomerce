@@ -53,6 +53,15 @@ export default async function ProductDetailPage({
 
   const basePrice = parseFloat(product.basePrice);
   const activeVariants = product.variants?.filter((v) => v.isActive) ?? [];
+  const activeLocalServices =
+    product.additionalServices
+      ?.filter((s) => s.isActive)
+      .map((s) => ({
+        id: s.id,
+        name: s.name,
+        price: parseFloat(s.price),
+        description: s.description,
+      })) ?? [];
   const showSplitNotice = settings.paymentMode === "SPLIT_50_50";
 
   return (
@@ -119,6 +128,7 @@ export default async function ProductDetailPage({
                 price: parseFloat(v.price),
                 stock: v.stock,
               }))}
+              localServices={activeLocalServices}
               showSplitNotice={showSplitNotice}
               labels={{
                 price: m.catalog.product.price,
@@ -126,6 +136,10 @@ export default async function ProductDetailPage({
                 stock: m.catalog.product.stock,
                 selectVariant:
                   m.catalog.product.selectVariant ?? "Select an option",
+                services: {
+                  sectionTitle: m.additionalServices.sectionTitle,
+                  optionalAddOns: m.additionalServices.optionalAddOns,
+                },
                 availability: {
                   checkDates: m.catalog.availability.title,
                   selectDate: m.catalog.availability.selectDate,

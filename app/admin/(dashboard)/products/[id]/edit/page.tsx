@@ -2,8 +2,16 @@ import { asc } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
-import { createVariant, updateProduct, updateVariant, ProductForm } from "@/features/products";
 import {
+  createVariant,
+  updateProduct,
+  updateVariant,
+  createLocalService,
+  updateLocalService,
+  ProductForm,
+} from "@/features/products";
+import {
+  findAllLocalServicesByProductId,
   findAllVariantsByProductId,
   findProductById,
 } from "@/features/products/services/products.service";
@@ -19,19 +27,21 @@ type Props = {
 export default async function EditProductPage({ params }: Props) {
   const { id } = await params;
 
-  const [product, categoryList, variants] = await Promise.all([
+  const [product, categoryList, variants, localServices] = await Promise.all([
     findProductById(id),
     findAllCategories({
       columns: { id: true, name: true },
       orderBy: asc(categories.sortOrder),
     }),
     findAllVariantsByProductId(id),
+    findAllLocalServicesByProductId(id),
   ]);
 
   if (!product) notFound();
 
   const boundAction = updateProduct.bind(null, id);
   const boundCreateVariant = createVariant.bind(null, id);
+  const boundCreateLocalService = createLocalService.bind(null, id);
 
   return (
     <>
@@ -86,6 +96,15 @@ export default async function EditProductPage({ params }: Props) {
           }))}
           createVariantAction={boundCreateVariant}
           updateVariantAction={updateVariant}
+          localServices={localServices.map((s) => ({
+            id: s.id,
+            name: s.name,
+            price: s.price,
+            description: s.description,
+            isActive: s.isActive,
+          }))}
+          createLocalServiceAction={boundCreateLocalService}
+          updateLocalServiceAction={updateLocalService}
         />
       </div>
     </>

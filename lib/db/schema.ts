@@ -160,6 +160,9 @@ export const orders = pgTable("orders", {
     precision: 10,
     scale: 7,
   }),
+  servicesTotal: numeric("services_total", { precision: 10, scale: 2 })
+    .notNull()
+    .default("0"),
   total: numeric("total", { precision: 10, scale: 2 }).notNull(),
   amountPaid: numeric("amount_paid", { precision: 10, scale: 2 }).notNull(),
   squarePaymentId: text("square_payment_id"),
@@ -195,6 +198,79 @@ export const orderItems = pgTable("order_items", {
   unitPrice: numeric("unit_price", { precision: 10, scale: 2 }).notNull(),
   subtotal: numeric("subtotal", { precision: 10, scale: 2 }).notNull(),
   rentDate: timestamp("rent_date", { precision: 6 }).notNull(),
+});
+
+// ── Additional services (ADR-009) ──────────────────────────────
+// Optional paid extras that ADD to the price and are multi-select (no stock).
+// Two definition scopes: global (store-wide) and local (per product). Two
+// snapshot tables copy name + price at checkout, with a nullable FK back to
+// the definition so historical orders stay stable when a service is repriced
+// or deleted (mirrors the order_items.unitPrice snapshot precedent).
+
+// Global definition: configured store-wide, selected at checkout, applies to
+// the whole order. Scoped by store_id like delivery_distance_tiers.
+export const storeAdditionalServices = pgTable("store_additional_services", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  storeId: text("store_id").notNull(),
+  name: text("name").notNull(),
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+  description: text("description"),
+  isActive: boolean("is_active").notNull().default(true),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+// Local definition: configured inline on a product, selected on the product
+// page, applies to a single order line. Mirrors product_variants.
+export const productAdditionalServices = pgTable(
+  "product_additional_services",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    productId: uuid("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+    description: text("description"),
+    isActive: boolean("is_active").notNull().default(true),
+    sortOrder: integer("sort_order").notNull().default(0),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+);
+
+// Global snapshot: copies name + price of a global service onto the order.
+// Nullable FK to the definition (set null on delete) so history is stable.
+export const orderServices = pgTable("order_services", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orderId: uuid("order_id")
+    .notNull()
+    .references(() => orders.id, { onDelete: "cascade" }),
+  serviceId: uuid("service_id").references(() => storeAdditionalServices.id, {
+    onDelete: "set null",
+  }),
+  name: text("name").notNull(),
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+});
+
+// Local snapshot: copies name + price of a local service onto an order line.
+// Nullable FK to the definition (set null on delete) so history is stable.
+export const orderItemServices = pgTable("order_item_services", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orderItemId: uuid("order_item_id")
+    .notNull()
+    .references(() => orderItems.id, { onDelete: "cascade" }),
+  serviceId: uuid("service_id").references(
+    () => productAdditionalServices.id,
+    { onDelete: "set null" },
+  ),
+  name: text("name").notNull(),
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
 });
 
 export const availability = pgTable(
@@ -519,6 +595,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
     references: [categories.id],
   }),
   variants: many(productVariants),
+  additionalServices: many(productAdditionalServices),
   orderItems: many(orderItems),
   availability: many(availability),
 }));
@@ -533,12 +610,23 @@ export const productVariantsRelations = relations(
   }),
 );
 
+export const productAdditionalServicesRelations = relations(
+  productAdditionalServices,
+  ({ one }) => ({
+    product: one(products, {
+      fields: [productAdditionalServices.productId],
+      references: [products.id],
+    }),
+  }),
+);
+
 export const ordersRelations = relations(orders, ({ many }) => ({
   orderItems: many(orderItems),
+  services: many(orderServices),
   availability: many(availability),
 }));
 
-export const orderItemsRelations = relations(orderItems, ({ one }) => ({
+export const orderItemsRelations = relations(orderItems, ({ one, many }) => ({
   order: one(orders, {
     fields: [orderItems.orderId],
     references: [orders.id],
@@ -551,7 +639,33 @@ export const orderItemsRelations = relations(orderItems, ({ one }) => ({
     fields: [orderItems.variantId],
     references: [productVariants.id],
   }),
+  services: many(orderItemServices),
 }));
+
+export const orderServicesRelations = relations(orderServices, ({ one }) => ({
+  order: one(orders, {
+    fields: [orderServices.orderId],
+    references: [orders.id],
+  }),
+  service: one(storeAdditionalServices, {
+    fields: [orderServices.serviceId],
+    references: [storeAdditionalServices.id],
+  }),
+}));
+
+export const orderItemServicesRelations = relations(
+  orderItemServices,
+  ({ one }) => ({
+    orderItem: one(orderItems, {
+      fields: [orderItemServices.orderItemId],
+      references: [orderItems.id],
+    }),
+    service: one(productAdditionalServices, {
+      fields: [orderItemServices.serviceId],
+      references: [productAdditionalServices.id],
+    }),
+  }),
+);
 
 export const availabilityRelations = relations(availability, ({ one }) => ({
   product: one(products, {

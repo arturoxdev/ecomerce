@@ -15,6 +15,7 @@ import { db, type Database } from "@/lib/db";
 import {
   availability,
   categories,
+  productAdditionalServices,
   products,
   productVariants,
 } from "@/lib/db/schema";
@@ -103,7 +104,7 @@ export function createProductsService(deps: ProductsServiceDeps) {
   function findBySlug(slug: string) {
     return dbx.query.products.findFirst({
       where: and(eq(products.slug, slug), eq(products.storeId, storeId)),
-      with: { category: true, variants: true },
+      with: { category: true, variants: true, additionalServices: true },
     });
   }
 
@@ -181,6 +182,22 @@ export function createProductsService(deps: ProductsServiceDeps) {
     });
   }
 
+  function findAllLocalServicesByProductId(productId: string) {
+    return dbx.query.productAdditionalServices.findMany({
+      where: eq(productAdditionalServices.productId, productId),
+      orderBy: [
+        asc(productAdditionalServices.sortOrder),
+        asc(productAdditionalServices.createdAt),
+      ],
+    });
+  }
+
+  function findLocalServiceById(id: string) {
+    return dbx.query.productAdditionalServices.findFirst({
+      where: eq(productAdditionalServices.id, id),
+    });
+  }
+
   function findBlocksByProduct(productId: string) {
     return dbx.query.availability.findMany({
       where: eq(availability.productId, productId),
@@ -220,6 +237,8 @@ export function createProductsService(deps: ProductsServiceDeps) {
     findVariantsByProductId,
     findAllVariantsByProductId,
     findVariantById,
+    findAllLocalServicesByProductId,
+    findLocalServiceById,
     findBlocksByProduct,
     findBlockById,
     findByDate,
@@ -248,6 +267,9 @@ export const findVariantsByProductId = defaultService.findVariantsByProductId;
 export const findAllVariantsByProductId =
   defaultService.findAllVariantsByProductId;
 export const findVariantById = defaultService.findVariantById;
+export const findAllLocalServicesByProductId =
+  defaultService.findAllLocalServicesByProductId;
+export const findLocalServiceById = defaultService.findLocalServiceById;
 export const findBlocksByProduct = defaultService.findBlocksByProduct;
 export const findBlockById = defaultService.findBlockById;
 export const findByDate = defaultService.findByDate;

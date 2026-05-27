@@ -1,5 +1,6 @@
 import "server-only";
 
+import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 
 import { findZipcodeByCityAndCode } from "@/features/zipcodes/services/zipcodes.service";
@@ -7,7 +8,15 @@ import { getStoreId } from "@/lib/config/tenant";
 import * as settingRepo from "@/lib/data/settings";
 import { getMinBookableDate, parseDateOnly } from "@/lib/date";
 import { db, type Database } from "@/lib/db";
-import { availability, orderItems, orders } from "@/lib/db/schema";
+import {
+  availability,
+  orderItems,
+  orderItemServices,
+  orderServices,
+  orders,
+  productAdditionalServices,
+  storeAdditionalServices,
+} from "@/lib/db/schema";
 import { checkAvailability } from "@/lib/services/availability.service";
 
 import {
@@ -72,6 +81,9 @@ const placeOrderItemSchema = z.object({
   quantity: z.number().int().positive(),
   unitPrice: z.number().positive(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  // ADR-009: selected Local Service ids for this line. Prices are NEVER taken
+  // from the client — they are re-derived server-side from the live table.
+  localServiceIds: z.array(z.string().uuid()).optional().default([]),
 });
 
 const placeOrderSchema = z.object({
@@ -97,6 +109,9 @@ const placeOrderSchema = z.object({
   destLng: z.coerce.number().gte(-180).lte(180).optional().nullable(),
   formattedAddress: z.string().max(500).optional().nullable(),
   locale: z.enum(["en", "es"]).optional().default("en"),
+  // ADR-009: selected Global Service ids for the whole order. Prices are NEVER
+  // taken from the client — they are re-derived server-side from the live table.
+  globalServiceIds: z.array(z.string().uuid()).optional().default([]),
   items: z.array(placeOrderItemSchema).min(1, "Cart cannot be empty"),
 });
 
@@ -244,6 +259,9 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
           unitPrice: number;
           date: Date;
           productName: string;
+          // Re-derived from the live product_additional_services table.
+          services: Array<{ serviceId: string; name: string; price: number }>;
+          servicesCharge: number;
         }> = [];
 
         for (const item of data.items) {
@@ -289,6 +307,38 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
             continue;
           }
 
+          // ADR-009: re-derive Local Service prices server-side. Never trust
+          // the client. Load this product's live services, keep only the ones
+          // the client selected that are still ACTIVE and belong to this
+          // product; discard (don't error on) inactive/deleted/foreign ids.
+          // Charged ONCE per line, regardless of quantity.
+          let lineServices: Array<{
+            serviceId: string;
+            name: string;
+            price: number;
+          }> = [];
+          let lineServicesCharge = 0;
+          if (item.localServiceIds.length > 0) {
+            const requestedIds = [...new Set(item.localServiceIds)];
+            const liveServices =
+              await tx.query.productAdditionalServices.findMany({
+                where: and(
+                  eq(productAdditionalServices.productId, item.productId),
+                  eq(productAdditionalServices.isActive, true),
+                  inArray(productAdditionalServices.id, requestedIds),
+                ),
+              });
+            lineServices = liveServices.map((svc) => ({
+              serviceId: svc.id,
+              name: svc.name,
+              price: parseFloat(svc.price),
+            }));
+            lineServicesCharge = lineServices.reduce(
+              (sum, svc) => sum + svc.price,
+              0,
+            );
+          }
+
           validatedItems.push({
             productId: item.productId,
             variantId: item.variantId,
@@ -296,6 +346,8 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
             unitPrice: item.unitPrice,
             date,
             productName: product.name,
+            services: lineServices,
+            servicesCharge: lineServicesCharge,
           });
         }
 
@@ -307,11 +359,49 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
           (sum, item) => sum + item.unitPrice * item.quantity,
           0,
         );
+
+        // ADR-009: re-derive Global Service prices server-side. Load the
+        // store's live services, keep only the selected ids that are still
+        // ACTIVE and belong to this store; discard invalid ones. Charged ONCE
+        // per order, regardless of item count.
+        let globalServices: Array<{
+          serviceId: string;
+          name: string;
+          price: number;
+        }> = [];
+        if (data.globalServiceIds.length > 0) {
+          const requestedGlobalIds = [...new Set(data.globalServiceIds)];
+          const liveGlobalServices =
+            await tx.query.storeAdditionalServices.findMany({
+              where: and(
+                eq(storeAdditionalServices.storeId, deps.storeId),
+                eq(storeAdditionalServices.isActive, true),
+                inArray(storeAdditionalServices.id, requestedGlobalIds),
+              ),
+            });
+          globalServices = liveGlobalServices.map((svc) => ({
+            serviceId: svc.id,
+            name: svc.name,
+            price: parseFloat(svc.price),
+          }));
+        }
+
+        const localServicesTotal = validatedItems.reduce(
+          (sum, item) => sum + item.servicesCharge,
+          0,
+        );
+        const globalServicesTotal = globalServices.reduce(
+          (sum, svc) => sum + svc.price,
+          0,
+        );
+        const servicesTotal = localServicesTotal + globalServicesTotal;
+
         const summary = calculateCartSummary({
           subtotal,
           settings: storeSettings,
           resolvedZipFee,
           resolvedDistanceFee,
+          servicesTotal,
         });
 
         const [order] = await tx
@@ -336,6 +426,7 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
             subtotal: subtotal.toFixed(2),
             depositAmount: summary.deposit.toFixed(2),
             deliveryFee: summary.deliveryFee.toFixed(2),
+            servicesTotal: summary.servicesTotal.toFixed(2),
             total: summary.total.toFixed(2),
             amountPaid: "0",
             paymentStatus: "AUTHORIZED",
@@ -346,15 +437,31 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
           .returning();
 
         for (const item of validatedItems) {
-          await tx.insert(orderItems).values({
-            orderId: order.id,
-            productId: item.productId,
-            variantId: item.variantId,
-            quantity: item.quantity,
-            unitPrice: item.unitPrice.toFixed(2),
-            subtotal: (item.unitPrice * item.quantity).toFixed(2),
-            rentDate: item.date,
-          });
+          const [orderItem] = await tx
+            .insert(orderItems)
+            .values({
+              orderId: order.id,
+              productId: item.productId,
+              variantId: item.variantId,
+              quantity: item.quantity,
+              unitPrice: item.unitPrice.toFixed(2),
+              subtotal: (item.unitPrice * item.quantity).toFixed(2),
+              rentDate: item.date,
+            })
+            .returning();
+
+          // ADR-009: snapshot the line's re-derived Local Services (name +
+          // price) linked to this order_item, mirroring order_items.unitPrice.
+          if (item.services.length > 0) {
+            await tx.insert(orderItemServices).values(
+              item.services.map((svc) => ({
+                orderItemId: orderItem.id,
+                serviceId: svc.serviceId,
+                name: svc.name,
+                price: svc.price.toFixed(2),
+              })),
+            );
+          }
 
           await tx.insert(availability).values({
             productId: item.productId,
@@ -363,6 +470,19 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
             quantity: item.quantity,
             orderId: order.id,
           });
+        }
+
+        // ADR-009: snapshot the order's re-derived Global Services (name +
+        // price) linked to the order as a whole.
+        if (globalServices.length > 0) {
+          await tx.insert(orderServices).values(
+            globalServices.map((svc) => ({
+              orderId: order.id,
+              serviceId: svc.serviceId,
+              name: svc.name,
+              price: svc.price.toFixed(2),
+            })),
+          );
         }
 
         return {

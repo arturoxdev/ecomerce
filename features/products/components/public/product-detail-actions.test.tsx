@@ -33,6 +33,10 @@ describe("ProductDetailActions", () => {
     selectDatesFirst: "Select dates first",
     quantity: "Quantity",
     perUnit: "day",
+    services: {
+      sectionTitle: "Additional Services",
+      optionalAddOns: "Optional add-ons",
+    },
   };
 
   function readDialogProps() {
@@ -54,6 +58,7 @@ describe("ProductDetailActions", () => {
           baseStock={6}
           priceType="PER_UNIT"
           variants={[]}
+          localServices={[]}
           labels={labels}
         />,
       );
@@ -94,6 +99,7 @@ describe("ProductDetailActions", () => {
             { id: "v1", name: "Red", price: 20, stock: 5 },
             { id: "v2", name: "Blue", price: 30, stock: 2 },
           ]}
+          localServices={[]}
           labels={labels}
         />,
       );

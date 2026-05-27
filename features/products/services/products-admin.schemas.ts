@@ -1,6 +1,11 @@
 import { z } from "zod";
 
-import { priceTypeEnum, products, productVariants } from "@/lib/db/schema";
+import {
+  priceTypeEnum,
+  productAdditionalServices,
+  products,
+  productVariants,
+} from "@/lib/db/schema";
 import { MAX_MEDIA_COUNT } from "@/lib/services/media";
 import { toSlug } from "@/lib/utils";
 
@@ -40,6 +45,28 @@ export const variantSchema = z.object({
 
 export type VariantInput = z.infer<typeof variantSchema>;
 
+export const localServiceSchema = z.object({
+  name: z.string().min(1, "El nombre es requerido"),
+  // ADR-009: services are additive, so $0 is a valid price (unlike variants,
+  // which replace the base price and must be positive).
+  price: z.coerce.number().min(0, "El precio debe ser 0 o mayor"),
+  description: z
+    .string()
+    .max(500, "La descripción debe tener 500 caracteres o menos")
+    .optional(),
+  isActive: z.boolean().default(true),
+});
+
+export type LocalServiceInput = z.infer<typeof localServiceSchema>;
+
+export type LocalService = {
+  id: string;
+  name: string;
+  price: string;
+  description: string | null;
+  isActive: boolean;
+};
+
 export function parseProductForm(formData: FormData) {
   return productSchema.safeParse({
     name: formData.get("name"),
@@ -60,6 +87,15 @@ export function parseVariantForm(formData: FormData) {
     name: formData.get("name"),
     price: formData.get("price"),
     stock: formData.get("stock"),
+  });
+}
+
+export function parseLocalServiceForm(formData: FormData) {
+  return localServiceSchema.safeParse({
+    name: formData.get("name"),
+    price: formData.get("price"),
+    description: formData.get("description") || undefined,
+    isActive: formData.get("isActive") === "true",
   });
 }
 
@@ -118,5 +154,32 @@ export function buildVariantUpdate(
     name: input.name,
     price: input.price.toString(),
     stock: input.stock,
+  };
+}
+
+export function buildLocalServiceInsert(
+  input: LocalServiceInput,
+  ctx: { productId: string },
+): typeof productAdditionalServices.$inferInsert {
+  return {
+    productId: ctx.productId,
+    name: input.name,
+    price: input.price.toString(),
+    description: input.description || null,
+    isActive: input.isActive,
+  };
+}
+
+export function buildLocalServiceUpdate(
+  input: LocalServiceInput,
+): Pick<
+  typeof productAdditionalServices.$inferInsert,
+  "name" | "price" | "description" | "isActive"
+> {
+  return {
+    name: input.name,
+    price: input.price.toString(),
+    description: input.description || null,
+    isActive: input.isActive,
   };
 }

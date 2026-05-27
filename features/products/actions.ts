@@ -14,6 +14,10 @@ import {
   updateVariant as dalUpdateVariant,
   deleteVariant as dalDeleteVariant,
   getProductVariants as dalGetVariants,
+  createLocalService as dalCreateLocalService,
+  updateLocalService as dalUpdateLocalService,
+  deleteLocalService as dalDeleteLocalService,
+  getProductLocalServices as dalGetLocalServices,
   getProductBlocks as dalGetBlocks,
   createManualBlock as dalCreateBlock,
   deleteManualBlock as dalDeleteBlock,
@@ -21,6 +25,7 @@ import {
 import type {
   ProductFormState,
   VariantFormState,
+  LocalServiceFormState,
   ManualBlockFormState,
 } from "./services/products-admin.service";
 
@@ -85,6 +90,30 @@ export async function deleteVariant(variantId: string) {
 
 export async function getProductVariants(productId: string) {
   return dalGetVariants(productId);
+}
+
+export async function createLocalService(
+  productId: string,
+  _prev: LocalServiceFormState,
+  formData: FormData,
+): Promise<LocalServiceFormState> {
+  return dalCreateLocalService(productId, _prev, formData);
+}
+
+export async function updateLocalService(
+  serviceId: string,
+  _prev: LocalServiceFormState,
+  formData: FormData,
+): Promise<LocalServiceFormState> {
+  return dalUpdateLocalService(serviceId, _prev, formData);
+}
+
+export async function deleteLocalService(serviceId: string) {
+  return dalDeleteLocalService(serviceId);
+}
+
+export async function getProductLocalServices(productId: string) {
+  return dalGetLocalServices(productId);
 }
 
 export async function getProductBlocks(productId: string) {

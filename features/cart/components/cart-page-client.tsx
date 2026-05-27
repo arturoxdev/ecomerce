@@ -18,9 +18,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 import {
   getCartSubtotal,
   isCartItemPastDue,
@@ -34,6 +36,13 @@ import {
   type PlaceOrderInput,
 } from "@/app/[locale]/cart/actions";
 
+type GlobalService = {
+  id: string;
+  name: string;
+  price: number;
+  description: string | null;
+};
+
 type Labels = {
   title: string;
   empty: string;
@@ -44,8 +53,13 @@ type Labels = {
   summary: string;
   subtotal: string;
   deliveryFee: string;
+  servicesFee: string;
+  deposit: string;
   total: string;
   included: string;
+  servicesSectionTitle: string;
+  servicesOptionalAddOns: string;
+  servicesNone: string;
   customerInfo: string;
   name: string;
   email: string;
@@ -80,10 +94,11 @@ type Labels = {
 
 type Props = {
   locale: string;
+  globalServices: GlobalService[];
   labels: Labels;
 };
 
-export function CartPageClient({ locale, labels }: Props) {
+export function CartPageClient({ locale, globalServices, labels }: Props) {
   const items = useCartStore((s) => s.items);
   const removeItem = useCartStore((s) => s.removeItem);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
@@ -117,6 +132,12 @@ export function CartPageClient({ locale, labels }: Props) {
     type: "OUT_OF_CAP" | "UNAVAILABLE";
     message: string;
   } | null>(null);
+
+  // ADR-009: Global Services chosen at checkout. Ephemeral local state (NOT
+  // persisted in the cart store) — mirrors how distanceQuote is handled.
+  const [selectedGlobalServiceIds, setSelectedGlobalServiceIds] = useState<
+    string[]
+  >([]);
 
   // Customer form state
   const [customerName, setCustomerName] = useState("");
@@ -265,12 +286,37 @@ export function CartPageClient({ locale, labels }: Props) {
     paymentMode: "SPLIT_50_50" as const,
     currency: "USD",
   };
+
+  // ADR-009: client-side preview of servicesTotal. Local Services add ONCE per
+  // line (regardless of qty); Global Services add ONCE per order. The server
+  // re-derives both authoritatively at checkout — this is display only.
+  const localServicesTotal = items.reduce(
+    (sum, item) =>
+      sum + item.selectedServices.reduce((acc, svc) => acc + svc.price, 0),
+    0,
+  );
+  const selectedGlobalServices = globalServices.filter((s) =>
+    selectedGlobalServiceIds.includes(s.id),
+  );
+  const globalServicesTotal = selectedGlobalServices.reduce(
+    (sum, svc) => sum + svc.price,
+    0,
+  );
+  const servicesTotal = localServicesTotal + globalServicesTotal;
+
   const summary = calculateCartSummary({
     subtotal,
     settings: resolvedSettings,
     resolvedZipFee,
     resolvedDistanceFee: distanceQuote?.fee ?? null,
+    servicesTotal,
   });
+
+  function toggleGlobalService(id: string, checked: boolean) {
+    setSelectedGlobalServiceIds((prev) =>
+      checked ? [...prev, id] : prev.filter((existing) => existing !== id),
+    );
+  }
 
   const isZipMode = resolvedSettings.deliveryMode === "ZIP_CODE";
   const zipNotSelected = isZipMode && !selectedZone;
@@ -311,12 +357,15 @@ export function CartPageClient({ locale, labels }: Props) {
       formattedAddress:
         isDistanceMode && selectedPlace ? selectedPlace.formattedAddress : null,
       locale: locale === "es" ? "es" : "en",
+      // ADR-009: send only ids — the server re-derives prices, never trusts us.
+      globalServiceIds: selectedGlobalServiceIds,
       items: items.map((item) => ({
         productId: item.productId,
         variantId: item.variantId,
         quantity: item.quantity,
         unitPrice: item.unitPrice,
         date: item.date,
+        localServiceIds: item.selectedServices.map((s) => s.id),
       })),
     };
 
@@ -550,6 +599,66 @@ export function CartPageClient({ locale, labels }: Props) {
                 </div>
               </CardContent>
             </Card>
+
+            {/* ADR-009: Global Services — multi-select, once per order */}
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-slate-900">
+                  {labels.servicesSectionTitle}
+                </CardTitle>
+                <p className="text-sm text-slate-400">
+                  {labels.servicesOptionalAddOns}
+                </p>
+              </CardHeader>
+              <CardContent>
+                {globalServices.length === 0 ? (
+                  <p className="text-sm text-slate-500">{labels.servicesNone}</p>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {globalServices.map((service) => {
+                      const checked = selectedGlobalServiceIds.includes(
+                        service.id,
+                      );
+                      return (
+                        <label
+                          key={service.id}
+                          className={cn(
+                            "flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors",
+                            checked
+                              ? "border-primary bg-primary/5"
+                              : "border-slate-200 hover:border-primary/40",
+                          )}
+                          data-testid="cart-global-service"
+                        >
+                          <Checkbox
+                            checked={checked}
+                            onCheckedChange={(value) =>
+                              toggleGlobalService(service.id, value === true)
+                            }
+                            className="mt-0.5"
+                          />
+                          <div className="flex flex-1 items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium text-slate-900">
+                                {service.name}
+                              </p>
+                              {service.description && (
+                                <p className="text-xs text-slate-500">
+                                  {service.description}
+                                </p>
+                              )}
+                            </div>
+                            <p className="shrink-0 text-sm font-semibold text-primary">
+                              +${service.price.toFixed(2)}
+                            </p>
+                          </div>
+                        </label>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
 
           {/* Summary sidebar */}
@@ -594,6 +703,17 @@ export function CartPageClient({ locale, labels }: Props) {
                     : `$${summary.deliveryFee.toFixed(2)}`}
                 </span>
               </div>
+              {summary.servicesTotal > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-600">{labels.servicesFee}</span>
+                  <span
+                    className="font-medium"
+                    data-testid="cart-summary-services"
+                  >
+                    ${summary.servicesTotal.toFixed(2)}
+                  </span>
+                </div>
+              )}
               <Separator />
               <div className="flex justify-between text-base font-bold">
                 <span>{labels.total}</span>
@@ -604,6 +724,17 @@ export function CartPageClient({ locale, labels }: Props) {
                   ${summary.total.toFixed(2)}
                 </span>
               </div>
+              {summary.deposit > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-600">{labels.deposit}</span>
+                  <span
+                    className="font-medium"
+                    data-testid="cart-summary-deposit"
+                  >
+                    ${summary.deposit.toFixed(2)}
+                  </span>
+                </div>
+              )}
               {resolvedSettings.paymentMode === "SPLIT_50_50" && (
                 <>
                   <Separator />

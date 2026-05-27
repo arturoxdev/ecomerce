@@ -1,8 +1,11 @@
 export type {
   ProductFormState,
   VariantFormState,
+  LocalServiceFormState,
   ManualBlockFormState,
 } from "./services/products-admin.service";
+
+export type { LocalService } from "./services/products-admin.schemas";
 
 export {
   createProduct,
@@ -15,6 +18,10 @@ export {
   updateVariant,
   deleteVariant,
   getProductVariants,
+  createLocalService,
+  updateLocalService,
+  deleteLocalService,
+  getProductLocalServices,
   getProductBlocks,
   createManualBlock,
   deleteManualBlock,
@@ -24,6 +31,7 @@ export { ProductForm } from "./components/admin/product-form";
 export { ProductTable } from "./components/admin/product-table";
 export { ProductFilters } from "./components/admin/product-status-filter";
 export { VariantManager } from "./components/admin/variant-manager";
+export { LocalServiceManager } from "./components/admin/local-service-manager";
 export { ManualBlockForm } from "./components/admin/manual-block-form";
 export { AvailabilityBlockTable } from "./components/admin/availability-block-table";
 

@@ -203,6 +203,9 @@ export function createManualOrderService(deps: ManualOrderServiceDeps) {
             subtotal: subtotal.toFixed(2),
             depositAmount: "0",
             deliveryFee: "0",
+            // ADR-009: manual orders don't support service selection yet
+            // (out of scope for Phase 4). Explicit 0; revisit in a follow-up.
+            servicesTotal: "0",
             total: total.toFixed(2),
             amountPaid: data.amountPaid.toFixed(2),
             paymentStatus,

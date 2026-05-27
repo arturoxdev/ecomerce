@@ -1,4 +1,4 @@
-import { CreditCard, Palette, Truck } from "lucide-react";
+import { CreditCard, Palette, PackagePlus, Truck } from "lucide-react";
 import Link from "next/link";
 
 import { SiteHeader } from "@/components/admin/site-header";
@@ -23,6 +23,13 @@ const sections = [
     description:
       "Modo de entrega, códigos postales, origen y tramos por distancia.",
     icon: Truck,
+  },
+  {
+    href: "/admin/settings/additional-services",
+    label: "Servicios adicionales",
+    description:
+      "Servicios opcionales globales que el cliente elige en el checkout.",
+    icon: PackagePlus,
   },
 ];
 

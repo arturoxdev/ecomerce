@@ -1,6 +1,12 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+export type CartItemService = {
+  id: string;
+  name: string;
+  price: number;
+};
+
 export type CartItem = {
   id: string;
   productId: string;
@@ -14,7 +20,21 @@ export type CartItem = {
   priceType: "FIXED" | "PER_UNIT";
   date: string; // "YYYY-MM-DD"
   stock: number;
+  // Selected Local Services snapshot (ADR-009). Display + line identity only;
+  // prices are always re-derived server-side at checkout, never trusted here.
+  selectedServices: CartItemService[];
 };
+
+// Order-independent comparison of two selected-service id sets. Two lines only
+// merge when they carry the exact same set of local service ids.
+function sameServiceIds(
+  a: CartItemService[],
+  b: CartItemService[],
+): boolean {
+  if (a.length !== b.length) return false;
+  const setB = new Set(b.map((s) => s.id));
+  return a.every((s) => setB.has(s.id));
+}
 
 export type DeliveryZone = {
   city: string;
@@ -38,11 +58,13 @@ export const useCartStore = create<CartStore>()(
       selectedZone: null,
 
       addItem: (item) => {
+        const incomingServices = item.selectedServices ?? [];
         const existing = get().items.find(
           (i) =>
             i.productId === item.productId &&
             i.variantId === item.variantId &&
-            i.date === item.date,
+            i.date === item.date &&
+            sameServiceIds(i.selectedServices, incomingServices),
         );
 
         if (existing && item.priceType === "PER_UNIT") {
@@ -54,7 +76,16 @@ export const useCartStore = create<CartStore>()(
             ),
           });
         } else if (!existing) {
-          set({ items: [...get().items, { ...item, id: crypto.randomUUID() }] });
+          set({
+            items: [
+              ...get().items,
+              {
+                ...item,
+                selectedServices: incomingServices,
+                id: crypto.randomUUID(),
+              },
+            ],
+          });
         }
       },
 
@@ -80,14 +111,20 @@ export const useCartStore = create<CartStore>()(
     }),
     {
       name: "festejos-cart",
-      version: 3,
+      version: 4,
       migrate: (persisted, version) => {
         const base = (persisted ?? {}) as Partial<CartStore>;
+        // Default selectedServices on any pre-v4 persisted line so old carts
+        // (added before ADR-009) don't crash the merge/identity logic.
+        const items = (base.items ?? []).map((item) => ({
+          ...item,
+          selectedServices: item.selectedServices ?? [],
+        }));
         if (version < 3) {
-          return { items: base.items ?? [], selectedZone: null };
+          return { items, selectedZone: null };
         }
         return {
-          items: base.items ?? [],
+          items,
           selectedZone: base.selectedZone ?? null,
         };
       },

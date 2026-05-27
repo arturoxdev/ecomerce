@@ -32,6 +32,7 @@ describe("AddToCartButton", () => {
     priceType: "FIXED" as const,
     date: "2099-06-01",
     stock: 5,
+    selectedServices: [],
   };
 
   beforeEach(() => {
