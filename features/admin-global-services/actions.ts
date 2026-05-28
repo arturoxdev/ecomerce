@@ -24,6 +24,7 @@ import {
 export type GlobalServiceFormState = FormState;
 
 const SERVICES_PATH = "/admin/settings/additional-services";
+const PUBLIC_LOCALE_LAYOUT = "/[locale]";
 
 const serviceFormSchema = z.object({
   name: z.string().trim().min(1, "El nombre es requerido").max(120),
@@ -96,6 +97,7 @@ export async function createService(
   }
 
   revalidatePath(SERVICES_PATH);
+  revalidatePath(PUBLIC_LOCALE_LAYOUT, "layout");
   return { success: true };
 }
 
@@ -132,6 +134,7 @@ export async function updateService(
   }
 
   revalidatePath(SERVICES_PATH);
+  revalidatePath(PUBLIC_LOCALE_LAYOUT, "layout");
   return { success: true };
 }
 
@@ -158,6 +161,7 @@ export async function toggleServiceActive(
   }
 
   revalidatePath(SERVICES_PATH);
+  revalidatePath(PUBLIC_LOCALE_LAYOUT, "layout");
   return { success: true };
 }
 
@@ -179,5 +183,6 @@ export async function deleteService(
   });
 
   revalidatePath(SERVICES_PATH);
+  revalidatePath(PUBLIC_LOCALE_LAYOUT, "layout");
   return { success: true };
 }
