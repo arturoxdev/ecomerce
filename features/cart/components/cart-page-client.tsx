@@ -432,6 +432,66 @@ export function CartPageClient({ locale, globalServices, labels }: Props) {
               </p>
             )}
 
+            {/* ADR-009: Global Services — multi-select, once per order */}
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-slate-900">
+                  {labels.servicesSectionTitle}
+                </CardTitle>
+                <p className="text-sm text-slate-400">
+                  {labels.servicesOptionalAddOns}
+                </p>
+              </CardHeader>
+              <CardContent>
+                {globalServices.length === 0 ? (
+                  <p className="text-sm text-slate-500">{labels.servicesNone}</p>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {globalServices.map((service) => {
+                      const checked = selectedGlobalServiceIds.includes(
+                        service.id,
+                      );
+                      return (
+                        <label
+                          key={service.id}
+                          className={cn(
+                            "flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors",
+                            checked
+                              ? "border-primary bg-primary/5"
+                              : "border-slate-200 hover:border-primary/40",
+                          )}
+                          data-testid="cart-global-service"
+                        >
+                          <Checkbox
+                            checked={checked}
+                            onCheckedChange={(value) =>
+                              toggleGlobalService(service.id, value === true)
+                            }
+                            className="mt-0.5"
+                          />
+                          <div className="flex flex-1 items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium text-slate-900">
+                                {service.name}
+                              </p>
+                              {service.description && (
+                                <p className="text-xs text-slate-500">
+                                  {service.description}
+                                </p>
+                              )}
+                            </div>
+                            <p className="shrink-0 text-sm font-semibold text-primary">
+                              +${service.price.toFixed(2)}
+                            </p>
+                          </div>
+                        </label>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             {/* Customer info */}
             <Card className="mt-6">
               <CardHeader>
@@ -597,66 +657,6 @@ export function CartPageClient({ locale, globalServices, labels }: Props) {
                     </div>
                   )}
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* ADR-009: Global Services — multi-select, once per order */}
-            <Card className="mt-6">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold text-slate-900">
-                  {labels.servicesSectionTitle}
-                </CardTitle>
-                <p className="text-sm text-slate-400">
-                  {labels.servicesOptionalAddOns}
-                </p>
-              </CardHeader>
-              <CardContent>
-                {globalServices.length === 0 ? (
-                  <p className="text-sm text-slate-500">{labels.servicesNone}</p>
-                ) : (
-                  <div className="flex flex-col gap-2">
-                    {globalServices.map((service) => {
-                      const checked = selectedGlobalServiceIds.includes(
-                        service.id,
-                      );
-                      return (
-                        <label
-                          key={service.id}
-                          className={cn(
-                            "flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors",
-                            checked
-                              ? "border-primary bg-primary/5"
-                              : "border-slate-200 hover:border-primary/40",
-                          )}
-                          data-testid="cart-global-service"
-                        >
-                          <Checkbox
-                            checked={checked}
-                            onCheckedChange={(value) =>
-                              toggleGlobalService(service.id, value === true)
-                            }
-                            className="mt-0.5"
-                          />
-                          <div className="flex flex-1 items-start justify-between gap-3">
-                            <div className="min-w-0">
-                              <p className="text-sm font-medium text-slate-900">
-                                {service.name}
-                              </p>
-                              {service.description && (
-                                <p className="text-xs text-slate-500">
-                                  {service.description}
-                                </p>
-                              )}
-                            </div>
-                            <p className="shrink-0 text-sm font-semibold text-primary">
-                              +${service.price.toFixed(2)}
-                            </p>
-                          </div>
-                        </label>
-                      );
-                    })}
-                  </div>
-                )}
               </CardContent>
             </Card>
           </div>
