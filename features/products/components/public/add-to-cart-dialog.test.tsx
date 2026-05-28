@@ -89,6 +89,7 @@ describe("AddToCartDialog", () => {
     variantId: null,
     variantName: null,
     unitPrice: 10,
+    selectedServices: [],
     stock: 5,
     labels,
   };

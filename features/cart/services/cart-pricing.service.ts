@@ -15,6 +15,9 @@ export type CartSummaryInput = {
   // DISTANCE_MILES: fee resolved upstream (server `quoteDelivery`, or the cart's
   // quote endpoint client-side). Kept pure here — no Google call.
   resolvedDistanceFee?: number | null;
+  // Sum of selected Additional Services (local per-line + global per-order),
+  // re-derived server-side. Optional/defaults to 0 for back-compat (ADR-009).
+  servicesTotal?: number | null;
 };
 
 export function calculateCartSummary(input: CartSummaryInput) {
@@ -27,11 +30,14 @@ export function calculateCartSummary(input: CartSummaryInput) {
     deliveryFee = input.resolvedDistanceFee ?? 0;
   }
 
-  const deposit = input.subtotal * input.settings.depositPercent;
-  const total = input.subtotal + deliveryFee;
+  const servicesTotal = input.servicesTotal ?? 0;
+  const deposit =
+    (input.subtotal + servicesTotal) * input.settings.depositPercent;
+  const total = input.subtotal + servicesTotal + deliveryFee;
 
   return {
     deliveryFee,
+    servicesTotal,
     deposit,
     total,
   };

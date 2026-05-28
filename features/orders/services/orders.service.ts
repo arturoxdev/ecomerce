@@ -81,6 +81,8 @@ export function createOrdersService(deps: OrdersServiceDeps) {
     return dbx.query.orders.findFirst({
       where: and(eq(orders.id, id), eq(orders.storeId, storeId)),
       with: {
+        // ADR-009: order-level Global Service snapshots (once per order).
+        services: true,
         orderItems: {
           with: {
             product: {
@@ -93,6 +95,8 @@ export function createOrdersService(deps: OrdersServiceDeps) {
               },
             },
             variant: { columns: { id: true, name: true } },
+            // ADR-009: per-line Local Service snapshots (once per line).
+            services: true,
           },
         },
       },

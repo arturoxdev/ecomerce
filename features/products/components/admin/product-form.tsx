@@ -60,6 +60,7 @@ import { isFormError, getFieldErrors, type FormState as ProductFormState } from 
 type VariantFormState = ProductFormState;
 import { appendProductPhoto, removeProductPhoto } from "../../actions";
 import { VariantManager } from "./variant-manager";
+import { LocalServiceManager } from "./local-service-manager";
 
 type Category = { id: string; name: string };
 
@@ -68,6 +69,14 @@ type Variant = {
   name: string;
   price: string;
   stock: number;
+};
+
+type LocalService = {
+  id: string;
+  name: string;
+  price: string;
+  description: string | null;
+  isActive: boolean;
 };
 
 type Props = {
@@ -97,6 +106,16 @@ type Props = {
     prev: VariantFormState,
     formData: FormData,
   ) => Promise<VariantFormState>;
+  localServices?: LocalService[];
+  createLocalServiceAction?: (
+    prev: VariantFormState,
+    formData: FormData,
+  ) => Promise<VariantFormState>;
+  updateLocalServiceAction?: (
+    serviceId: string,
+    prev: VariantFormState,
+    formData: FormData,
+  ) => Promise<VariantFormState>;
 };
 
 const BASIC_FIELDS = ["name", "slug", "description", "categoryId", "basePrice", "priceType", "stock", "photos"];
@@ -110,6 +129,9 @@ export function ProductForm({
   variants,
   createVariantAction,
   updateVariantAction,
+  localServices,
+  createLocalServiceAction,
+  updateLocalServiceAction,
 }: Props) {
   const [state, formAction, pending] = useActionState(action, {} as ProductFormState);
   const fieldErrors = getFieldErrors(state);
@@ -262,6 +284,7 @@ export function ProductForm({
             )}
           </TabsTrigger>
           <TabsTrigger value="variants">Variantes</TabsTrigger>
+          <TabsTrigger value="servicios">Servicios adicionales</TabsTrigger>
         </TabsList>
 
         <TabsContent value="basic" keepMounted className="flex flex-col gap-6 pt-6">
@@ -542,6 +565,25 @@ export function ProductForm({
               </p>
               <p className="text-xs text-muted-foreground/70">
                 Guarda primero el producto para agregar variantes.
+              </p>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="servicios" className="flex flex-col gap-6 pt-6">
+          {localServices && createLocalServiceAction && updateLocalServiceAction ? (
+            <LocalServiceManager
+              services={localServices}
+              createAction={createLocalServiceAction}
+              updateAction={updateLocalServiceAction}
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-muted-foreground/25 py-12">
+              <p className="text-sm font-medium text-muted-foreground">
+                Aún no hay servicios adicionales
+              </p>
+              <p className="text-xs text-muted-foreground/70">
+                Guarda primero el producto para agregar servicios adicionales.
               </p>
             </div>
           )}

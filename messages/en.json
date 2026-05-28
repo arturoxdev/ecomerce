@@ -131,6 +131,7 @@
     "remove": "Remove",
     "summary": "Order Summary",
     "deliveryFee": "Delivery Fee",
+    "servicesFee": "Additional Services",
     "deposit": "Deposit",
     "total": "Total",
     "included": "Included",
@@ -156,6 +157,11 @@
     "zipcodeLoading": "Searching…",
     "zipcodeRequired": "Select city and zipcode before continuing",
     "zipcodeStale": "Your previous selection is no longer available, please pick another"
+  },
+  "additionalServices": {
+    "sectionTitle": "Additional Services",
+    "optionalAddOns": "Optional add-ons",
+    "noServices": "No additional services available"
   },
   "payment": {
     "splitBadge": "50% now · 50% on delivery",

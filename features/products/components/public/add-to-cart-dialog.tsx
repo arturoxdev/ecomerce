@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/dialog";
 import { QuantitySelector } from "@/components/quantity-selector";
 
+import type { CartItemService } from "@/lib/stores/cart-store";
+
 import {
   AvailabilityCheckerBody,
   type AvailabilityLabels,
@@ -28,6 +30,8 @@ type Props = {
   variantId: string | null;
   variantName: string | null;
   unitPrice: number;
+  // Selected Local Services for this line (charged once per line; ADR-009).
+  selectedServices: CartItemService[];
   priceType: "FIXED" | "PER_UNIT";
   stock: number;
   labels: {
@@ -54,6 +58,7 @@ export function AddToCartDialog({
   variantId,
   variantName,
   unitPrice,
+  selectedServices,
   priceType,
   stock,
   labels,
@@ -82,6 +87,7 @@ export function AddToCartDialog({
             variantId={variantId}
             variantName={variantName}
             unitPrice={unitPrice}
+            selectedServices={selectedServices}
             priceType={priceType}
             stock={stock}
             labels={labels}
@@ -101,6 +107,7 @@ function AddToCartDialogBody({
   variantId,
   variantName,
   unitPrice,
+  selectedServices,
   priceType,
   stock,
   labels,
@@ -166,6 +173,8 @@ function AddToCartDialogBody({
           priceType,
           date: availabilityResult ? toDateString(availabilityResult.date) : "",
           stock: maxQty,
+          // ADR-009: chosen Local Services for this line (once per line).
+          selectedServices,
         }}
         disabled={!isAvailable}
         disabledMessage={labels.selectDatesFirst}

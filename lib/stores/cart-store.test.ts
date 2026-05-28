@@ -16,6 +16,7 @@ function buildItem(partial: Partial<CartItem> = {}): CartItem {
     priceType: "PER_UNIT",
     date: "2099-05-01",
     stock: 10,
+    selectedServices: [],
     ...partial,
   };
 }

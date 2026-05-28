@@ -19,6 +19,7 @@ const mocks = vi.hoisted(() => {
       quantity: number;
       unitPrice: number;
       date: string;
+      selectedServices: Array<{ id: string; name: string; price: number }>;
     }>,
     removeItem,
     updateQuantity,
@@ -132,8 +133,13 @@ describe("CartPageClient", () => {
     summary: "Summary",
     subtotal: "Subtotal",
     deliveryFee: "Delivery",
+    servicesFee: "Additional Services",
+    deposit: "Deposit",
     total: "Total",
     included: "Included",
+    servicesSectionTitle: "Additional Services",
+    servicesOptionalAddOns: "Optional add-ons",
+    servicesNone: "No additional services available",
     customerInfo: "Customer info",
     name: "Name",
     email: "Email",
@@ -169,6 +175,7 @@ describe("CartPageClient", () => {
         quantity: 2,
         unitPrice: 30,
         date: "2099-05-10",
+        selectedServices: [],
       },
     ];
 
@@ -183,7 +190,7 @@ describe("CartPageClient", () => {
     it("missing customer fields -> shows validation errors and skips submit", async () => {
       // Arrange
       const user = userEvent.setup();
-      render(<CartPageClient locale="en" labels={labels} />);
+      render(<CartPageClient locale="en" globalServices={[]} labels={labels} />);
 
       // Act
       await user.click(screen.getByRole("button", { name: "Confirm order" }));
@@ -210,7 +217,7 @@ describe("CartPageClient", () => {
         configurable: true,
         value: { assign: assignMock },
       });
-      render(<CartPageClient locale="en" labels={labels} />);
+      render(<CartPageClient locale="en" globalServices={[]} labels={labels} />);
 
       // Act
       await user.type(screen.getByLabelText("Name"), "Jane Doe");
@@ -232,6 +239,7 @@ describe("CartPageClient", () => {
           destLng: null,
           formattedAddress: null,
           locale: "en",
+          globalServiceIds: [],
           items: [
             {
               productId: "product-1",
@@ -239,6 +247,7 @@ describe("CartPageClient", () => {
               quantity: 2,
               unitPrice: 30,
               date: "2099-05-10",
+              localServiceIds: [],
             },
           ],
         });
@@ -270,7 +279,7 @@ describe("CartPageClient", () => {
         configurable: true,
         value: { assign: assignMock },
       });
-      render(<CartPageClient locale="en" labels={labels} />);
+      render(<CartPageClient locale="en" globalServices={[]} labels={labels} />);
 
       // Act
       await user.type(screen.getByLabelText("Name"), "Jane Doe");
@@ -307,7 +316,7 @@ describe("CartPageClient", () => {
         json: async () => ({ ok: true, miles: 7.2, fee: 35 }),
       });
       vi.stubGlobal("fetch", fetchMock);
-      render(<CartPageClient locale="en" labels={labels} />);
+      render(<CartPageClient locale="en" globalServices={[]} labels={labels} />);
 
       // Act: the autocomplete stub appears once settings resolve
       const selectButton = await screen.findByRole("button", {

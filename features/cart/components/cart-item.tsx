@@ -71,6 +71,23 @@ export function CartItem({ item, onRemove, onQuantityChange, labels }: Props) {
           )}
         </div>
 
+        {/* ADR-009: selected Local Services for this line (charged once/line) */}
+        {item.selectedServices.length > 0 && (
+          <ul className="flex flex-col gap-0.5" data-testid="cart-item-services">
+            {item.selectedServices.map((service) => (
+              <li
+                key={service.id}
+                className="flex items-center justify-between text-xs text-slate-500"
+              >
+                <span className="truncate">+ {service.name}</span>
+                <span className="shrink-0 font-medium text-slate-600">
+                  ${service.price.toFixed(2)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+
         {/* Quantity + Remove */}
         <div className="flex items-center justify-between">
           {item.priceType === "PER_UNIT" ? (

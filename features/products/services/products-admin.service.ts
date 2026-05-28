@@ -5,17 +5,22 @@ import { eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 import {
+  findAllLocalServicesByProductId,
   findAllVariantsByProductId,
   findBlockById,
   findBlocksByProduct,
+  findLocalServiceById,
   findProductById,
   findVariantById,
 } from "./products.service";
 import {
+  buildLocalServiceInsert,
+  buildLocalServiceUpdate,
   buildProductInsert,
   buildProductUpdate,
   buildVariantInsert,
   buildVariantUpdate,
+  parseLocalServiceForm,
   parseProductForm,
   parseVariantForm,
 } from "./products-admin.schemas";
@@ -23,7 +28,12 @@ import { parseAndValidateManualBlock } from "./manual-block.service";
 import { requireWriteAccess } from "@/lib/services/auth";
 import { db } from "@/lib/db";
 import { isForeignKeyViolation, isUniqueViolation } from "@/lib/db/errors";
-import { availability, products, productVariants } from "@/lib/db/schema";
+import {
+  availability,
+  productAdditionalServices,
+  products,
+  productVariants,
+} from "@/lib/db/schema";
 import { MAX_MEDIA_COUNT } from "@/lib/services/media";
 import { s3Bucket, s3Client, s3PublicUrl } from "@/lib/services/s3-client";
 import {
@@ -59,6 +69,7 @@ function revalidateProductEdit(productId: string) {
 
 export type ProductFormState = FormState;
 export type VariantFormState = FormState;
+export type LocalServiceFormState = FormState;
 export type ManualBlockFormState = FormState;
 
 // ---------------------------------------------------------------------------
@@ -308,6 +319,98 @@ export async function deleteVariant(
 
 export async function getProductVariants(productId: string) {
   return findAllVariantsByProductId(productId);
+}
+
+// ---------------------------------------------------------------------------
+// Local service mutations (ADR-009)
+// ---------------------------------------------------------------------------
+
+export async function createLocalService(
+  productId: string,
+  _prev: LocalServiceFormState,
+  formData: FormData,
+): Promise<LocalServiceFormState> {
+  await requireWriteAccess();
+
+  const parsed = parseLocalServiceForm(formData);
+  if (!parsed.success) {
+    return validationProblem(parsed.error);
+  }
+
+  const product = await findProductById(productId);
+  if (!product) {
+    return notFoundProblem("Product not found");
+  }
+
+  try {
+    await db
+      .insert(productAdditionalServices)
+      .values(buildLocalServiceInsert(parsed.data, { productId }))
+      .returning()
+      .then((r) => r[0]);
+  } catch {
+    return internalProblem("Failed to create service");
+  }
+
+  revalidateProductEdit(productId);
+  return { success: true };
+}
+
+export async function updateLocalService(
+  serviceId: string,
+  _prev: LocalServiceFormState,
+  formData: FormData,
+): Promise<LocalServiceFormState> {
+  await requireWriteAccess();
+
+  const parsed = parseLocalServiceForm(formData);
+  if (!parsed.success) {
+    return validationProblem(parsed.error);
+  }
+
+  const service = await findLocalServiceById(serviceId);
+  if (!service) {
+    return notFoundProblem("Service not found");
+  }
+
+  try {
+    await db
+      .update(productAdditionalServices)
+      .set(buildLocalServiceUpdate(parsed.data))
+      .where(eq(productAdditionalServices.id, serviceId))
+      .returning()
+      .then((r) => r[0]);
+  } catch {
+    return internalProblem("Failed to update service");
+  }
+
+  revalidateProductEdit(service.productId);
+  return { success: true };
+}
+
+export async function deleteLocalService(
+  serviceId: string,
+): Promise<LocalServiceFormState> {
+  await requireWriteAccess();
+  const service = await findLocalServiceById(serviceId);
+  if (!service) {
+    return notFoundProblem("Service not found");
+  }
+
+  try {
+    await db
+      .delete(productAdditionalServices)
+      .where(eq(productAdditionalServices.id, serviceId));
+  } catch {
+    return internalProblem("Failed to delete service");
+  }
+
+  revalidateProductEdit(service.productId);
+  return { success: true };
+}
+
+export async function getProductLocalServices(productId: string) {
+  return findAllLocalServicesByProductId(productId);
 }
 
 // ---------------------------------------------------------------------------
