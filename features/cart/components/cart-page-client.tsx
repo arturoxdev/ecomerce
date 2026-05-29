@@ -724,17 +724,6 @@ export function CartPageClient({ locale, globalServices, labels }: Props) {
                   ${summary.total.toFixed(2)}
                 </span>
               </div>
-              {summary.deposit > 0 && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-600">{labels.deposit}</span>
-                  <span
-                    className="font-medium"
-                    data-testid="cart-summary-deposit"
-                  >
-                    ${summary.deposit.toFixed(2)}
-                  </span>
-                </div>
-              )}
               {resolvedSettings.paymentMode === "SPLIT_50_50" && (
                 <>
                   <Separator />

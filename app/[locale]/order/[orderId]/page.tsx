@@ -86,10 +86,6 @@ export default async function OrderConfirmationPage({ params }: Props) {
                   : `$${parseFloat(order.deliveryFee).toFixed(2)}`}
               </span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-600">{m.cart.deposit}</span>
-              <span>${parseFloat(order.depositAmount).toFixed(2)}</span>
-            </div>
             <Separator />
             <div className="flex justify-between text-base font-bold">
               <span>{m.cart.total}</span>

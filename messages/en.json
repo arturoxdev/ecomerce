@@ -156,7 +156,15 @@
     "zipcodeEmpty": "We don't yet deliver to that destination",
     "zipcodeLoading": "Searching…",
     "zipcodeRequired": "Select city and zipcode before continuing",
-    "zipcodeStale": "Your previous selection is no longer available, please pick another"
+    "zipcodeStale": "Your previous selection is no longer available, please pick another",
+    "distanceAddressLabel": "Delivery address",
+    "distanceAddressPlaceholder": "Enter your address…",
+    "distanceRequired": "Select your delivery address",
+    "distanceQuoting": "Calculating shipping…",
+    "distanceOutOfCap": "Your address is outside the delivery area",
+    "distanceUnavailable": "We can't complete the reservation right now, please get in touch with us",
+    "distanceContactCta": "Contact us",
+    "distanceMilesSuffix": "mi"
   },
   "additionalServices": {
     "sectionTitle": "Additional Services",
