@@ -156,7 +156,15 @@
     "zipcodeEmpty": "Aún no hacemos entregas a ese destino",
     "zipcodeLoading": "Buscando…",
     "zipcodeRequired": "Selecciona ciudad y código postal antes de continuar",
-    "zipcodeStale": "Tu selección anterior ya no está disponible, escoge otra"
+    "zipcodeStale": "Tu selección anterior ya no está disponible, escoge otra",
+    "distanceAddressLabel": "Dirección de entrega",
+    "distanceAddressPlaceholder": "Escribe tu dirección…",
+    "distanceRequired": "Selecciona tu dirección de entrega",
+    "distanceQuoting": "Calculando envío…",
+    "distanceOutOfCap": "Tu dirección está fuera de la zona de entrega",
+    "distanceUnavailable": "Por ahora no podemos completar la reserva, comunícate con nosotros",
+    "distanceContactCta": "Contáctanos",
+    "distanceMilesSuffix": "mi"
   },
   "additionalServices": {
     "sectionTitle": "Servicios adicionales",
