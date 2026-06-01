@@ -26,11 +26,21 @@ _Example_: insurance for this specific trampoline.
 An Additional Service defined **store-wide** (mirrors delivery tiers). Configured in `/admin/settings`. Selected by the customer at **checkout**. Attaches to the **Order** as a whole.
 _Example_: overnight — everything stays the night and is picked up the next day.
 
+**Event Start Time** (es: _Hora de inicio del evento_):
+The single time-of-day, chosen by the customer at **checkout** and stored on the **Order**, that their event is set to start. It is order-level metadata for fulfillment — it tells the operator roughly when delivery is needed. It does **not** affect availability (stock stays day-level; see ADR-006), and it is independent of how many distinct line dates the cart holds (one time per Order regardless).
+_Avoid_: delivery time / hora de entrega — the customer states when their **event** begins, not when the store dispatches.
+
+**Event Window** (es: _Horario de eventos_):
+A single store-wide range — one earliest and one latest **Event Start Time** — that applies to all days, configured in `/admin/settings`. It constrains the checkout time picker. When unset, no event time is requested (the picker is hidden and checkout behaves as before).
+_Avoid_: horarios de entrega — the catalog limits allowed event start times, not the store's dispatch times.
+
 ## Relationships
 
 - A **Product** has zero or more **Variants** (single-select, replaces price).
 - A **Product** has zero or more **Local Services** (multi-select, adds to the line).
 - A **Store** has zero or more **Global Services** (multi-select at checkout, adds to the order).
+- A **Store** has at most one **Event Window** (allowed range of event start times).
+- An **Order** carries at most one **Event Start Time**, which must fall within the store's **Event Window**.
 
 ## Pricing rules
 
@@ -50,3 +60,5 @@ _Example_: overnight — everything stays the night and is picked up the next da
 ## Flagged ambiguities
 
 - "Variant" vs "Additional Service" — resolved: Variant replaces price & is single-select; Additional Service adds to price & is multi-select. They are separate concepts with separate storage.
+- "hora del evento" vs "hora de entrega" — resolved: the customer picks the **Event Start Time** (when their event begins), stored on the Order; the store's actual delivery dispatch is decided separately by the operator. The `/admin/settings` catalog (drafted as "horarios de entrega") configures the **Event Window** of allowed event start times and should be labelled accordingly (e.g. "Horario de eventos").
+- One **Event Start Time** per Order is intentionally kept even though a cart may hold lines with different dates (the customer chose not to force a single date). When line dates differ, the single event time is understood as the customer's stated event start, not bound to a specific line.
