@@ -5,6 +5,7 @@ import { CalendarDays } from "lucide-react";
 import Link from "next/link";
 
 import { formatAdminDate } from "@/lib/admin/format";
+import { toDisplayDate } from "@/lib/date";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -105,7 +106,7 @@ export function CalendarSchedule() {
                       {entry.itemsSummary}
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">
-                      {formatAdminDate(entry.rentDate)}
+                      {formatAdminDate(toDisplayDate(entry.rentDate))}
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">
                       {entry.eventStartTime ?? "—"}

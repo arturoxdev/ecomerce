@@ -16,6 +16,7 @@ import {
   stripeWebhookEvents,
   type PaymentMode,
 } from "@/lib/db/schema";
+import { toDisplayDate } from "@/lib/date";
 import { sendNewOrderNotification } from "@/lib/email";
 import { logger } from "@/lib/logger";
 import { internalProblem, notFoundProblem } from "@/lib/problems";
@@ -297,7 +298,7 @@ export async function handleCheckoutCompleted(
           items: items.map((it) => ({
             name: it.product.name,
             quantity: it.quantity,
-            rentDate: format(it.rentDate, "d 'de' MMMM 'de' yyyy", {
+            rentDate: format(toDisplayDate(it.rentDate), "d 'de' MMMM 'de' yyyy", {
               locale: es,
             }),
           })),

@@ -24,6 +24,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatAdminDate } from "@/lib/admin/format";
+import { toDisplayDate } from "@/lib/date";
 
 import { deleteManualBlock } from "../../actions";
 
@@ -93,7 +94,7 @@ export function AvailabilityBlockTable({ blocks }: Props) {
                   </span>
                 )}
               </TableCell>
-              <TableCell>{formatAdminDate(block.date)}</TableCell>
+              <TableCell>{formatAdminDate(toDisplayDate(block.date))}</TableCell>
               <TableCell>{block.quantity}</TableCell>
               <TableCell className="max-w-xs truncate text-sm text-gray-500">
                 {block.reason ?? "—"}
