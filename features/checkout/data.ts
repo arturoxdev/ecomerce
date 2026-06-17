@@ -1,6 +1,8 @@
 import "server-only";
 
 import { and, eq, lt, sql } from "drizzle-orm";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 import { revalidatePath } from "next/cache";
 import type Stripe from "stripe";
 
@@ -9,10 +11,12 @@ import { recordAudit } from "@/lib/audit";
 import { db } from "@/lib/db";
 import {
   availability,
+  orderItems,
   orders,
   stripeWebhookEvents,
   type PaymentMode,
 } from "@/lib/db/schema";
+import { sendNewOrderNotification } from "@/lib/email";
 import { logger } from "@/lib/logger";
 import { internalProblem, notFoundProblem } from "@/lib/problems";
 import type { ProblemDetail } from "@/lib/types/problem-detail";
@@ -196,6 +200,8 @@ export async function handleCheckoutCompleted(
   const orderId = session.metadata?.orderId;
   if (!orderId) return;
 
+  let didTransition = false;
+
   await db.transaction(async (tx) => {
     const order = await getOrderByIdForUpdate(tx, orderId);
     if (!order) return;
@@ -247,6 +253,8 @@ export async function handleCheckoutCompleted(
       })
       .where(eq(orders.id, orderId));
 
+    didTransition = true;
+
     await recordAudit(
       {
         action: "webhook.checkout_completed",
@@ -265,6 +273,47 @@ export async function handleCheckoutCompleted(
   revalidatePath(`/en/order/${orderId}/success`);
   revalidatePath(`/es/order/${orderId}/success`);
   revalidatePath(`/admin/orders/${orderId}`);
+
+  if (didTransition) {
+    try {
+      const confirmed = await db.query.orders.findFirst({
+        where: eq(orders.id, orderId),
+      });
+      if (confirmed) {
+        const settingsRow = await db.query.settings.findFirst();
+        const items = await db.query.orderItems.findMany({
+          where: eq(orderItems.orderId, orderId),
+          with: { product: { columns: { name: true } } },
+        });
+        const total = parseFloat(confirmed.total);
+        const paid = parseFloat(confirmed.amountPaid ?? "0");
+        await sendNewOrderNotification({
+          orderNumber: orderId.slice(0, 8),
+          adminOrderUrl: `${requireAppUrl()}/admin/orders/${orderId}`,
+          customerName: confirmed.customerName,
+          customerEmail: confirmed.customerEmail,
+          customerPhone: confirmed.customerPhone,
+          deliveryAddress: confirmed.deliveryAddress,
+          items: items.map((it) => ({
+            name: it.product.name,
+            quantity: it.quantity,
+            rentDate: format(it.rentDate, "d 'de' MMMM 'de' yyyy", {
+              locale: es,
+            }),
+          })),
+          currency: settingsRow?.currency ?? "USD",
+          totalAmount: total,
+          paidOnlineAmount: paid,
+          balanceDueAmount: Math.max(0, total - paid),
+        });
+      }
+    } catch (err) {
+      logger.warn("No se pudo enviar la notificación de nueva orden", {
+        orderId,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }
 }
 
 export async function handleCheckoutExpired(
