@@ -81,6 +81,23 @@ async function loadStoreSettings() {
     depositPercent: 0.1,
     paymentMode: "SPLIT_50_50" as const,
     currency: "USD",
+    eventWindowStart: null,
+    eventWindowEnd: null,
+  };
+}
+
+async function loadStoreSettingsWithWindow(
+  start: string,
+  end: string,
+) {
+  return {
+    deliveryMode: "INCLUDED" as const,
+    deliveryFee: 0,
+    depositPercent: 0.1,
+    paymentMode: "SPLIT_50_50" as const,
+    currency: "USD",
+    eventWindowStart: start,
+    eventWindowEnd: end,
   };
 }
 
@@ -218,6 +235,8 @@ describe("cart-order service — integration", () => {
         depositPercent: 0.1,
         paymentMode: "SPLIT_50_50" as const,
         currency: "USD",
+        eventWindowStart: null,
+        eventWindowEnd: null,
       }),
       quoteDelivery: async () => ({ ok: true, miles: 7.2, fee: 35 }),
     });
@@ -256,6 +275,166 @@ describe("cart-order service — integration", () => {
     expect(order?.deliveryAddress).toBe("123 Main St, Dallas, TX");
   });
 
+  it("event window configured + missing eventStartTime -> error, no order inserted", async () => {
+    // Arrange
+    await seedSettings();
+    const { productId } = await seedCategoryAndProduct();
+    const service = createCartOrderService({
+      db: testDb,
+      storeId: STORE_ID,
+      findProductByIdWithVariants: buildFindProductByIdWithVariants(),
+      loadStoreSettings: () => loadStoreSettingsWithWindow("09:00", "12:00"),
+    });
+
+    // Act
+    const result = await service.placeOrder({
+      customerName: "Jane",
+      customerEmail: "jane@example.com",
+      customerPhone: "555-1111",
+      deliveryAddress: "",
+      items: [
+        {
+          productId,
+          variantId: null,
+          quantity: 1,
+          unitPrice: 50,
+          date: "2099-06-01",
+        },
+      ],
+      // intentionally omitting eventStartTime
+    });
+
+    // Assert
+    expect(result.success).toBe(false);
+    if (result.success) return;
+    expect(result.error).toContain("hora");
+
+    const orders = await testDb.query.orders.findMany({
+      where: eq(schema.orders.storeId, STORE_ID),
+    });
+    expect(orders).toHaveLength(0);
+  });
+
+  it("event window configured + eventStartTime outside window -> error, no order inserted", async () => {
+    // Arrange
+    await seedSettings();
+    const { productId } = await seedCategoryAndProduct();
+    const service = createCartOrderService({
+      db: testDb,
+      storeId: STORE_ID,
+      findProductByIdWithVariants: buildFindProductByIdWithVariants(),
+      loadStoreSettings: () => loadStoreSettingsWithWindow("09:00", "12:00"),
+    });
+
+    // Act
+    const result = await service.placeOrder({
+      customerName: "Jane",
+      customerEmail: "jane@example.com",
+      customerPhone: "555-1111",
+      deliveryAddress: "",
+      items: [
+        {
+          productId,
+          variantId: null,
+          quantity: 1,
+          unitPrice: 50,
+          date: "2099-06-01",
+        },
+      ],
+      eventStartTime: "15:00", // outside the 09:00–12:00 window
+    });
+
+    // Assert
+    expect(result.success).toBe(false);
+    if (result.success) return;
+    expect(result.error).toBeDefined();
+
+    const orders = await testDb.query.orders.findMany({
+      where: eq(schema.orders.storeId, STORE_ID),
+    });
+    expect(orders).toHaveLength(0);
+  });
+
+  it("NO event window + any eventStartTime -> success, eventStartTime persisted as null", async () => {
+    // Arrange
+    await seedSettings();
+    const { productId } = await seedCategoryAndProduct();
+    const service = createCartOrderService({
+      db: testDb,
+      storeId: STORE_ID,
+      findProductByIdWithVariants: buildFindProductByIdWithVariants(),
+      loadStoreSettings, // window is null/null
+    });
+
+    // Act
+    const result = await service.placeOrder({
+      customerName: "Jane",
+      customerEmail: "jane@example.com",
+      customerPhone: "555-1111",
+      deliveryAddress: "",
+      items: [
+        {
+          productId,
+          variantId: null,
+          quantity: 1,
+          unitPrice: 50,
+          date: "2099-06-01",
+        },
+      ],
+      eventStartTime: "11:00", // ignored when no window is configured
+    });
+
+    // Assert
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+
+    const order = await testDb.query.orders.findFirst({
+      where: eq(schema.orders.id, result.orderId),
+    });
+    expect(order).toBeDefined();
+    expect(order?.eventStartTime).toBeNull();
+  });
+
+  it("event window configured + valid eventStartTime -> success, eventStartTime persisted in order", async () => {
+    // Arrange
+    await seedSettings();
+    const { productId } = await seedCategoryAndProduct();
+    const service = createCartOrderService({
+      db: testDb,
+      storeId: STORE_ID,
+      findProductByIdWithVariants: buildFindProductByIdWithVariants(),
+      loadStoreSettings: () => loadStoreSettingsWithWindow("09:00", "12:00"),
+    });
+
+    // Act
+    const result = await service.placeOrder({
+      customerName: "Jane",
+      customerEmail: "jane@example.com",
+      customerPhone: "555-1111",
+      deliveryAddress: "",
+      items: [
+        {
+          productId,
+          variantId: null,
+          quantity: 1,
+          unitPrice: 50,
+          date: "2099-06-01",
+        },
+      ],
+      eventStartTime: "10:00",
+    });
+
+    // Assert
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+
+    const order = await testDb.query.orders.findFirst({
+      where: eq(schema.orders.id, result.orderId),
+    });
+    expect(order).toBeDefined();
+    expect(order?.eventStartTime).toBe("10:00");
+  });
+
   it("DISTANCE_MILES out of cap -> rejects and inserts nothing", async () => {
     // Arrange
     await seedSettings();
@@ -270,6 +449,8 @@ describe("cart-order service — integration", () => {
         depositPercent: 0.1,
         paymentMode: "SPLIT_50_50" as const,
         currency: "USD",
+        eventWindowStart: null,
+        eventWindowEnd: null,
       }),
       quoteDelivery: async () => ({
         ok: false as const,

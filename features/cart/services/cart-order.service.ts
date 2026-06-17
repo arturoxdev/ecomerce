@@ -18,6 +18,7 @@ import {
   storeAdditionalServices,
 } from "@/lib/db/schema";
 import { checkAvailability } from "@/lib/services/availability.service";
+import { isWithinEventWindow } from "@/features/settings/services/event-window.service";
 
 import {
   calculateCartSummary,
@@ -112,6 +113,9 @@ const placeOrderSchema = z.object({
   // ADR-009: selected Global Service ids for the whole order. Prices are NEVER
   // taken from the client — they are re-derived server-side from the live table.
   globalServiceIds: z.array(z.string().uuid()).optional().default([]),
+  // Event Window: client sends the chosen hour string when the store has an
+  // event window configured. The server revalidates it against the live range.
+  eventStartTime: z.string().regex(/^([01]\d|2[0-3]):00$/).optional(),
   items: z.array(placeOrderItemSchema).min(1, "Cart cannot be empty"),
 });
 
@@ -137,6 +141,8 @@ export async function getStoreSettings(): Promise<CartStoreSettings> {
       : 0.1,
     paymentMode: settings?.paymentMode ?? "SPLIT_50_50",
     currency: settings?.currency ?? "USD",
+    eventWindowStart: settings?.eventWindowStart ?? null,
+    eventWindowEnd: settings?.eventWindowEnd ?? null,
   };
 }
 
@@ -245,6 +251,28 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
       resolvedDestLat = data.destLat;
       resolvedDestLng = data.destLng;
       resolvedDistanceAddress = data.formattedAddress ?? null;
+    }
+
+    // Event Window: server revalidates the chosen hour against the live range.
+    // If the window is configured, eventStartTime is required and must be a
+    // valid hour within the range. If not configured, any sent value is ignored.
+    const ewStart = storeSettings.eventWindowStart;
+    const ewEnd = storeSettings.eventWindowEnd;
+    let resolvedEventStartTime: string | null = null;
+    if (ewStart && ewEnd) {
+      if (!data.eventStartTime) {
+        return {
+          success: false,
+          error: "Selecciona la hora de inicio de tu evento",
+        };
+      }
+      if (!isWithinEventWindow(data.eventStartTime, ewStart, ewEnd)) {
+        return {
+          success: false,
+          error: "La hora seleccionada no está dentro del rango disponible",
+        };
+      }
+      resolvedEventStartTime = data.eventStartTime;
     }
 
     const minBookable = getMinBookableDate();
@@ -433,6 +461,7 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
             paymentMethod: "CARD",
             status: "PENDING",
             currency: storeSettings.currency,
+            eventStartTime: resolvedEventStartTime,
           })
           .returning();
 

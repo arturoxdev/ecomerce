@@ -1,4 +1,4 @@
-import { CreditCard, Palette, PackagePlus, Truck } from "lucide-react";
+import { Clock, CreditCard, Palette, PackagePlus, Truck } from "lucide-react";
 import Link from "next/link";
 
 import { SiteHeader } from "@/components/admin/site-header";
@@ -30,6 +30,13 @@ const sections = [
     description:
       "Servicios opcionales globales que el cliente elige en el checkout.",
     icon: PackagePlus,
+  },
+  {
+    href: "/admin/settings/event-window",
+    label: "Horario de eventos",
+    description:
+      "Define el rango de horas en que aceptas que inicien los eventos.",
+    icon: Clock,
   },
 ];
 

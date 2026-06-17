@@ -164,7 +164,13 @@
     "distanceOutOfCap": "Your address is outside the delivery area",
     "distanceUnavailable": "We can't complete the reservation right now, please get in touch with us",
     "distanceContactCta": "Contact us",
-    "distanceMilesSuffix": "mi"
+    "distanceMilesSuffix": "mi",
+    "eventStartTime": {
+      "label": "Event start time",
+      "helper": "Tell us when your event begins. We use it to plan delivery; the store coordinates the exact time.",
+      "placeholder": "Select a time",
+      "error": "Select your event start time"
+    }
   },
   "additionalServices": {
     "sectionTitle": "Additional Services",

@@ -9,9 +9,15 @@ import { CreateOrderSheet } from "./create-order-sheet";
 
 type Props = {
   currentRole: "ROOT" | "ADMIN" | "EMPLOYEE";
+  eventWindowStart?: string | null;
+  eventWindowEnd?: string | null;
 };
 
-export function CreateOrderButton({ currentRole }: Props) {
+export function CreateOrderButton({
+  currentRole,
+  eventWindowStart,
+  eventWindowEnd,
+}: Props) {
   const [open, setOpen] = useState(false);
 
   if (currentRole === "EMPLOYEE") return null;
@@ -22,7 +28,12 @@ export function CreateOrderButton({ currentRole }: Props) {
         <Plus className="size-4" />
         Crear orden
       </Button>
-      <CreateOrderSheet open={open} onOpenChange={setOpen} />
+      <CreateOrderSheet
+        open={open}
+        onOpenChange={setOpen}
+        eventWindowStart={eventWindowStart ?? null}
+        eventWindowEnd={eventWindowEnd ?? null}
+      />
     </>
   );
 }

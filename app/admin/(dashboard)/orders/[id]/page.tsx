@@ -151,6 +151,14 @@ export default async function AdminOrderDetailPage({ params }: Props) {
                       {order.deliveryDestinationLng}
                     </p>
                   )}
+                {order.eventStartTime && (
+                  <div className="text-muted-foreground">
+                    Hora de inicio del evento:{" "}
+                    <span className="font-medium text-foreground">
+                      {order.eventStartTime}
+                    </span>
+                  </div>
+                )}
               </CardContent>
             </Card>
 

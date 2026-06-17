@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { countTiers, getOrigin } from "@/features/delivery-pricing/data";
+import { parseEventWindowForm } from "@/features/settings/services/settings-admin.schemas";
 import { countZipcodes } from "@/features/zipcodes/services/zipcodes.service";
 import { recordAudit } from "@/lib/audit";
 import { getStoreId } from "@/lib/config/tenant";
@@ -192,6 +193,51 @@ export async function updateDeliverySettings(
   });
 
   revalidatePath("/admin/settings/delivery");
+  revalidatePath("/[locale]", "layout");
+  return { success: true };
+}
+
+export async function updateEventWindowSettings(
+  _prev: SettingsFormState,
+  formData: FormData,
+): Promise<SettingsFormState> {
+  const user = await requireWriteAccess();
+  if (user.role !== "ROOT" && user.role !== "ADMIN") {
+    return forbiddenProblem("Solo los administradores pueden editar los ajustes");
+  }
+
+  const parsed = parseEventWindowForm(formData);
+  if (!parsed.success) return validationProblem(parsed.error);
+
+  const storeId = getStoreId();
+  const before = await db.query.settings.findFirst({
+    where: eq(settings.storeId, storeId),
+  });
+
+  const data = {
+    eventWindowStart: parsed.data.eventWindowStart ?? null,
+    eventWindowEnd: parsed.data.eventWindowEnd ?? null,
+  };
+
+  try {
+    await db
+      .insert(settings)
+      .values({ storeId, ...data })
+      .onConflictDoUpdate({ target: settings.storeId, set: data });
+  } catch {
+    return internalProblem("Failed to update event window settings");
+  }
+
+  await recordAudit({
+    userId: user.id,
+    action: "settings.event-window.update",
+    entity: "settings",
+    entityId: storeId,
+    before: before ?? null,
+    after: data,
+  });
+
+  revalidatePath("/admin/settings/event-window");
   revalidatePath("/[locale]", "layout");
   return { success: true };
 }

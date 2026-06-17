@@ -14,6 +14,8 @@ describe("cart pricing service", () => {
           depositPercent: 0.1,
           paymentMode: "SPLIT_50_50" as const,
           currency: "USD",
+          eventWindowStart: null,
+          eventWindowEnd: null,
         },
       };
 
@@ -36,6 +38,8 @@ describe("cart pricing service", () => {
           depositPercent: 0.15,
           paymentMode: "SPLIT_50_50" as const,
           currency: "USD",
+          eventWindowStart: null,
+          eventWindowEnd: null,
         },
       };
 
@@ -58,6 +62,8 @@ describe("cart pricing service", () => {
           depositPercent: 0.1,
           paymentMode: "SPLIT_50_50" as const,
           currency: "USD",
+          eventWindowStart: null,
+          eventWindowEnd: null,
         },
       };
 
@@ -79,6 +85,8 @@ describe("cart pricing service", () => {
           depositPercent: 0.1,
           paymentMode: "SPLIT_50_50" as const,
           currency: "USD",
+          eventWindowStart: null,
+          eventWindowEnd: null,
         },
         resolvedZipFee: 75,
       };
@@ -101,6 +109,8 @@ describe("cart pricing service", () => {
           depositPercent: 0.1,
           paymentMode: "SPLIT_50_50" as const,
           currency: "USD",
+          eventWindowStart: null,
+          eventWindowEnd: null,
         },
       };
 
@@ -122,6 +132,8 @@ describe("cart pricing service", () => {
           depositPercent: 0.1,
           paymentMode: "SPLIT_50_50" as const,
           currency: "USD",
+          eventWindowStart: null,
+          eventWindowEnd: null,
         },
         resolvedDistanceFee: 35,
       };

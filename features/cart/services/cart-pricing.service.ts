@@ -6,6 +6,8 @@ export type CartStoreSettings = {
   depositPercent: number;
   paymentMode: PaymentMode;
   currency: string;
+  eventWindowStart: string | null;
+  eventWindowEnd: string | null;
 };
 
 export type CartSummaryInput = {

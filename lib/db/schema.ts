@@ -168,6 +168,7 @@ export const orders = pgTable("orders", {
   squarePaymentId: text("square_payment_id"),
   stripeSessionId: text("stripe_session_id").unique(),
   stripePaymentIntentId: text("stripe_payment_intent_id"),
+  eventStartTime: text("event_start_time"),
   stripeSessionExpiresAt: timestamp("stripe_session_expires_at", {
     withTimezone: true,
   }),
@@ -311,6 +312,8 @@ export const settings = pgTable("settings", {
     .default("SPLIT_50_50"),
   currency: text("currency").notNull().default("USD"),
   themeId: text("theme_id").notNull().default("default"),
+  eventWindowStart: text("event_window_start"),
+  eventWindowEnd: text("event_window_end"),
   updatedAt: timestamp("updated_at")
     .notNull()
     .$onUpdate(() => new Date()),

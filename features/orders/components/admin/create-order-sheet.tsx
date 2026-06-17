@@ -53,6 +53,7 @@ const initialState: DraftState = {
     customerEmail: "",
     customerPhone: "",
     deliveryAddress: "",
+    eventStartTime: undefined,
   },
   payment: { paymentMethod: "CASH", amountPaid: 0 },
 };
@@ -89,9 +90,16 @@ function isValidEmail(value: string): boolean {
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  eventWindowStart?: string | null;
+  eventWindowEnd?: string | null;
 };
 
-export function CreateOrderSheet({ open, onOpenChange }: Props) {
+export function CreateOrderSheet({
+  open,
+  onOpenChange,
+  eventWindowStart,
+  eventWindowEnd,
+}: Props) {
   const router = useRouter();
   const [state, dispatch] = useReducer(reducer, initialState);
   const [pickedProduct, setPickedProduct] = useState<
@@ -140,6 +148,7 @@ export function CreateOrderSheet({ open, onOpenChange }: Props) {
         customerEmail: state.customer.customerEmail.trim(),
         customerPhone: state.customer.customerPhone.trim(),
         deliveryAddress: state.customer.deliveryAddress.trim(),
+        eventStartTime: state.customer.eventStartTime || undefined,
         items: state.items.map((i) => ({
           productId: i.productId,
           variantId: i.variantId,
@@ -203,6 +212,8 @@ export function CreateOrderSheet({ open, onOpenChange }: Props) {
             <CustomerForm
               value={state.customer}
               onChange={(c) => dispatch({ type: "SET_CUSTOMER", payload: c })}
+              eventWindowStart={eventWindowStart}
+              eventWindowEnd={eventWindowEnd}
             />
             {emailInvalid && (
               <p className="text-xs text-red-600">

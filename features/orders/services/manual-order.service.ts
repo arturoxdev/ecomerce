@@ -58,6 +58,10 @@ const createManualOrderSchema = z
     customerEmail: z.string().email("Valid email is required"),
     customerPhone: z.string().min(1, "Phone is required"),
     deliveryAddress: z.string().optional().default(""),
+    eventStartTime: z
+      .string()
+      .regex(/^([01]\d|2[0-3]):00$/)
+      .optional(),
     items: z.array(itemSchema).min(1, "At least one item is required"),
     amountPaid: z.number().nonnegative(),
     paymentMethod: z.enum(["CASH", "TRANSFER"]),
@@ -200,6 +204,7 @@ export function createManualOrderService(deps: ManualOrderServiceDeps) {
             customerEmail: data.customerEmail,
             customerPhone: data.customerPhone,
             deliveryAddress: data.deliveryAddress || null,
+            eventStartTime: data.eventStartTime ?? null,
             subtotal: subtotal.toFixed(2),
             depositAmount: "0",
             deliveryFee: "0",
