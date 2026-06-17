@@ -4,19 +4,30 @@ import { useEffect, useRef, useState } from "react";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { searchCustomerSuggestions } from "@/features/orders/actions";
+import { generateEventHours } from "@/features/settings/services/event-window.service";
 
 export type CustomerFormValue = {
   customerName: string;
   customerEmail: string;
   customerPhone: string;
   deliveryAddress: string;
+  eventStartTime?: string;
 };
 
 type Props = {
   value: CustomerFormValue;
   onChange: (value: CustomerFormValue) => void;
+  eventWindowStart?: string | null;
+  eventWindowEnd?: string | null;
 };
 
 type Suggestion = {
@@ -28,7 +39,17 @@ type Suggestion = {
 
 const DEBOUNCE_MS = 250;
 
-export function CustomerForm({ value, onChange }: Props) {
+export function CustomerForm({
+  value,
+  onChange,
+  eventWindowStart,
+  eventWindowEnd,
+}: Props) {
+  const eventHours = generateEventHours(
+    eventWindowStart ?? null,
+    eventWindowEnd ?? null,
+  );
+  const hasEventWindow = eventHours.length > 0;
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -143,6 +164,35 @@ export function CustomerForm({ value, onChange }: Props) {
             placeholder="Calle 123, Ciudad"
           />
         </div>
+
+        {hasEventWindow && (
+          <div className="sm:col-span-2">
+            <Label htmlFor="eventStartTime">
+              Hora de inicio del evento (opcional)
+            </Label>
+            <Select
+              value={value.eventStartTime ?? ""}
+              onValueChange={(val) =>
+                onChange({
+                  ...value,
+                  eventStartTime: val == null || val === "" ? undefined : val,
+                })
+              }
+            >
+              <SelectTrigger id="eventStartTime">
+                <SelectValue placeholder="Sin especificar" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Sin especificar</SelectItem>
+                {eventHours.map((hour) => (
+                  <SelectItem key={hour} value={hour}>
+                    {hour}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
     </div>
   );

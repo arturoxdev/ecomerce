@@ -41,6 +41,10 @@ export default async function CartPage({ params }: Props) {
         servicesSectionTitle: m.additionalServices.sectionTitle,
         servicesOptionalAddOns: m.additionalServices.optionalAddOns,
         servicesNone: m.additionalServices.noServices,
+        eventStartTimeLabel: m.cart.eventStartTime.label,
+        eventStartTimeHelper: m.cart.eventStartTime.helper,
+        eventStartTimePlaceholder: m.cart.eventStartTime.placeholder,
+        eventStartTimeError: m.cart.eventStartTime.error,
       }}
     />
   );

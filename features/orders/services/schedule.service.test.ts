@@ -18,6 +18,7 @@ function buildItem(partial: Partial<ScheduleSourceItem> = {}): ScheduleSourceIte
       customerPhone: "555",
       deliveryAddress: null,
       storeId: "store-1",
+      eventStartTime: null,
     },
     product: { name: "Chair" },
     variant: null,
@@ -70,6 +71,7 @@ describe("orders schedule service", () => {
             customerPhone: "X",
             deliveryAddress: null,
             storeId: "store-99",
+            eventStartTime: null,
           },
           rentDate: localDate(2026, 6, 10, 10),
         }),
@@ -103,6 +105,7 @@ describe("orders schedule service", () => {
         customerPhone: "555",
         deliveryAddress: null,
         storeId: "store-1",
+        eventStartTime: null,
       };
       const items = [
         buildItem({

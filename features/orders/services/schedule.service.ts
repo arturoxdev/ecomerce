@@ -5,6 +5,7 @@ export type ScheduleEntry = {
   deliveryAddress: string | null;
   itemsSummary: string;
   rentDate: string;
+  eventStartTime: string | null;
 };
 
 export type ScheduleSourceItem = {
@@ -14,6 +15,7 @@ export type ScheduleSourceItem = {
     customerPhone: string;
     deliveryAddress: string | null;
     storeId: string;
+    eventStartTime: string | null;
   };
   product: { name: string };
   variant: { name: string | null } | null;
@@ -82,6 +84,7 @@ export function buildScheduleEntries(
       deliveryAddress: group.order.deliveryAddress,
       itemsSummary,
       rentDate: group.items[0].rentDate.toISOString(),
+      eventStartTime: group.order.eventStartTime,
     });
   }
 

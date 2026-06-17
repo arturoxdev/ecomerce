@@ -31,7 +31,7 @@ The single time-of-day, chosen by the customer at **checkout** and stored on the
 _Avoid_: delivery time / hora de entrega — the customer states when their **event** begins, not when the store dispatches.
 
 **Event Window** (es: _Horario de eventos_):
-A single store-wide range — one earliest and one latest **Event Start Time** — that applies to all days, configured in `/admin/settings`. It constrains the checkout time picker. When unset, no event time is requested (the picker is hidden and checkout behaves as before).
+A single store-wide range — one earliest and one latest **Event Start Time** — that applies to all days, configured in `/admin/settings`. It constrains the checkout time picker. When unset, no event time is requested (the picker is hidden and checkout behaves as before). The range is in **whole-hour steps** and is **inclusive of both ends** (the latest hour is itself a selectable start); `end` may equal `start` (a single allowed hour), and `end` must never be earlier than `start`.
 _Avoid_: horarios de entrega — the catalog limits allowed event start times, not the store's dispatch times.
 
 ## Relationships

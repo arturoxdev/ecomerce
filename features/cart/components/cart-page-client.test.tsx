@@ -301,6 +301,107 @@ describe("CartPageClient", () => {
     });
   });
 
+  describe("🕐 Event Window", () => {
+    it("window NOT configured (null start/end) -> hour selector is NOT rendered", async () => {
+      // Arrange
+      mocks.getStoreSettings.mockResolvedValue({
+        deliveryMode: "INCLUDED",
+        deliveryFee: 0,
+        depositPercent: 0.1,
+        paymentMode: "SPLIT_50_50",
+        currency: "USD",
+        eventWindowStart: null,
+        eventWindowEnd: null,
+      });
+      const eventLabels = {
+        ...labels,
+        eventStartTimeLabel: "Hora de inicio de tu evento",
+      };
+
+      // Act
+      render(
+        <CartPageClient locale="en" globalServices={[]} labels={eventLabels} />,
+      );
+
+      // Assert — wait for settings to resolve, then confirm selector is absent
+      await waitFor(() => {
+        expect(
+          screen.queryByText("Hora de inicio de tu evento"),
+        ).not.toBeInTheDocument();
+      });
+    });
+
+    it("window configured (09:00–12:00) -> hour selector IS rendered", async () => {
+      // Arrange
+      mocks.getStoreSettings.mockResolvedValue({
+        deliveryMode: "INCLUDED",
+        deliveryFee: 0,
+        depositPercent: 0.1,
+        paymentMode: "SPLIT_50_50",
+        currency: "USD",
+        eventWindowStart: "09:00",
+        eventWindowEnd: "12:00",
+      });
+      const eventLabels = {
+        ...labels,
+        eventStartTimeLabel: "Hora de inicio de tu evento",
+      };
+
+      // Act
+      render(
+        <CartPageClient locale="en" globalServices={[]} labels={eventLabels} />,
+      );
+
+      // Assert — selector card heading appears after settings load
+      await waitFor(() => {
+        expect(
+          screen.getByText("Hora de inicio de tu evento"),
+        ).toBeInTheDocument();
+      });
+    });
+
+    it("window configured + submit without choosing hour -> blocked and error shown", async () => {
+      // Arrange
+      const user = userEvent.setup();
+      mocks.getStoreSettings.mockResolvedValue({
+        deliveryMode: "INCLUDED",
+        deliveryFee: 0,
+        depositPercent: 0.1,
+        paymentMode: "SPLIT_50_50",
+        currency: "USD",
+        eventWindowStart: "09:00",
+        eventWindowEnd: "12:00",
+      });
+      const eventLabels = {
+        ...labels,
+        eventStartTimeLabel: "Hora de inicio de tu evento",
+        eventStartTimeError: "Selecciona la hora de inicio de tu evento",
+      };
+      render(
+        <CartPageClient locale="en" globalServices={[]} labels={eventLabels} />,
+      );
+
+      // Wait for the selector to appear so settings have loaded
+      await waitFor(() => {
+        expect(
+          screen.getByText("Hora de inicio de tu evento"),
+        ).toBeInTheDocument();
+      });
+
+      // Act — fill required customer fields but skip the hour selector
+      await user.type(screen.getByLabelText("Name"), "Jane Doe");
+      await user.type(screen.getByLabelText("Email"), "jane@example.com");
+      await user.type(screen.getByLabelText("Phone"), "555-1111");
+      await user.click(screen.getByRole("button", { name: "Confirm order" }));
+
+      // Assert — placeOrder NOT called; error message displayed
+      expect(mocks.placeOrder).not.toHaveBeenCalled();
+      expect(
+        screen.getByText("Selecciona la hora de inicio de tu evento"),
+      ).toBeInTheDocument();
+    });
+  });
+
   describe("📍 DISTANCE_MILES", () => {
     it("selecting a place quotes the fee and renders the miles + fee in the summary", async () => {
       // Arrange

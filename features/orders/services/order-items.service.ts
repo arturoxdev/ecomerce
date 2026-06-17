@@ -31,6 +31,7 @@ export function createOrderItemsService(deps: OrderItemsServiceDeps) {
             customerPhone: true,
             deliveryAddress: true,
             storeId: true,
+            eventStartTime: true,
           },
         },
         product: { columns: { id: true, name: true } },

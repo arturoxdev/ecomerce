@@ -80,6 +80,7 @@ export function CalendarSchedule() {
                   <TableHead>Teléfono</TableHead>
                   <TableHead>Artículos</TableHead>
                   <TableHead>Fecha</TableHead>
+                  <TableHead>Hora</TableHead>
                   <TableHead>Dirección</TableHead>
                 </TableRow>
               </TableHeader>
@@ -105,6 +106,9 @@ export function CalendarSchedule() {
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">
                       {formatAdminDate(entry.rentDate)}
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {entry.eventStartTime ?? "—"}
                     </TableCell>
                     <TableCell className="max-w-[150px] truncate text-xs text-muted-foreground">
                       {entry.deliveryAddress || "—"}

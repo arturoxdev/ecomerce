@@ -21,6 +21,13 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import {
@@ -28,6 +35,7 @@ import {
   isCartItemPastDue,
   useCartStore,
 } from "@/lib/stores/cart-store";
+import { generateEventHours } from "@/features/settings/services/event-window.service";
 import { calculateCartSummary } from "../services/cart-pricing.service";
 import { CartItem } from "./cart-item";
 import {
@@ -90,6 +98,10 @@ type Labels = {
   distanceUnavailable?: string;
   distanceContactCta?: string;
   distanceRequired?: string;
+  eventStartTimeLabel?: string;
+  eventStartTimeHelper?: string;
+  eventStartTimePlaceholder?: string;
+  eventStartTimeError?: string;
 };
 
 type Props = {
@@ -115,6 +127,8 @@ export function CartPageClient({ locale, globalServices, labels }: Props) {
     depositPercent: number;
     paymentMode: "SPLIT_50_50" | "FULL_ONLINE";
     currency: string;
+    eventWindowStart: string | null;
+    eventWindowEnd: string | null;
   } | null>(null);
   const [resolvedZipFee, setResolvedZipFee] = useState<number | null>(null);
   const [zipcodeStale, setZipcodeStale] = useState(false);
@@ -138,6 +152,10 @@ export function CartPageClient({ locale, globalServices, labels }: Props) {
   const [selectedGlobalServiceIds, setSelectedGlobalServiceIds] = useState<
     string[]
   >([]);
+
+  // Event Window: ephemeral local state, not persisted in cart store.
+  // Only relevant (and required) when the store has an event window configured.
+  const [eventStartTime, setEventStartTime] = useState<string>("");
 
   // Customer form state
   const [customerName, setCustomerName] = useState("");
@@ -285,7 +303,16 @@ export function CartPageClient({ locale, globalServices, labels }: Props) {
     depositPercent: 0.1,
     paymentMode: "SPLIT_50_50" as const,
     currency: "USD",
+    eventWindowStart: null,
+    eventWindowEnd: null,
   };
+
+  // Event Window: derive the list of valid hours from the current settings.
+  // Empty array means the feature is inactive and the selector is hidden.
+  const eventHours = generateEventHours(
+    resolvedSettings.eventWindowStart,
+    resolvedSettings.eventWindowEnd,
+  );
 
   // ADR-009: client-side preview of servicesTotal. Local Services add ONCE per
   // line (regardless of qty); Global Services add ONCE per order. The server
@@ -339,6 +366,10 @@ export function CartPageClient({ locale, globalServices, labels }: Props) {
       errors.distance =
         labels.distanceRequired ?? "Selecciona tu dirección de entrega";
     }
+    if (eventHours.length > 0 && !eventStartTime) {
+      errors.eventStartTime =
+        labels.eventStartTimeError ?? "Selecciona la hora de inicio de tu evento";
+    }
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
@@ -359,6 +390,8 @@ export function CartPageClient({ locale, globalServices, labels }: Props) {
       locale: locale === "es" ? "es" : "en",
       // ADR-009: send only ids — the server re-derives prices, never trusts us.
       globalServiceIds: selectedGlobalServiceIds,
+      // Event Window: only send when the feature is active; undefined otherwise.
+      eventStartTime: eventHours.length > 0 ? eventStartTime : undefined,
       items: items.map((item) => ({
         productId: item.productId,
         variantId: item.variantId,
@@ -491,6 +524,55 @@ export function CartPageClient({ locale, globalServices, labels }: Props) {
                 )}
               </CardContent>
             </Card>
+
+            {/* Event Window: hour selector — only shown when configured */}
+            {eventHours.length > 0 && (
+              <Card className="mt-6">
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold text-slate-900">
+                    {labels.eventStartTimeLabel ?? "Hora de inicio de tu evento"}
+                  </CardTitle>
+                  <p className="text-sm text-slate-400">
+                    {labels.eventStartTimeHelper ??
+                      "Indica a qué hora comienza tu evento."}
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-1.5">
+                    <Select
+                      value={eventStartTime}
+                      onValueChange={(value) => setEventStartTime(value ?? "")}
+                    >
+                      <SelectTrigger
+                        className={cn(
+                          "w-full",
+                          formErrors.eventStartTime ? "border-red-500" : "",
+                        )}
+                      >
+                        <SelectValue
+                          placeholder={
+                            labels.eventStartTimePlaceholder ??
+                            "Selecciona una hora"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {eventHours.map((hour) => (
+                          <SelectItem key={hour} value={hour}>
+                            {hour}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {formErrors.eventStartTime && (
+                      <p className="text-xs text-red-500">
+                        {formErrors.eventStartTime}
+                      </p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Customer info */}
             <Card className="mt-6">
