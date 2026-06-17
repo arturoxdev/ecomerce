@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { findByIdWithItems } from "@/features/orders/services/orders.service";
+import { toDisplayDate } from "@/lib/date";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
 
@@ -61,7 +62,9 @@ export default async function OrderConfirmationPage({ params }: Props) {
                 </p>
                 <div className="flex items-center gap-1.5 text-xs text-slate-500">
                   <CalendarDays className="size-3" />
-                  <span>{new Date(item.rentDate).toLocaleDateString()}</span>
+                  <span>
+                    {toDisplayDate(item.rentDate).toLocaleDateString(locale)}
+                  </span>
                 </div>
                 <p className="text-xs text-slate-500">
                   {item.quantity} × ${parseFloat(item.unitPrice).toFixed(2)}

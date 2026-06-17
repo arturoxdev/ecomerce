@@ -16,3 +16,20 @@ export function toDateOnlyString(date: Date): string {
   const d = String(date.getUTCDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
 }
+
+/**
+ * Re-anchors a calendar date that was stored at midnight UTC (see
+ * {@link parseDateOnly}) to local midnight, keeping its Y/M/D intact.
+ *
+ * Rent/availability dates are calendar days, but the DB column is
+ * `timestamp` without time zone, so the value round-trips as the instant
+ * "midnight UTC of day X". Locale-aware formatters (`Intl`, `date-fns`)
+ * render in the runtime's local zone, which shifts that instant back a day
+ * in negative-offset zones (e.g. UTC-6 shows the day before). Wrapping the
+ * value with this helper before formatting makes them render the intended
+ * calendar day regardless of the runtime time zone.
+ */
+export function toDisplayDate(value: Date | string | number): Date {
+  const d = value instanceof Date ? value : new Date(value);
+  return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+}
