@@ -35,7 +35,7 @@ A single store-wide range — one earliest and one latest **Event Start Time** �
 _Avoid_: horarios de entrega — the catalog limits allowed event start times, not the store's dispatch times.
 
 **Order Ticket** (es: _Ticket de orden_):
-A letter-size PDF **summary of one Order** — store name, buyer data, lines with their Services, and the charge breakdown (subtotal, services, delivery, total, paid online, balance due) — generated **on demand** from the admin order detail and never stored. It exists for an Order in **any status** (the status is printed on it); its filename is the full Order id.
+A letter-size PDF **summary of one Order** — store name, buyer data, lines with their Services, and the charge breakdown (subtotal, services, delivery, total, paid online, balance due) — generated **on demand** from the admin order detail and never stored. It exists for an Order in **any status** (the status is printed on it); its filename is the full Order id. It is a customer-facing document and is rendered **entirely in English**, independent of the admin UI language.
 _Avoid_: receipt / recibo / comprobante de pago (it is not proof of payment — a PENDING unpaid Order still has one), invoice / factura (not a tax document), thermal/POS ticket (it is a letter-size document).
 
 ## Relationships
