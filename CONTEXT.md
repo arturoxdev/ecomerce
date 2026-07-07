@@ -34,6 +34,10 @@ _Avoid_: delivery time / hora de entrega — the customer states when their **ev
 A single store-wide range — one earliest and one latest **Event Start Time** — that applies to all days, configured in `/admin/settings`. It constrains the checkout time picker. When unset, no event time is requested (the picker is hidden and checkout behaves as before). The range is in **whole-hour steps** and is **inclusive of both ends** (the latest hour is itself a selectable start); `end` may equal `start` (a single allowed hour), and `end` must never be earlier than `start`.
 _Avoid_: horarios de entrega — the catalog limits allowed event start times, not the store's dispatch times.
 
+**Order Ticket** (es: _Ticket de orden_):
+A letter-size PDF **summary of one Order** — store name, buyer data, lines with their Services, and the charge breakdown (subtotal, services, delivery, total, paid online, balance due) — generated **on demand** from the admin order detail and never stored. It exists for an Order in **any status** (the status is printed on it); its filename is the full Order id.
+_Avoid_: receipt / recibo / comprobante de pago (it is not proof of payment — a PENDING unpaid Order still has one), invoice / factura (not a tax document), thermal/POS ticket (it is a letter-size document).
+
 ## Relationships
 
 - A **Product** has zero or more **Variants** (single-select, replaces price).
@@ -41,6 +45,7 @@ _Avoid_: horarios de entrega — the catalog limits allowed event start times, n
 - A **Store** has zero or more **Global Services** (multi-select at checkout, adds to the order).
 - A **Store** has at most one **Event Window** (allowed range of event start times).
 - An **Order** carries at most one **Event Start Time**, which must fall within the store's **Event Window**.
+- Any **Order** can produce an **Order Ticket** on demand (generated fresh per download; not persisted).
 
 ## Pricing rules
 
@@ -62,3 +67,4 @@ _Avoid_: horarios de entrega — the catalog limits allowed event start times, n
 - "Variant" vs "Additional Service" — resolved: Variant replaces price & is single-select; Additional Service adds to price & is multi-select. They are separate concepts with separate storage.
 - "hora del evento" vs "hora de entrega" — resolved: the customer picks the **Event Start Time** (when their event begins), stored on the Order; the store's actual delivery dispatch is decided separately by the operator. The `/admin/settings` catalog (drafted as "horarios de entrega") configures the **Event Window** of allowed event start times and should be labelled accordingly (e.g. "Horario de eventos").
 - One **Event Start Time** per Order is intentionally kept even though a cart may hold lines with different dates (the customer chose not to force a single date). When line dates differ, the single event time is understood as the customer's stated event start, not bound to a specific line.
+- "ticket" — resolved: the **Order Ticket** is a letter-size order *summary*, not a thermal POS receipt and not proof of payment; it downloads for Orders in any status, including PENDING (unpaid) and CANCELLED.
