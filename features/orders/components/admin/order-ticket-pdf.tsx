@@ -8,20 +8,57 @@ import {
   type DocumentProps,
 } from "@react-pdf/renderer";
 
-import {
-  ORDER_STATUS_LABEL,
-  PAYMENT_METHOD_LABEL,
-  PAYMENT_STATUS_LABEL,
-} from "@/lib/admin/labels";
-import { formatAdminDate, formatAdminDateTime } from "@/lib/admin/format";
 import { siteConfig } from "@/lib/config/site";
 import { toDisplayDate } from "@/lib/date";
+import type {
+  OrderStatus,
+  PaymentMethod,
+  PaymentStatus,
+} from "@/lib/db/schema";
 
 import type { findByIdWithItems } from "../../services/orders.service";
 
 export type OrderTicketOrder = NonNullable<
   Awaited<ReturnType<typeof findByIdWithItems>>
 >;
+
+// The ticket is a customer-facing document and is always rendered in
+// English, independent of the admin UI language (lib/admin/labels is es).
+const ORDER_STATUS_EN: Record<OrderStatus, string> = {
+  PENDING: "Pending",
+  CONFIRMED: "Confirmed",
+  DELIVERED: "Delivered",
+  RETURNED: "Returned",
+  CANCELLED: "Cancelled",
+};
+
+const PAYMENT_STATUS_EN: Record<PaymentStatus, string> = {
+  AUTHORIZED: "Authorized",
+  CAPTURED: "Captured",
+  VOIDED: "Voided",
+  FAILED: "Failed",
+  SUSPICIOUS: "Suspicious",
+};
+
+const PAYMENT_METHOD_EN: Record<PaymentMethod, string> = {
+  CASH: "Cash",
+  CARD: "Card",
+  TRANSFER: "Transfer",
+};
+
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+});
+
+const dateTimeFormatter = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+});
 
 const PRIMARY = process.env.NEXT_PUBLIC_COLOR_PRIMARY ?? "#f28b0d";
 const MUTED = "#6b7280";
@@ -141,7 +178,7 @@ type Props = DocumentProps & {
 };
 
 export function OrderTicketDocument({ order, generatedAt }: Props) {
-  const money = new Intl.NumberFormat("es", {
+  const money = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: order.currency,
     currencyDisplay: "code",
@@ -163,7 +200,7 @@ export function OrderTicketDocument({ order, generatedAt }: Props) {
     .join(", ");
 
   return (
-    <Document title={`Ticket de orden #${shortId}`} author={siteConfig.name}>
+    <Document title={`Order Ticket #${shortId}`} author={siteConfig.name}>
       <Page size="LETTER" style={styles.page}>
         <View style={styles.header}>
           <View style={styles.brand}>
@@ -174,7 +211,7 @@ export function OrderTicketDocument({ order, generatedAt }: Props) {
             <Text style={styles.siteName}>{siteConfig.name}</Text>
           </View>
           <View>
-            <Text style={styles.ticketLabel}>TICKET DE ORDEN</Text>
+            <Text style={styles.ticketLabel}>ORDER TICKET</Text>
             <Text style={styles.shortId}>#{shortId}</Text>
             <Text style={styles.fullId}>{order.id}</Text>
           </View>
@@ -182,27 +219,27 @@ export function OrderTicketDocument({ order, generatedAt }: Props) {
 
         <View style={styles.metaRow}>
           <View>
-            <Text style={styles.metaLabel}>FECHA DE CREACIÓN</Text>
+            <Text style={styles.metaLabel}>CREATED</Text>
             <Text style={styles.metaValue}>
-              {formatAdminDateTime(order.createdAt)}
+              {dateTimeFormatter.format(order.createdAt)}
             </Text>
           </View>
           <View>
-            <Text style={styles.metaLabel}>ESTADO</Text>
+            <Text style={styles.metaLabel}>STATUS</Text>
             <Text style={styles.metaValue}>
-              {ORDER_STATUS_LABEL[order.status]}
+              {ORDER_STATUS_EN[order.status]}
             </Text>
           </View>
           <View>
-            <Text style={styles.metaLabel}>PAGO</Text>
+            <Text style={styles.metaLabel}>PAYMENT</Text>
             <Text style={styles.metaValue}>
-              {PAYMENT_STATUS_LABEL[order.paymentStatus]} ·{" "}
-              {PAYMENT_METHOD_LABEL[order.paymentMethod]}
+              {PAYMENT_STATUS_EN[order.paymentStatus]} ·{" "}
+              {PAYMENT_METHOD_EN[order.paymentMethod]}
             </Text>
           </View>
         </View>
 
-        <Text style={styles.sectionTitle}>Cliente</Text>
+        <Text style={styles.sectionTitle}>Customer</Text>
         <View style={styles.customerBox}>
           <View style={styles.customerCol}>
             <Text style={styles.productName}>{order.customerName}</Text>
@@ -213,20 +250,20 @@ export function OrderTicketDocument({ order, generatedAt }: Props) {
             {address ? <Text style={styles.muted}>{address}</Text> : null}
             {order.eventStartTime ? (
               <Text>
-                <Text style={styles.muted}>Hora de inicio del evento: </Text>
+                <Text style={styles.muted}>Event start time: </Text>
                 {order.eventStartTime}
               </Text>
             ) : null}
           </View>
         </View>
 
-        <Text style={styles.sectionTitle}>Artículos</Text>
+        <Text style={styles.sectionTitle}>Items</Text>
         <View style={styles.table}>
           <View style={styles.tableHeader}>
-            <Text style={[styles.th, styles.colProduct]}>PRODUCTO</Text>
-            <Text style={[styles.th, styles.colDate]}>FECHA DE RENTA</Text>
-            <Text style={[styles.th, styles.colQty]}>CANT.</Text>
-            <Text style={[styles.th, styles.colPrice]}>PRECIO UNIT.</Text>
+            <Text style={[styles.th, styles.colProduct]}>PRODUCT</Text>
+            <Text style={[styles.th, styles.colDate]}>RENT DATE</Text>
+            <Text style={[styles.th, styles.colQty]}>QTY</Text>
+            <Text style={[styles.th, styles.colPrice]}>UNIT PRICE</Text>
             <Text style={[styles.th, styles.colSubtotal]}>SUBTOTAL</Text>
           </View>
           {order.orderItems.map((item, index) => (
@@ -250,7 +287,7 @@ export function OrderTicketDocument({ order, generatedAt }: Props) {
                 ))}
               </View>
               <Text style={styles.colDate}>
-                {formatAdminDate(toDisplayDate(item.rentDate))}
+                {dateFormatter.format(toDisplayDate(item.rentDate))}
               </Text>
               <Text style={styles.colQty}>{item.quantity}</Text>
               <Text style={styles.colPrice}>{fmt(item.unitPrice)}</Text>
@@ -268,7 +305,7 @@ export function OrderTicketDocument({ order, generatedAt }: Props) {
             >
               <View style={styles.colProduct}>
                 <Text>{service.name}</Text>
-                <Text style={styles.itemDetail}>Servicio de la orden</Text>
+                <Text style={styles.itemDetail}>Order service</Text>
               </View>
               <Text style={styles.colDate}>—</Text>
               <Text style={styles.colQty}>1</Text>
@@ -286,13 +323,13 @@ export function OrderTicketDocument({ order, generatedAt }: Props) {
             </View>
             {servicesTotalNum > 0 ? (
               <View style={styles.summaryLine}>
-                <Text style={styles.muted}>Servicios adicionales</Text>
+                <Text style={styles.muted}>Additional services</Text>
                 <Text>{fmt(servicesTotalNum)}</Text>
               </View>
             ) : null}
             <View style={styles.summaryLine}>
-              <Text style={styles.muted}>Entrega</Text>
-              <Text>{deliveryFeeNum === 0 ? "Incluida" : fmt(deliveryFeeNum)}</Text>
+              <Text style={styles.muted}>Delivery</Text>
+              <Text>{deliveryFeeNum === 0 ? "Included" : fmt(deliveryFeeNum)}</Text>
             </View>
             <View style={styles.totalLine}>
               <Text style={styles.totalText}>Total</Text>
@@ -300,7 +337,7 @@ export function OrderTicketDocument({ order, generatedAt }: Props) {
             </View>
             <View style={styles.summaryLine}>
               <Text style={styles.muted}>
-                Pagado en línea
+                Paid online
                 {isSplit
                   ? " (50%)"
                   : paidNum >= totalNum && totalNum > 0
@@ -312,7 +349,7 @@ export function OrderTicketDocument({ order, generatedAt }: Props) {
             {balanceNum > 0 ? (
               <View style={styles.summaryLine}>
                 <Text style={styles.muted}>
-                  Saldo a la entrega{isSplit ? " (50%)" : ""}
+                  Balance due on delivery{isSplit ? " (50%)" : ""}
                 </Text>
                 <Text style={styles.productName}>{fmt(balanceNum)}</Text>
               </View>
@@ -322,10 +359,10 @@ export function OrderTicketDocument({ order, generatedAt }: Props) {
 
         <View style={styles.footer} fixed>
           <Text style={styles.footerText}>
-            {siteConfig.name} — Orden {order.id}
+            {siteConfig.name} — Order {order.id}
           </Text>
           <Text style={styles.footerText}>
-            Generado el {formatAdminDateTime(generatedAt)}
+            Generated on {dateTimeFormatter.format(generatedAt)}
           </Text>
         </View>
       </Page>
