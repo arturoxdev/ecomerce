@@ -22,6 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getOrderDetail } from "@/features/orders/actions";
+import { DownloadTicketButton } from "@/features/orders/components/admin/download-ticket-button";
 import { OrderDetailActions } from "@/features/orders/components/admin/order-detail-actions";
 import { getSessionUser } from "@/lib/services/auth";
 
@@ -59,14 +60,17 @@ export default async function AdminOrderDetailPage({ params }: Props) {
             <ArrowLeft className="size-4" />
             Volver a Órdenes
           </Link>
-          <OrderDetailActions
-            orderId={order.id}
-            status={order.status}
-            paymentStatus={order.paymentStatus}
-            paymentMethod={order.paymentMethod}
-            isStripe={Boolean(order.stripeSessionId)}
-            currentRole={user.role}
-          />
+          <div className="flex items-center gap-2">
+            <DownloadTicketButton orderId={order.id} />
+            <OrderDetailActions
+              orderId={order.id}
+              status={order.status}
+              paymentStatus={order.paymentStatus}
+              paymentMethod={order.paymentMethod}
+              isStripe={Boolean(order.stripeSessionId)}
+              currentRole={user.role}
+            />
+          </div>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[1fr_320px]">

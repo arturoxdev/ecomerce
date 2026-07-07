@@ -34,6 +34,7 @@
     "@mdxeditor/editor": "^3.53.1",
     "@react-email/components": "^1.0.12",
     "@react-email/render": "^2.0.9",
+    "@react-pdf/renderer": "^4.5.1",
     "@tailwindcss/typography": "^0.5.19",
     "agentation": "latest",
     "bcryptjs": "^3.0.3",
