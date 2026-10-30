@@ -67,3 +67,33 @@ export function parseEventWindowForm(formData: FormData) {
     eventWindowEnd: formData.get("eventWindowEnd"),
   });
 }
+
+// ---------------------------------------------------------------------------
+// Social Links
+// ---------------------------------------------------------------------------
+
+const socialUrlOrNull = z.preprocess(
+  (val) => (typeof val === "string" && val.trim() === "" ? null : val),
+  z
+    .url({
+      protocol: /^https?$/,
+      error: "Ingresa un enlace completo, por ejemplo https://facebook.com/tu-pagina",
+    })
+    .trim()
+    .max(500)
+    .nullable(),
+);
+
+export const socialLinksSchema = z.object({
+  facebookUrl: socialUrlOrNull,
+  instagramUrl: socialUrlOrNull,
+});
+
+export type SocialLinksInput = z.infer<typeof socialLinksSchema>;
+
+export function parseSocialLinksForm(formData: FormData) {
+  return socialLinksSchema.safeParse({
+    facebookUrl: formData.get("facebookUrl") ?? "",
+    instagramUrl: formData.get("instagramUrl") ?? "",
+  });
+}

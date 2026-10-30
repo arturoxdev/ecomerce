@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   localeSchema,
   parseAboutForm,
+  parseAboutMediaForm,
   parseContactForm,
   parseFaqPayload,
   parseHomeHeroTextsForm,
@@ -208,6 +209,49 @@ describe("pages-admin schemas", () => {
       expect(result.success).toBe(false);
       if (result.success) return;
       expect(result.error.flatten().fieldErrors.description).toBeDefined();
+    });
+  });
+
+  describe("parseAboutMediaForm", () => {
+    it("image url -> success", () => {
+      // Arrange
+      const fd = buildFormData({
+        storyImageUrl: "https://cdn.example.com/store/about/a.webp",
+      });
+
+      // Act
+      const result = parseAboutMediaForm(fd);
+
+      // Assert
+      expect(result.success).toBe(true);
+    });
+
+    it("video url -> validation error on storyImageUrl", () => {
+      // Arrange
+      const fd = buildFormData({
+        storyImageUrl: "https://cdn.example.com/store/about/a.mp4",
+      });
+
+      // Act
+      const result = parseAboutMediaForm(fd);
+
+      // Assert
+      expect(result.success).toBe(false);
+      if (result.success) return;
+      expect(result.error.flatten().fieldErrors.storyImageUrl).toEqual([
+        "Solo se permiten imágenes",
+      ]);
+    });
+
+    it("empty value -> validation error", () => {
+      // Arrange
+      const fd = buildFormData({ storyImageUrl: "" });
+
+      // Act
+      const result = parseAboutMediaForm(fd);
+
+      // Assert
+      expect(result.success).toBe(false);
     });
   });
 });

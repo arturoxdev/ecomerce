@@ -42,12 +42,14 @@ export function DocumentShell({ children }: { children: React.ReactNode }) {
 
 export function AboutStorySection({
   locale,
+  imageUrl,
   storyTitle,
   storyBody,
   valuesTitle,
   valuesBody,
 }: {
   locale: string;
+  imageUrl: string;
   storyTitle: string;
   storyBody: string;
   valuesTitle: string;
@@ -91,8 +93,8 @@ export function AboutStorySection({
           <div className="overflow-hidden rounded-2xl bg-slate-200 shadow-[0_16px_40px_rgba(15,23,42,0.08)]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://images.unsplash.com/photo-1669670131653-dc07f4be01ec?auto=format&fit=crop&w=1200&q=80"
-              alt="Party setup"
+              src={imageUrl}
+              alt={storyTitle}
               className="h-full min-h-[320px] w-full object-cover"
             />
           </div>

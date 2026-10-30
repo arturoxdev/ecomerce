@@ -6,6 +6,7 @@ import { getStoreId } from "@/lib/config/tenant";
 import { db } from "@/lib/db";
 import {
   aboutPageContents,
+  aboutPageMedia,
   contactPageContents,
   faqEntries,
   homeHeroTexts,
@@ -17,6 +18,7 @@ import { getMessages } from "@/lib/i18n/messages";
 import type { LegalPageSlug } from "./pages-catalog.service";
 import {
   aboutPageFallbacks,
+  aboutPageMediaFallbacks,
   contactPageFallbacks,
   faqFallbacks,
   homePageFallbacks,
@@ -135,6 +137,30 @@ export async function getLegalDocument(slug: LegalPageSlug, locale: Locale) {
   return {
     source: "fallback-bundled" as const,
     data: { slug, locale, ...legalPageFallbacks[slug][locale] },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// About Page — media (global, no por locale)
+// ---------------------------------------------------------------------------
+
+export async function getAboutMedia(): Promise<{
+  source: "db" | "fallback-bundled";
+  data: { storyImageUrl: string };
+}> {
+  try {
+    const current = await db.query.aboutPageMedia.findFirst({
+      where: eq(aboutPageMedia.storeId, getStoreId()),
+    });
+    if (current?.storyImageUrl) {
+      return { source: "db", data: { storyImageUrl: current.storyImageUrl } };
+    }
+  } catch {
+    // tabla puede no existir antes de correr la migración — caemos al fallback
+  }
+  return {
+    source: "fallback-bundled",
+    data: { storyImageUrl: aboutPageMediaFallbacks.storyImageUrl },
   };
 }
 

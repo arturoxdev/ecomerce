@@ -46,6 +46,11 @@ export const homePageFallbacks: { heroMediaUrl: string } = {
     "https://lh3.googleusercontent.com/aida-public/AB6AXuCWQyE9DMg-JDkm060LzSQqQ2STADSY1PSRyBso20F6UfgOrYYyfTGz0UYRmvgQilpWxSMynslYC6gXD48d6oFNC8-lC7FAHN0uQeizdgkJE4imQ6I4d-apMwbW8aiPU60-OFjPstMwtZi-fsmpiRD_6c59p4f7WNAUJU7lwYdyfsW-UYhr1-XH5NFAUVmB7P1D7Y5YOSjunk3Hy0ne5yzgtqcMQLcUpw04tr2K-_seDR3Xtv0lmhIx05dHSizEREp582Nk4xlQcDVA",
 };
 
+export const aboutPageMediaFallbacks: { storyImageUrl: string } = {
+  storyImageUrl:
+    "https://images.unsplash.com/photo-1669670131653-dc07f4be01ec?auto=format&fit=crop&w=1200&q=80",
+};
+
 export const aboutPageFallbacks: Record<Locale, Omit<AboutPageContent, "locale">> = {
   en: {
     eyebrow: "Family-owned party rentals",

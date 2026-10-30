@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import {
   localeSchema,
   parseAboutForm,
+  parseAboutMediaForm,
   parseContactForm,
   parseFaqPayload,
   parseHomeForm,
@@ -18,6 +19,7 @@ import { getStoreId } from "@/lib/config/tenant";
 import { db } from "@/lib/db";
 import {
   aboutPageContents,
+  aboutPageMedia,
   contactPageContents,
   faqEntries,
   homeHeroTexts,
@@ -51,6 +53,10 @@ function revalidateStaticPage(slug: string) {
   revalidatePath(`/es/${slug}`);
 }
 
+function revalidateAboutMedia() {
+  revalidateStaticPage("about");
+}
+
 function revalidateHomePage() {
   revalidatePath("/admin/pages");
   revalidatePath("/admin/pages/home");
@@ -65,7 +71,7 @@ async function deleteS3ObjectByUrl(url: string) {
       new DeleteObjectCommand({ Bucket: s3Bucket, Key: key }),
     );
   } catch (err) {
-    console.error("[home] Failed to delete old S3 object:", err);
+    console.error("[pages] Failed to delete old S3 object:", err);
   }
 }
 
@@ -100,6 +106,12 @@ export function findLegalBySlugAndLocale(slug: LegalPageSlug, locale: Locale) {
       eq(legalPageDocuments.slug, slug),
       eq(legalPageDocuments.locale, locale),
     ),
+  });
+}
+
+export function findAboutMediaByStoreId() {
+  return db.query.aboutPageMedia.findFirst({
+    where: eq(aboutPageMedia.storeId, getStoreId()),
   });
 }
 
@@ -402,6 +414,72 @@ export async function saveHomeHeroTexts(
   }
 
   revalidateHomePage();
+  return { success: true };
+}
+
+export async function saveAboutMedia(
+  _prev: StaticPageFormState,
+  formData: FormData,
+): Promise<StaticPageFormState> {
+  await requireWriteAccess();
+
+  const parsed = parseAboutMediaForm(formData);
+  if (!parsed.success) {
+    return validationProblem(parsed.error);
+  }
+
+  const { storyImageUrl } = parsed.data;
+
+  const ownsUrl =
+    getObjectKeyFromPublicMediaUrl(storyImageUrl, s3PublicUrl) !== null;
+  if (!ownsUrl) {
+    return forbiddenProblem("La URL no pertenece al bucket de la tienda");
+  }
+
+  const storeId = getStoreId();
+  const previous = await findAboutMediaByStoreId();
+  const previousUrl = previous?.storyImageUrl ?? null;
+
+  try {
+    await db
+      .insert(aboutPageMedia)
+      .values({ storeId, storyImageUrl })
+      .onConflictDoUpdate({
+        target: [aboutPageMedia.storeId],
+        set: { storyImageUrl },
+      });
+  } catch {
+    return internalProblem("No se pudo guardar la imagen de About");
+  }
+
+  if (previousUrl && previousUrl !== storyImageUrl) {
+    await deleteS3ObjectByUrl(previousUrl);
+  }
+
+  revalidateAboutMedia();
+  return { success: true };
+}
+
+export async function removeAboutMedia(): Promise<StaticPageFormState> {
+  await requireWriteAccess();
+
+  const previous = await findAboutMediaByStoreId();
+  const previousUrl = previous?.storyImageUrl ?? null;
+
+  try {
+    await db
+      .update(aboutPageMedia)
+      .set({ storyImageUrl: null })
+      .where(eq(aboutPageMedia.storeId, getStoreId()));
+  } catch {
+    return internalProblem("No se pudo eliminar la imagen de About");
+  }
+
+  if (previousUrl) {
+    await deleteS3ObjectByUrl(previousUrl);
+  }
+
+  revalidateAboutMedia();
   return { success: true };
 }
 

@@ -5,7 +5,10 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { countTiers, getOrigin } from "@/features/delivery-pricing/data";
-import { parseEventWindowForm } from "@/features/settings/services/settings-admin.schemas";
+import {
+  parseEventWindowForm,
+  parseSocialLinksForm,
+} from "@/features/settings/services/settings-admin.schemas";
 import { countZipcodes } from "@/features/zipcodes/services/zipcodes.service";
 import { recordAudit } from "@/lib/audit";
 import { getStoreId } from "@/lib/config/tenant";
@@ -238,6 +241,49 @@ export async function updateEventWindowSettings(
   });
 
   revalidatePath("/admin/settings/event-window");
+  revalidatePath("/[locale]", "layout");
+  return { success: true };
+}
+
+export async function updateSocialLinksSettings(
+  _prev: SettingsFormState,
+  formData: FormData,
+): Promise<SettingsFormState> {
+  const user = await requireWriteAccess();
+  if (user.role !== "ROOT" && user.role !== "ADMIN") {
+    return forbiddenProblem("Solo los administradores pueden editar los ajustes");
+  }
+
+  const parsed = parseSocialLinksForm(formData);
+  if (!parsed.success) return validationProblem(parsed.error);
+
+  const storeId = getStoreId();
+  const before = await db.query.settings.findFirst({
+    where: eq(settings.storeId, storeId),
+    columns: { facebookUrl: true, instagramUrl: true },
+  });
+
+  const data = parsed.data;
+
+  try {
+    await db
+      .insert(settings)
+      .values({ storeId, ...data })
+      .onConflictDoUpdate({ target: settings.storeId, set: data });
+  } catch {
+    return internalProblem("Failed to update social links");
+  }
+
+  await recordAudit({
+    userId: user.id,
+    action: "settings.social-links.update",
+    entity: "settings",
+    entityId: storeId,
+    before: before ?? null,
+    after: data,
+  });
+
+  revalidatePath("/admin/settings/social");
   revalidatePath("/[locale]", "layout");
   return { success: true };
 }

@@ -314,6 +314,8 @@ export const settings = pgTable("settings", {
   themeId: text("theme_id").notNull().default("default"),
   eventWindowStart: text("event_window_start"),
   eventWindowEnd: text("event_window_end"),
+  facebookUrl: text("facebook_url"),
+  instagramUrl: text("instagram_url"),
   updatedAt: timestamp("updated_at")
     .notNull()
     .$onUpdate(() => new Date()),
@@ -463,6 +465,22 @@ export const homeHeroTexts = pgTable(
       .$onUpdate(() => new Date()),
   },
   (t) => [unique("idx_home_hero_texts_locale").on(t.storeId, t.locale)],
+);
+
+// Imagen de "Our story" en /about. Global por tienda (no por locale), mismo
+// criterio que home_page_contents: el medio es visual, no traducible (ADR-008).
+export const aboutPageMedia = pgTable(
+  "about_page_media",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    storeId: text("store_id").notNull(),
+    storyImageUrl: text("story_image_url"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [unique("idx_about_page_media_store").on(t.storeId)],
 );
 
 export const aboutPageContents = pgTable(

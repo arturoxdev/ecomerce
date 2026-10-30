@@ -19,6 +19,7 @@ import { Field } from "@/components/admin/field";
 import {
   getAcceptString,
   getMaxSizeForMime,
+  IMAGE_MIME_TYPES,
   isVideoMime,
   isVideoUrl,
 } from "@/lib/services/media";
@@ -39,6 +40,17 @@ type Props = {
   defaultMediaUrl: string | null;
   fallbackMediaUrl: string;
   canWrite: boolean;
+  /** Nombre del input hidden que recibe la server action. */
+  fieldName: string;
+  /** Carpeta dentro de `${storeId}/` en S3; debe estar permitida en el presign. */
+  uploadPrefix: "home" | "about";
+  allowVideo: boolean;
+  copy: {
+    saved: string;
+    removed: string;
+    previewAlt: string;
+    removeTitle: string;
+  };
 };
 
 function readVideoDuration(file: File): Promise<number> {
@@ -58,8 +70,9 @@ function readVideoDuration(file: File): Promise<number> {
   });
 }
 
-async function uploadHeroFile(
+async function uploadMediaFile(
   file: File,
+  prefix: Props["uploadPrefix"],
 ): Promise<{ ok: true; publicUrl: string } | { ok: false; message: string }> {
   const presignRes = await fetch("/api/admin/upload/presign", {
     method: "POST",
@@ -68,7 +81,7 @@ async function uploadHeroFile(
       filename: file.name,
       contentType: file.type,
       fileSize: file.size,
-      prefix: "home",
+      prefix,
     }),
   });
 
@@ -115,18 +128,22 @@ function readImageDimensions(
   });
 }
 
-export function HomeForm({
+export function PageMediaForm({
   saveAction,
   removeAction,
   defaultMediaUrl,
   fallbackMediaUrl,
   canWrite,
+  fieldName,
+  uploadPrefix,
+  allowVideo,
+  copy,
 }: Props) {
   const [state, formAction, pending] = useActionState(
     saveAction,
     {} as StaticPageFormState,
   );
-  useFormActionToast(state, "Hero del Home actualizado");
+  useFormActionToast(state, copy.saved);
 
   const [currentUrl, setCurrentUrl] = useState<string | null>(defaultMediaUrl);
   const [pendingUrl, setPendingUrl] = useState<string | null>(null);
@@ -141,6 +158,12 @@ export function HomeForm({
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (!allowVideo && isVideoMime(file.type)) {
+      toast.error("Aquí solo se permiten imágenes", { description: file.name });
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
 
     const maxSize = getMaxSizeForMime(file.type);
     if (file.size > maxSize) {
@@ -191,7 +214,7 @@ export function HomeForm({
 
     setUploading(true);
     try {
-      const result = await uploadHeroFile(file);
+      const result = await uploadMediaFile(file, uploadPrefix);
       if (!result.ok) {
         toast.error(result.message, { description: file.name });
         return;
@@ -213,7 +236,7 @@ export function HomeForm({
         toast.error(result.detail ?? result.title);
         return;
       }
-      toast.success("Hero restablecido al medio por defecto");
+      toast.success(copy.removed);
       setPendingUrl(null);
       setCurrentUrl(null);
     });
@@ -223,7 +246,7 @@ export function HomeForm({
 
   return (
     <form action={formAction} className="space-y-6">
-      <input type="hidden" name="heroMediaUrl" value={finalUrlForSave} />
+      <input type="hidden" name={fieldName} value={finalUrlForSave} />
 
       <Field label="Vista previa">
         <div className="relative h-72 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
@@ -241,13 +264,13 @@ export function HomeForm({
             <img
               key={displayUrl}
               src={displayUrl}
-              alt="Hero del Home"
+              alt={copy.previewAlt}
               className="h-full w-full object-cover"
             />
           )}
           {!displayIsCustom && (
             <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-slate-700 shadow-sm">
-              Mostrando hero por defecto
+              Mostrando imagen por defecto
             </span>
           )}
         </div>
@@ -256,20 +279,24 @@ export function HomeForm({
       {canWrite && (
         <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-5">
           <p className="text-sm font-medium text-slate-700">
-            Sube una foto o un video corto
+            {allowVideo ? "Sube una foto o un video corto" : "Sube una foto"}
           </p>
           <p className="mt-1 text-xs text-slate-500">
             Imagen: hasta 5 MB · recomendado ≥1280×720 horizontal.
-            <br />
-            Video: hasta 20 MB y máximo {MAX_VIDEO_DURATION_SECONDS}{" "}
-            segundos. Se reproduce en silencio y en bucle.
+            {allowVideo ? (
+              <>
+                <br />
+                Video: hasta 20 MB y máximo {MAX_VIDEO_DURATION_SECONDS}{" "}
+                segundos. Se reproduce en silencio y en bucle.
+              </>
+            ) : null}
           </p>
 
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <input
               ref={fileInputRef}
               type="file"
-              accept={getAcceptString()}
+              accept={allowVideo ? getAcceptString() : IMAGE_MIME_TYPES.join(",")}
               onChange={handleFileChange}
               disabled={uploading || pending || removing}
               className="block w-full max-w-md text-sm text-slate-700 file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-2 file:text-sm file:font-semibold file:text-primary-foreground hover:file:bg-primary/90"
@@ -298,9 +325,9 @@ export function HomeForm({
               />
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>¿Eliminar el medio del hero?</AlertDialogTitle>
+                  <AlertDialogTitle>{copy.removeTitle}</AlertDialogTitle>
                   <AlertDialogDescription>
-                    El sitio público volverá a mostrar el hero por defecto y el
+                    El sitio público volverá a mostrar la imagen por defecto y el
                     archivo se borrará del almacenamiento. Esta acción no se
                     puede deshacer.
                   </AlertDialogDescription>

@@ -7,6 +7,8 @@ import {
   saveHomeMedia as dalSaveHomeMedia,
   removeHomeMedia as dalRemoveHomeMedia,
   saveHomeHeroTexts as dalSaveHomeHeroTexts,
+  saveAboutMedia as dalSaveAboutMedia,
+  removeAboutMedia as dalRemoveAboutMedia,
   createFaqEntry as dalCreateFaq,
   updateFaqEntry as dalUpdateFaq,
   deleteFaqEntry as dalDeleteFaq,
@@ -94,4 +96,15 @@ export async function sendEventInquiry(
   formData: FormData,
 ): Promise<FormState> {
   return svcSendEventInquiry(localeInput, _prev, formData);
+}
+
+export async function saveAboutMedia(
+  _prev: StaticPageFormState,
+  formData: FormData,
+): Promise<StaticPageFormState> {
+  return dalSaveAboutMedia(_prev, formData);
+}
+
+export async function removeAboutMedia(): Promise<StaticPageFormState> {
+  return dalRemoveAboutMedia();
 }

@@ -7,6 +7,11 @@ import { db, type Database } from "@/lib/db";
 import { settings } from "@/lib/db/schema";
 import { DEFAULT_THEME_ID } from "@/lib/themes";
 
+export type SocialLinks = {
+  facebookUrl: string | null;
+  instagramUrl: string | null;
+};
+
 export type SettingsRepoDeps = {
   db: Database;
   storeId: string;
@@ -45,6 +50,23 @@ export function createSettingsRepo(deps: SettingsRepoDeps) {
     return row?.themeId ?? DEFAULT_THEME_ID;
   }
 
+  // Se lee en el layout público de todas las páginas: si falla, el footer se
+  // queda sin íconos en vez de tumbar el sitio.
+  async function getSocialLinks(): Promise<SocialLinks> {
+    try {
+      const row = await dbx.query.settings.findFirst({
+        where: eq(settings.storeId, storeId),
+        columns: { facebookUrl: true, instagramUrl: true },
+      });
+      return {
+        facebookUrl: row?.facebookUrl ?? null,
+        instagramUrl: row?.instagramUrl ?? null,
+      };
+    } catch {
+      return { facebookUrl: null, instagramUrl: null };
+    }
+  }
+
   function setThemeId(themeId: string) {
     return upsert({ themeId });
   }
@@ -55,6 +77,7 @@ export function createSettingsRepo(deps: SettingsRepoDeps) {
     upsert,
     getThemeId,
     setThemeId,
+    getSocialLinks,
   };
 }
 
@@ -67,3 +90,4 @@ export const getByKey = defaultRepo.getByKey;
 export const upsert = defaultRepo.upsert;
 export const getThemeId = defaultRepo.getThemeId;
 export const setThemeId = defaultRepo.setThemeId;
+export const getSocialLinks = defaultRepo.getSocialLinks;
