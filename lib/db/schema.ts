@@ -448,6 +448,23 @@ export const homePageContents = pgTable(
   (t) => [unique("idx_home_page_store_slug").on(t.storeId, t.slug)],
 );
 
+export const homeHeroTexts = pgTable(
+  "home_hero_texts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    storeId: text("store_id").notNull(),
+    locale: contentLocaleEnum("locale").notNull(),
+    titleStart: text("title_start").notNull(),
+    titleHighlight: text("title_highlight").notNull().default(""),
+    description: text("description").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [unique("idx_home_hero_texts_locale").on(t.storeId, t.locale)],
+);
+
 export const aboutPageContents = pgTable(
   "about_page_contents",
   {

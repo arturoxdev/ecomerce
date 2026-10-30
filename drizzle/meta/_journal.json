@@ -85,6 +85,13 @@
       "when": 1781655729858,
       "tag": "0011_ambiguous_firelord",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1793386018453,
+      "tag": "0012_white_exiles",
+      "breakpoints": true
     }
   ]
 }

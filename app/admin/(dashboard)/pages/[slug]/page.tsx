@@ -4,6 +4,7 @@ import {
   AboutForm,
   ContactForm,
   HomeForm,
+  HomeHeroTextsForm,
   MarkdownForm,
   FaqManager,
   EditorCard,
@@ -12,11 +13,14 @@ import {
   saveContactPage,
   saveHomeMedia,
   removeHomeMedia,
+  saveHomeHeroTexts,
   saveLegalDocument,
   findAboutByLocale,
   findContactByLocale,
   findHomeByStoreId,
+  findHomeHeroTextsByLocale,
   findLegalBySlugAndLocale,
+  getHomeHeroTextsFallback,
 } from "@/features/pages";
 import { canWriteData, getSessionUser } from "@/lib/services/auth";
 import { getFaqEntries } from "@/features/pages";
@@ -65,21 +69,51 @@ export default async function AdminStaticPagePage({ params, searchParams }: Prop
       heroMediaUrl = row?.heroMediaUrl ?? null;
     } catch {}
 
+    let heroTexts = getHomeHeroTextsFallback(locale);
+    try {
+      heroTexts = (await findHomeHeroTextsByLocale(locale)) ?? heroTexts;
+    } catch {}
+
+    const boundTextsAction = saveHomeHeroTexts.bind(null, locale);
+
     return (
-      <PagesEditorShell
-        title={definition.title}
-        locale={locale}
-        showLocaleSwitcher={false}
-      >
-        <EditorCard>
-          <HomeForm
-            saveAction={saveHomeMedia}
-            removeAction={removeHomeMedia}
-            defaultMediaUrl={heroMediaUrl}
-            fallbackMediaUrl={homePageFallbacks.heroMediaUrl}
-            canWrite={canWrite}
-          />
-        </EditorCard>
+      <PagesEditorShell title={definition.title} locale={locale}>
+        <div className="space-y-6">
+          <EditorCard className="space-y-4">
+            <div>
+              <h2 className="text-base font-semibold text-slate-900">
+                Textos del hero ({locale.toUpperCase()})
+              </h2>
+              <p className="text-sm text-slate-500">
+                Cada idioma tiene sus propios textos. Cambia de idioma arriba a
+                la derecha.
+              </p>
+            </div>
+            <HomeHeroTextsForm
+              key={locale}
+              action={boundTextsAction}
+              defaultValues={heroTexts}
+              canWrite={canWrite}
+            />
+          </EditorCard>
+          <EditorCard className="space-y-4">
+            <div>
+              <h2 className="text-base font-semibold text-slate-900">
+                Imagen o video del hero
+              </h2>
+              <p className="text-sm text-slate-500">
+                El medio es el mismo para todos los idiomas.
+              </p>
+            </div>
+            <HomeForm
+              saveAction={saveHomeMedia}
+              removeAction={removeHomeMedia}
+              defaultMediaUrl={heroMediaUrl}
+              fallbackMediaUrl={homePageFallbacks.heroMediaUrl}
+              canWrite={canWrite}
+            />
+          </EditorCard>
+        </div>
       </PagesEditorShell>
     );
   }

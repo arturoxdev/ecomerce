@@ -5,6 +5,7 @@ import {
   parseAboutForm,
   parseContactForm,
   parseFaqPayload,
+  parseHomeHeroTextsForm,
   parseMarkdownForm,
 } from "./pages-admin.schemas";
 
@@ -145,6 +146,68 @@ describe("pages-admin schemas", () => {
 
       // Assert
       expect(result.success).toBe(false);
+    });
+  });
+
+  describe("parseHomeHeroTextsForm", () => {
+    it("empty highlight -> success with empty string", () => {
+      // Arrange
+      const fd = buildFormData({
+        titleStart: "Make Your Party",
+        titleHighlight: "",
+        description: "Desc",
+      });
+
+      // Act
+      const result = parseHomeHeroTextsForm(fd);
+
+      // Assert
+      expect(result.success).toBe(true);
+      if (!result.success) return;
+      expect(result.data.titleHighlight).toBe("");
+    });
+
+    it("missing highlight field -> success with empty string", () => {
+      // Arrange
+      const fd = buildFormData({ titleStart: "Title", description: "Desc" });
+
+      // Act
+      const result = parseHomeHeroTextsForm(fd);
+
+      // Assert
+      expect(result.success).toBe(true);
+      if (!result.success) return;
+      expect(result.data.titleHighlight).toBe("");
+    });
+
+    it("whitespace-only title -> validation error on titleStart", () => {
+      // Arrange
+      const fd = buildFormData({
+        titleStart: "   ",
+        titleHighlight: "Unforgettable",
+        description: "Desc",
+      });
+
+      // Act
+      const result = parseHomeHeroTextsForm(fd);
+
+      // Assert
+      expect(result.success).toBe(false);
+      if (result.success) return;
+      expect(result.error.flatten().fieldErrors.titleStart).toBeDefined();
+    });
+
+    it("missing description -> validation error on description", () => {
+      // Arrange
+      const fd = buildFormData({ titleStart: "T", titleHighlight: "H" });
+
+      // Act
+      const result = parseHomeHeroTextsForm(fd);
+
+      // Assert
+      expect(result.success).toBe(false);
+      if (result.success) return;
+      expect(result.error.flatten().fieldErrors.description).toBeDefined();
     });
   });
 });

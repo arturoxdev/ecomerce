@@ -6,6 +6,7 @@ import {
   saveContactPage as dalSaveContact,
   saveHomeMedia as dalSaveHomeMedia,
   removeHomeMedia as dalRemoveHomeMedia,
+  saveHomeHeroTexts as dalSaveHomeHeroTexts,
   createFaqEntry as dalCreateFaq,
   updateFaqEntry as dalUpdateFaq,
   deleteFaqEntry as dalDeleteFaq,
@@ -68,6 +69,14 @@ export async function saveHomeMedia(
 
 export async function removeHomeMedia(): Promise<StaticPageFormState> {
   return dalRemoveHomeMedia();
+}
+
+export async function saveHomeHeroTexts(
+  localeInput: string,
+  _prev: StaticPageFormState,
+  formData: FormData,
+): Promise<StaticPageFormState> {
+  return dalSaveHomeHeroTexts(localeInput, _prev, formData);
 }
 
 export async function sendContactMessage(
