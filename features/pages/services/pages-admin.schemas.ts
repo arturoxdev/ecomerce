@@ -37,11 +37,18 @@ export const homeSchema = z.object({
   heroMediaUrl: z.string().url("La URL del medio no es válida"),
 });
 
+export const homeHeroTextsSchema = z.object({
+  titleStart: z.string().trim().min(1, "El título es requerido"),
+  titleHighlight: z.string().trim(),
+  description: z.string().trim().min(1, "El subtítulo es requerido"),
+});
+
 export type AboutInput = z.infer<typeof aboutSchema>;
 export type MarkdownInput = z.infer<typeof markdownSchema>;
 export type ContactInput = z.infer<typeof contactSchema>;
 export type FaqInput = z.infer<typeof faqSchema>;
 export type HomeInput = z.infer<typeof homeSchema>;
+export type HomeHeroTextsInput = z.infer<typeof homeHeroTextsSchema>;
 
 export function parseAboutForm(formData: FormData) {
   return aboutSchema.safeParse({
@@ -81,5 +88,13 @@ export function parseFaqPayload(payload: unknown) {
 export function parseHomeForm(formData: FormData) {
   return homeSchema.safeParse({
     heroMediaUrl: formData.get("heroMediaUrl"),
+  });
+}
+
+export function parseHomeHeroTextsForm(formData: FormData) {
+  return homeHeroTextsSchema.safeParse({
+    titleStart: formData.get("titleStart"),
+    titleHighlight: formData.get("titleHighlight") ?? "",
+    description: formData.get("description"),
   });
 }

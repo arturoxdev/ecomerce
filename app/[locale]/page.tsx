@@ -11,7 +11,7 @@ import { asc } from "drizzle-orm";
 
 import { findAllWithCategory } from "@/features/products/services/products.service";
 import { findAll as findAllCategories } from "@/features/categories/services/categories.service";
-import { getHomeMedia, HeroMedia } from "@/features/pages";
+import { getHomeHeroTexts, getHomeMedia, HeroMedia } from "@/features/pages";
 import { findThumbnail } from "@/lib/services/media";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
@@ -30,13 +30,14 @@ export default async function Home({ params }: HomeProps) {
   const typedLocale = locale as Locale;
   const m = getMessages(typedLocale);
 
-  const [dbCategories, dbProducts, heroMedia] = await Promise.all([
+  const [dbCategories, dbProducts, heroMedia, { data: heroTexts }] = await Promise.all([
     findAllCategories({ orderBy: asc(categoriesTable.sortOrder), limit: 6 }),
     findAllWithCategory({
       where: { isActive: true },
       limit: 6,
     }),
     getHomeMedia(),
+    getHomeHeroTexts(typedLocale),
   ]);
 
   return (
@@ -51,16 +52,21 @@ export default async function Home({ params }: HomeProps) {
                 {m.hero.badge}
               </div>
               <h1 className="mb-6 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-[60px] lg:leading-[1.1]">
-                {m.hero.titleStart}{" "}
-                <span className="relative inline-block text-primary">
-                  {m.hero.titleHighlight}
-                  <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 200 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M2 8c40-6 80-6 120-2s56 4 76-2" stroke="#fdba74" strokeWidth="3" strokeLinecap="round" strokeOpacity="0.7" />
-                  </svg>
-                </span>
+                {heroTexts.titleStart}
+                {heroTexts.titleHighlight ? (
+                  <>
+                    {" "}
+                    <span className="relative inline-block text-primary">
+                      {heroTexts.titleHighlight}
+                      <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 200 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 8c40-6 80-6 120-2s56 4 76-2" stroke="#fdba74" strokeWidth="3" strokeLinecap="round" strokeOpacity="0.7" />
+                      </svg>
+                    </span>
+                  </>
+                ) : null}
               </h1>
               <p className="mb-8 max-w-[480px] text-lg text-slate-600">
-                {m.hero.description}
+                {heroTexts.description}
               </p>
               <div className="flex flex-col gap-4 sm:flex-row">
                 <Link

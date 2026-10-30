@@ -66,3 +66,12 @@ Sin embargo, el contenido editable del hero en esta primera iteración es **sól
    ```
 
 Sin path de rollback automático: revertir requiere `DROP TABLE home_page_contents` y `DROP TYPE home_page_slug`. No hay datos que se pierdan en un revert temprano.
+
+## Actualización 2026-10-30: textos del hero editables
+
+Se implementó la "segunda iteración" que estaba fuera de alcance: el admin ahora edita el **título** (`titleStart`), la **palabra resaltada** (`titleHighlight`, opcional) y el **subtítulo** (`description`) del hero.
+
+- Los textos **sí son traducibles**, así que viven en una tabla aparte `home_hero_texts` con `unique (storeId, locale)`, igual que `about_page_contents`. El medio sigue global en `home_page_contents`; no se agregó `locale` a esa tabla.
+- Fallback: si no hay row para el locale, se usan `m.hero.*` de `messages/{locale}.json` (no se cae al otro idioma, para no mostrar inglés en `/es`).
+- Badge, CTAs, "trusted" y "safety" siguen en i18n estático.
+- El editor `/admin/pages/home` ahora muestra el switcher EN/ES; el switcher sólo afecta la card de textos.

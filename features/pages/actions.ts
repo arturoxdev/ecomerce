@@ -6,11 +6,14 @@ import {
   saveContactPage as dalSaveContact,
   saveHomeMedia as dalSaveHomeMedia,
   removeHomeMedia as dalRemoveHomeMedia,
+  saveHomeHeroTexts as dalSaveHomeHeroTexts,
   createFaqEntry as dalCreateFaq,
   updateFaqEntry as dalUpdateFaq,
   deleteFaqEntry as dalDeleteFaq,
 } from "./services/pages-admin.service";
 import type { StaticPageFormState } from "./services/pages-admin.service";
+import { sendContactMessage as svcSendContactMessage } from "./services/contact-message.service";
+import type { FormState } from "@/lib/types/form-state";
 import type { LegalPageSlug } from "./services/pages-catalog.service";
 
 export async function saveAboutPage(
@@ -66,4 +69,20 @@ export async function saveHomeMedia(
 
 export async function removeHomeMedia(): Promise<StaticPageFormState> {
   return dalRemoveHomeMedia();
+}
+
+export async function saveHomeHeroTexts(
+  localeInput: string,
+  _prev: StaticPageFormState,
+  formData: FormData,
+): Promise<StaticPageFormState> {
+  return dalSaveHomeHeroTexts(localeInput, _prev, formData);
+}
+
+export async function sendContactMessage(
+  localeInput: string,
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  return svcSendContactMessage(localeInput, _prev, formData);
 }

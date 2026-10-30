@@ -8,10 +8,12 @@ import {
   aboutPageContents,
   contactPageContents,
   faqEntries,
+  homeHeroTexts,
   homePageContents,
   legalPageDocuments,
 } from "@/lib/db/schema";
 import type { Locale } from "@/lib/i18n/config";
+import { getMessages } from "@/lib/i18n/messages";
 import type { LegalPageSlug } from "./pages-catalog.service";
 import {
   aboutPageFallbacks,
@@ -165,6 +167,41 @@ export async function getHomeMedia(): Promise<{
     source: "fallback-bundled",
     data: { heroMediaUrl: homePageFallbacks.heroMediaUrl },
   };
+}
+
+export type HomeHeroTexts = {
+  titleStart: string;
+  titleHighlight: string;
+  description: string;
+};
+
+function findHomeHeroTextsByLocale(locale: Locale) {
+  return db.query.homeHeroTexts.findFirst({
+    where: and(
+      eq(homeHeroTexts.storeId, getStoreId()),
+      eq(homeHeroTexts.locale, locale),
+    ),
+  });
+}
+
+export function getHomeHeroTextsFallback(locale: Locale): HomeHeroTexts {
+  const { titleStart, titleHighlight, description } = getMessages(locale).hero;
+  return { titleStart, titleHighlight, description };
+}
+
+export async function getHomeHeroTexts(
+  locale: Locale,
+): Promise<{ source: "db" | "fallback-bundled"; data: HomeHeroTexts }> {
+  try {
+    const current = await findHomeHeroTextsByLocale(locale);
+    if (current) {
+      const { titleStart, titleHighlight, description } = current;
+      return { source: "db", data: { titleStart, titleHighlight, description } };
+    }
+  } catch {
+    // tabla puede no existir antes de correr la migración — caemos al fallback
+  }
+  return { source: "fallback-bundled", data: getHomeHeroTextsFallback(locale) };
 }
 
 // ---------------------------------------------------------------------------

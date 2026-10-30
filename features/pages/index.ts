@@ -12,6 +12,7 @@ export type {
   HomePageContent,
 } from "./services/pages-fallbacks.service";
 export type { StaticPageFormState } from "./services/pages-admin.service";
+export type { HomeHeroTexts } from "./services/pages-public.service";
 
 export {
   getAboutPage,
@@ -19,6 +20,8 @@ export {
   getLegalDocument,
   getFaqEntries,
   getHomeMedia,
+  getHomeHeroTexts,
+  getHomeHeroTextsFallback,
 } from "./services/pages-public.service";
 
 export {
@@ -42,6 +45,7 @@ export {
   findLegalBySlugAndLocale,
   findFaqById,
   findHomeByStoreId,
+  findHomeHeroTextsByLocale,
 } from "./services/pages-admin.service";
 
 export {
@@ -53,6 +57,8 @@ export {
   deleteFaqEntry,
   saveHomeMedia,
   removeHomeMedia,
+  saveHomeHeroTexts,
+  sendContactMessage,
 } from "./actions";
 
 export {
@@ -70,4 +76,5 @@ export { ContactForm } from "./components/admin/contact-form";
 export { MarkdownForm } from "./components/admin/markdown-form";
 export { FaqManager } from "./components/admin/faq-manager";
 export { HomeForm } from "./components/admin/home-form";
+export { HomeHeroTextsForm } from "./components/admin/home-hero-texts-form";
 export { EditorCard, PagesEditorShell } from "./components/admin/editor-shell";

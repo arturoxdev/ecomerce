@@ -10,6 +10,7 @@ import {
   parseContactForm,
   parseFaqPayload,
   parseHomeForm,
+  parseHomeHeroTextsForm,
   parseMarkdownForm,
 } from "./pages-admin.schemas";
 import { requireWriteAccess } from "@/lib/services/auth";
@@ -19,6 +20,7 @@ import {
   aboutPageContents,
   contactPageContents,
   faqEntries,
+  homeHeroTexts,
   homePageContents,
   legalPageDocuments,
 } from "@/lib/db/schema";
@@ -106,6 +108,15 @@ export function findHomeByStoreId() {
     where: and(
       eq(homePageContents.storeId, getStoreId()),
       eq(homePageContents.slug, "home"),
+    ),
+  });
+}
+
+export function findHomeHeroTextsByLocale(locale: Locale) {
+  return db.query.homeHeroTexts.findFirst({
+    where: and(
+      eq(homeHeroTexts.storeId, getStoreId()),
+      eq(homeHeroTexts.locale, locale),
     ),
   });
 }
@@ -358,6 +369,36 @@ export async function removeHomeMedia(): Promise<StaticPageFormState> {
 
   if (previousUrl) {
     await deleteS3ObjectByUrl(previousUrl);
+  }
+
+  revalidateHomePage();
+  return { success: true };
+}
+
+export async function saveHomeHeroTexts(
+  localeInput: string,
+  _prev: StaticPageFormState,
+  formData: FormData,
+): Promise<StaticPageFormState> {
+  await requireWriteAccess();
+  const locale = ensureLocale(localeInput);
+
+  const parsed = parseHomeHeroTextsForm(formData);
+  if (!parsed.success) {
+    return validationProblem(parsed.error);
+  }
+
+  try {
+    const storeId = getStoreId();
+    await db
+      .insert(homeHeroTexts)
+      .values({ storeId, locale, ...parsed.data })
+      .onConflictDoUpdate({
+        target: [homeHeroTexts.storeId, homeHeroTexts.locale],
+        set: parsed.data,
+      });
+  } catch {
+    return internalProblem("No se pudieron guardar los textos del Home");
   }
 
   revalidateHomePage();
