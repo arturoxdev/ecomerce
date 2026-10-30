@@ -11,6 +11,8 @@ import {
   deleteFaqEntry as dalDeleteFaq,
 } from "./services/pages-admin.service";
 import type { StaticPageFormState } from "./services/pages-admin.service";
+import { sendContactMessage as svcSendContactMessage } from "./services/contact-message.service";
+import type { FormState } from "@/lib/types/form-state";
 import type { LegalPageSlug } from "./services/pages-catalog.service";
 
 export async function saveAboutPage(
@@ -66,4 +68,12 @@ export async function saveHomeMedia(
 
 export async function removeHomeMedia(): Promise<StaticPageFormState> {
   return dalRemoveHomeMedia();
+}
+
+export async function sendContactMessage(
+  localeInput: string,
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  return svcSendContactMessage(localeInput, _prev, formData);
 }

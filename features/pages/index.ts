@@ -53,6 +53,7 @@ export {
   deleteFaqEntry,
   saveHomeMedia,
   removeHomeMedia,
+  sendContactMessage,
 } from "./actions";
 
 export {

@@ -1,6 +1,9 @@
 import { Clock3, Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 
+import { sendContactMessage } from "../../actions";
+import { ContactMessageForm } from "./contact-message-form";
+
 type HeroProps = {
   eyebrow?: string;
   title: string;
@@ -153,12 +156,13 @@ export function ContactInfoSection({
           phone: "Teléfono",
           date: "Fecha del evento",
           message: "Mensaje",
-          button: "Escríbenos por correo",
+          button: "Enviar mensaje",
+          sending: "Enviando…",
+          success: "¡Gracias! Recibimos tu mensaje y te responderemos pronto.",
           placeholders: {
             name: "Tu nombre",
             email: "tu@email.com",
             phone: "+1 (713) 555-0198",
-            date: "MM/DD/YYYY",
             message: "Cuéntanos sobre tu evento",
           },
           cards: [
@@ -177,12 +181,13 @@ export function ContactInfoSection({
           phone: "Phone",
           date: "Event date",
           message: "Message",
-          button: "Email our team",
+          button: "Send message",
+          sending: "Sending…",
+          success: "Thanks! We got your message and will reply soon.",
           placeholders: {
             name: "Your name",
             email: "you@example.com",
             phone: "+1 (713) 555-0198",
-            date: "MM/DD/YYYY",
             message: "Tell us about your event",
           },
           cards: [
@@ -193,40 +198,26 @@ export function ContactInfoSection({
           ],
         };
 
+  // Solo textos serializables: los íconos de `cards` no pueden cruzar al cliente.
+  const { title, subtitle, cards, ...formCopy } = copy;
+
   return (
     <section className="bg-white px-6 py-12 lg:px-20">
       <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1fr_380px]">
         <div className="rounded-2xl border border-[#f1f5f9] bg-[#f8f7f5] p-8 shadow-[0_12px_28px_rgba(15,23,42,0.04)] sm:p-10">
-          <h2 className="text-2xl font-bold text-slate-900">{copy.title}</h2>
+          <h2 className="text-2xl font-bold text-slate-900">{title}</h2>
           <p className="mt-3 max-w-xl text-slate-600">
-            {copy.subtitle}
+            {subtitle}
           </p>
 
-          <div className="mt-8 grid gap-5 sm:grid-cols-2">
-            <Field label={copy.name} placeholder={copy.placeholders.name} />
-            <Field label={copy.email} placeholder={copy.placeholders.email} />
-            <Field label={copy.phone} placeholder={copy.placeholders.phone} />
-            <Field label={copy.date} placeholder={copy.placeholders.date} />
-          </div>
-
-          <div className="mt-5">
-            <label className="mb-2 block text-sm font-semibold text-slate-700">
-              {copy.message}
-            </label>
-            <textarea
-              rows={5}
-              className="w-full rounded-xl border border-[#e2e8f0] bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-primary"
-              placeholder={copy.placeholders.message}
-            />
-          </div>
-
-          <button className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-secondary px-5 py-3 text-sm font-bold text-white transition hover:bg-green-800">
-            {copy.button}
-          </button>
+          <ContactMessageForm
+            action={sendContactMessage.bind(null, locale)}
+            copy={formCopy}
+          />
         </div>
 
         <div className="flex flex-col gap-5">
-          {copy.cards.map((card) => {
+          {cards.map((card) => {
             const Icon = card.icon;
             return (
               <div
@@ -248,18 +239,6 @@ export function ContactInfoSection({
         </div>
       </div>
     </section>
-  );
-}
-
-function Field({ label, placeholder }: { label: string; placeholder: string }) {
-  return (
-    <div>
-      <label className="mb-2 block text-sm font-semibold text-slate-700">{label}</label>
-      <input
-        className="h-12 w-full rounded-xl border border-[#e2e8f0] bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-primary"
-        placeholder={placeholder}
-      />
-    </div>
   );
 }
 
