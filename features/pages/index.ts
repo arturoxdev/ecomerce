@@ -20,6 +20,7 @@ export {
   getLegalDocument,
   getFaqEntries,
   getHomeMedia,
+  getAboutMedia,
   getHomeHeroTexts,
   getHomeHeroTextsFallback,
 } from "./services/pages-public.service";
@@ -37,6 +38,7 @@ export {
   legalPageFallbacks,
   faqFallbacks,
   homePageFallbacks,
+  aboutPageMediaFallbacks,
 } from "./services/pages-fallbacks.service";
 
 export {
@@ -45,6 +47,7 @@ export {
   findLegalBySlugAndLocale,
   findFaqById,
   findHomeByStoreId,
+  findAboutMediaByStoreId,
   findHomeHeroTextsByLocale,
 } from "./services/pages-admin.service";
 
@@ -58,7 +61,10 @@ export {
   saveHomeMedia,
   removeHomeMedia,
   saveHomeHeroTexts,
+  saveAboutMedia,
+  removeAboutMedia,
   sendContactMessage,
+  sendEventInquiry,
 } from "./actions";
 
 export {
@@ -70,11 +76,12 @@ export {
 } from "./components/public/static-pages";
 export { MarkdownContent } from "./components/public/markdown-content";
 export { HeroMedia } from "./components/public/hero-media";
+export { EventInquiryForm } from "./components/public/event-inquiry-form";
 
 export { AboutForm } from "./components/admin/about-form";
 export { ContactForm } from "./components/admin/contact-form";
 export { MarkdownForm } from "./components/admin/markdown-form";
 export { FaqManager } from "./components/admin/faq-manager";
-export { HomeForm } from "./components/admin/home-form";
+export { PageMediaForm } from "./components/admin/page-media-form";
 export { HomeHeroTextsForm } from "./components/admin/home-hero-texts-form";
 export { EditorCard, PagesEditorShell } from "./components/admin/editor-shell";

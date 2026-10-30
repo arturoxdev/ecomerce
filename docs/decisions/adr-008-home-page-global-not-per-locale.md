@@ -75,3 +75,7 @@ Se implementó la "segunda iteración" que estaba fuera de alcance: el admin aho
 - Fallback: si no hay row para el locale, se usan `m.hero.*` de `messages/{locale}.json` (no se cae al otro idioma, para no mostrar inglés en `/es`).
 - Badge, CTAs, "trusted" y "safety" siguen en i18n estático.
 - El editor `/admin/pages/home` ahora muestra el switcher EN/ES; el switcher sólo afecta la card de textos.
+
+## Actualización 2026-10-30 (2): imagen de About
+
+La imagen de "Our story" en `/about` (antes una URL de Unsplash hardcodeada) es editable con el mismo criterio que el hero: **global por tienda**, tabla `about_page_media` con `unique (storeId)` y columna `story_image_url` nullable con fallback a la URL anterior. Solo imágenes (no video). El componente de subida se generalizó de `HomeForm` a `PageMediaForm` y se reutiliza en ambos editores; el presign acepta el prefijo `about`.

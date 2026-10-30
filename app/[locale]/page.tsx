@@ -11,7 +11,13 @@ import { asc } from "drizzle-orm";
 
 import { findAllWithCategory } from "@/features/products/services/products.service";
 import { findAll as findAllCategories } from "@/features/categories/services/categories.service";
-import { getHomeHeroTexts, getHomeMedia, HeroMedia } from "@/features/pages";
+import {
+  EventInquiryForm,
+  getHomeHeroTexts,
+  getHomeMedia,
+  HeroMedia,
+  sendEventInquiry,
+} from "@/features/pages";
 import { findThumbnail } from "@/lib/services/media";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
@@ -228,26 +234,15 @@ export default async function Home({ params }: HomeProps) {
               {m.cta.title}
             </h2>
             <p className="mt-4 text-lg leading-8 text-slate-600">{m.cta.description}</p>
-            <div className="mt-6 flex max-w-[420px] gap-x-4">
-              <label className="sr-only" htmlFor="email-address">
-                Email
-              </label>
-              <input
-                autoComplete="email"
-                className="min-w-0 flex-auto rounded-md border border-[#cbd5e1] px-3.5 py-2 text-slate-900 shadow-sm ring-0"
-                id="email-address"
-                name="email"
-                placeholder={m.cta.inputPlaceholder}
-                required
-                type="email"
-              />
-              <button
-                className="flex-none rounded-md bg-primary px-3.5 py-2.5 text-sm font-semibold text-white hover:bg-orange-600"
-                type="submit"
-              >
-                {m.cta.button}
-              </button>
-            </div>
+            <EventInquiryForm
+              action={sendEventInquiry.bind(null, typedLocale)}
+              copy={{
+                inputPlaceholder: m.cta.inputPlaceholder,
+                button: m.cta.button,
+                sending: m.cta.sending,
+                success: m.cta.success,
+              }}
+            />
           </div>
 
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">

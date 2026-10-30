@@ -4,6 +4,7 @@ import {
   updateDeliverySettings as dalUpdateDelivery,
   updateEventWindowSettings as dalUpdateEventWindow,
   updatePaymentSettings as dalUpdatePayment,
+  updateSocialLinksSettings as dalUpdateSocialLinks,
 } from "./data";
 import type { SettingsFormState } from "./data";
 
@@ -26,4 +27,11 @@ export async function updateEventWindowSettingsAction(
   formData: FormData,
 ): Promise<SettingsFormState> {
   return dalUpdateEventWindow(prev, formData);
+}
+
+export async function updateSocialLinksSettingsAction(
+  prev: SettingsFormState,
+  formData: FormData,
+): Promise<SettingsFormState> {
+  return dalUpdateSocialLinks(prev, formData);
 }

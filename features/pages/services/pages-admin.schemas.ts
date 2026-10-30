@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { isImageUrl } from "@/lib/services/media";
+
 export const localeSchema = z.enum(["en", "es"]);
 
 export const aboutSchema = z.object({
@@ -35,6 +37,13 @@ export const faqSchema = z.object({
 
 export const homeSchema = z.object({
   heroMediaUrl: z.string().url("La URL del medio no es válida"),
+});
+
+export const aboutMediaSchema = z.object({
+  storyImageUrl: z
+    .string()
+    .url("La URL de la imagen no es válida")
+    .refine(isImageUrl, "Solo se permiten imágenes"),
 });
 
 export const homeHeroTextsSchema = z.object({
@@ -96,5 +105,11 @@ export function parseHomeHeroTextsForm(formData: FormData) {
     titleStart: formData.get("titleStart"),
     titleHighlight: formData.get("titleHighlight") ?? "",
     description: formData.get("description"),
+  });
+}
+
+export function parseAboutMediaForm(formData: FormData) {
+  return aboutMediaSchema.safeParse({
+    storyImageUrl: formData.get("storyImageUrl"),
   });
 }

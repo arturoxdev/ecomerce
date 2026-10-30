@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import {
   AboutForm,
   ContactForm,
-  HomeForm,
+  PageMediaForm,
   HomeHeroTextsForm,
   MarkdownForm,
   FaqManager,
@@ -13,9 +13,12 @@ import {
   saveContactPage,
   saveHomeMedia,
   removeHomeMedia,
+  saveAboutMedia,
+  removeAboutMedia,
   saveHomeHeroTexts,
   saveLegalDocument,
   findAboutByLocale,
+  findAboutMediaByStoreId,
   findContactByLocale,
   findHomeByStoreId,
   findHomeHeroTextsByLocale,
@@ -31,6 +34,7 @@ import {
 } from "@/features/pages";
 import {
   aboutPageFallbacks,
+  aboutPageMediaFallbacks,
   contactPageFallbacks,
   homePageFallbacks,
   legalPageFallbacks,
@@ -105,12 +109,21 @@ export default async function AdminStaticPagePage({ params, searchParams }: Prop
                 El medio es el mismo para todos los idiomas.
               </p>
             </div>
-            <HomeForm
+            <PageMediaForm
               saveAction={saveHomeMedia}
               removeAction={removeHomeMedia}
               defaultMediaUrl={heroMediaUrl}
               fallbackMediaUrl={homePageFallbacks.heroMediaUrl}
               canWrite={canWrite}
+              fieldName="heroMediaUrl"
+              uploadPrefix="home"
+              allowVideo
+              copy={{
+                saved: "Hero del Home actualizado",
+                removed: "Hero restablecido al medio por defecto",
+                previewAlt: "Hero del Home",
+                removeTitle: "¿Eliminar el medio del hero?",
+              }}
             />
           </EditorCard>
         </div>
@@ -128,13 +141,56 @@ export default async function AdminStaticPagePage({ params, searchParams }: Prop
       content = (await findAboutByLocale(locale)) ?? content;
     } catch {}
 
+    let storyImageUrl: string | null = null;
+    try {
+      const row = await findAboutMediaByStoreId();
+      storyImageUrl = row?.storyImageUrl ?? null;
+    } catch {}
+
     const boundAction = saveAboutPage.bind(null, locale);
 
     return (
       <PagesEditorShell title={definition.title} locale={locale}>
-        <EditorCard>
-          <AboutForm action={boundAction} defaultValues={content} canWrite={canWrite} />
-        </EditorCard>
+        <div className="space-y-6">
+          <EditorCard className="space-y-4">
+            <div>
+              <h2 className="text-base font-semibold text-slate-900">
+                Textos ({locale.toUpperCase()})
+              </h2>
+              <p className="text-sm text-slate-500">
+                Cada idioma tiene sus propios textos. Cambia de idioma arriba a
+                la derecha.
+              </p>
+            </div>
+            <AboutForm action={boundAction} defaultValues={content} canWrite={canWrite} />
+          </EditorCard>
+          <EditorCard className="space-y-4">
+            <div>
+              <h2 className="text-base font-semibold text-slate-900">
+                Imagen de &quot;Nuestra historia&quot;
+              </h2>
+              <p className="text-sm text-slate-500">
+                La imagen es la misma para todos los idiomas.
+              </p>
+            </div>
+            <PageMediaForm
+              saveAction={saveAboutMedia}
+              removeAction={removeAboutMedia}
+              defaultMediaUrl={storyImageUrl}
+              fallbackMediaUrl={aboutPageMediaFallbacks.storyImageUrl}
+              canWrite={canWrite}
+              fieldName="storyImageUrl"
+              uploadPrefix="about"
+              allowVideo={false}
+              copy={{
+                saved: "Imagen de About actualizada",
+                removed: "Imagen restablecida a la imagen por defecto",
+                previewAlt: "Imagen de Nuestra historia",
+                removeTitle: "¿Eliminar la imagen de Nuestra historia?",
+              }}
+            />
+          </EditorCard>
+        </div>
       </PagesEditorShell>
     );
   }

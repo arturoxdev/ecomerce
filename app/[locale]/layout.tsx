@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { PublicFooter } from "@/components/public/footer";
 import { PublicHeader } from "@/components/public/header";
 import { siteConfig } from "@/lib/config/site";
-import { getThemeId } from "@/lib/data/settings";
+import { getSocialLinks, getThemeId } from "@/lib/data/settings";
 import { categories as categoriesTable } from "@/lib/db/schema";
 import { isLocale, locales, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
@@ -69,12 +69,13 @@ export default async function LocaleLayout({
 
   const typedLocale = locale as Locale;
   const messages = getMessages(typedLocale);
-  const [cats, themeId] = await Promise.all([
+  const [cats, themeId, socialLinks] = await Promise.all([
     findAllCategories({
       columns: { name: true, slug: true },
       orderBy: asc(categoriesTable.sortOrder),
     }),
     getThemeId(),
+    getSocialLinks(),
   ]);
   const theme = getThemeById(themeId);
 
@@ -85,6 +86,7 @@ export default async function LocaleLayout({
       <main className="flex-1">{children}</main>
       <PublicFooter
         locale={typedLocale}
+        socialLinks={socialLinks}
         rights={interpolate(messages.footer.rights)}
         links={messages.footer.links}
       />

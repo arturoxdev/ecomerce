@@ -5,7 +5,7 @@ import {
   StaticPageHero,
 } from "@/features/pages";
 import { isLocale, type Locale } from "@/lib/i18n/config";
-import { getAboutPage } from "@/features/pages";
+import { getAboutMedia, getAboutPage } from "@/features/pages";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -17,7 +17,10 @@ export default async function AboutPage({ params }: Props) {
     notFound();
   }
 
-  const { data: content } = await getAboutPage(locale as Locale);
+  const [{ data: content }, { data: media }] = await Promise.all([
+    getAboutPage(locale as Locale),
+    getAboutMedia(),
+  ]);
 
   return (
     <>
@@ -28,6 +31,7 @@ export default async function AboutPage({ params }: Props) {
       />
       <AboutStorySection
         locale={locale}
+        imageUrl={media.storyImageUrl}
         storyTitle={content.storyTitle}
         storyBody={content.storyBody}
         valuesTitle={content.valuesTitle}

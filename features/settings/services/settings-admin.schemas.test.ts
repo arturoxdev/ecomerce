@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   parseEventWindowForm,
+  parseSocialLinksForm,
   parseUpdateThemeForm,
 } from "./settings-admin.schemas";
 
@@ -143,6 +144,75 @@ describe("settings-admin schemas", () => {
 
       // Act
       const result = parseEventWindowForm(fd);
+
+      // Assert
+      expect(result.success).toBe(false);
+    });
+  });
+
+  describe("parseSocialLinksForm", () => {
+    it("both https urls -> success", () => {
+      // Arrange
+      const fd = buildFormData({
+        facebookUrl: "https://facebook.com/festejos",
+        instagramUrl: "https://instagram.com/festejos",
+      });
+
+      // Act
+      const result = parseSocialLinksForm(fd);
+
+      // Assert
+      expect(result.success).toBe(true);
+      if (!result.success) return;
+      expect(result.data).toEqual({
+        facebookUrl: "https://facebook.com/festejos",
+        instagramUrl: "https://instagram.com/festejos",
+      });
+    });
+
+    it("empty and blank values -> null (hidden in footer)", () => {
+      // Arrange
+      const fd = buildFormData({ facebookUrl: "", instagramUrl: "   " });
+
+      // Act
+      const result = parseSocialLinksForm(fd);
+
+      // Assert
+      expect(result.success).toBe(true);
+      if (!result.success) return;
+      expect(result.data).toEqual({ facebookUrl: null, instagramUrl: null });
+    });
+
+    it("missing fields -> null", () => {
+      // Act
+      const result = parseSocialLinksForm(new FormData());
+
+      // Assert
+      expect(result.success).toBe(true);
+      if (!result.success) return;
+      expect(result.data).toEqual({ facebookUrl: null, instagramUrl: null });
+    });
+
+    it("url without protocol -> validation error on that field", () => {
+      // Arrange
+      const fd = buildFormData({ facebookUrl: "facebook.com/festejos", instagramUrl: "" });
+
+      // Act
+      const result = parseSocialLinksForm(fd);
+
+      // Assert
+      expect(result.success).toBe(false);
+      if (result.success) return;
+      expect(result.error.flatten().fieldErrors.facebookUrl).toBeDefined();
+      expect(result.error.flatten().fieldErrors.instagramUrl).toBeUndefined();
+    });
+
+    it("javascript: url -> validation error", () => {
+      // Arrange
+      const fd = buildFormData({ instagramUrl: "javascript:alert(1)" });
+
+      // Act
+      const result = parseSocialLinksForm(fd);
 
       // Assert
       expect(result.success).toBe(false);

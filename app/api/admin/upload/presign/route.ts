@@ -15,7 +15,7 @@ import { s3Bucket, s3Client, s3PublicUrl } from "@/lib/services/s3-client";
 import { validationProblem } from "@/lib/problems";
 import { ProblemType } from "@/lib/types/problem-detail";
 
-const UPLOAD_PREFIXES = ["products", "home"] as const;
+const UPLOAD_PREFIXES = ["products", "home", "about"] as const;
 type UploadPrefix = (typeof UPLOAD_PREFIXES)[number];
 
 const presignSchema = z.object({

@@ -5,6 +5,10 @@ import type { Locale } from "@/lib/i18n/config";
 
 type Props = {
   locale: Locale;
+  socialLinks: {
+    facebookUrl: string | null;
+    instagramUrl: string | null;
+  };
   rights: string;
   links: {
     about: string;
@@ -16,7 +20,13 @@ type Props = {
   };
 };
 
-export function PublicFooter({ locale, rights, links }: Props) {
+export function PublicFooter({ locale, socialLinks, rights, links }: Props) {
+  // Solo se muestran las redes que el owner configuró en Ajustes → Redes sociales.
+  const socials = [
+    { href: socialLinks.facebookUrl, label: "Facebook", Icon: Facebook },
+    { href: socialLinks.instagramUrl, label: "Instagram", Icon: Instagram },
+  ].filter((social): social is typeof social & { href: string } => !!social.href);
+
   const footerLinks = [
     { href: `/${locale}/about`, label: links.about },
     { href: `/${locale}/contact`, label: links.contact },
@@ -42,16 +52,22 @@ export function PublicFooter({ locale, rights, links }: Props) {
         </div>
 
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <div className="flex justify-center space-x-6 md:order-2">
-          <a className="text-slate-400 hover:text-slate-500" href="#">
-            <span className="sr-only">Facebook</span>
-            <Facebook aria-hidden="true" className="h-6 w-6" />
-          </a>
-          <a className="text-slate-400 hover:text-slate-500" href="#">
-            <span className="sr-only">Instagram</span>
-            <Instagram aria-hidden="true" className="h-6 w-6" />
-          </a>
-          </div>
+          {socials.length > 0 ? (
+            <div className="flex justify-center space-x-6 md:order-2">
+              {socials.map(({ href, label, Icon }) => (
+                <a
+                  key={label}
+                  className="text-slate-400 hover:text-slate-500"
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="sr-only">{label}</span>
+                  <Icon aria-hidden="true" className="h-6 w-6" />
+                </a>
+              ))}
+            </div>
+          ) : null}
           <div className="md:order-1">
             <p className="text-center text-xs leading-5 text-slate-500 md:text-left">
               {rights}
