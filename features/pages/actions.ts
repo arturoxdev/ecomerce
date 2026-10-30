@@ -13,6 +13,7 @@ import {
 } from "./services/pages-admin.service";
 import type { StaticPageFormState } from "./services/pages-admin.service";
 import { sendContactMessage as svcSendContactMessage } from "./services/contact-message.service";
+import { sendEventInquiry as svcSendEventInquiry } from "./services/event-inquiry.service";
 import type { FormState } from "@/lib/types/form-state";
 import type { LegalPageSlug } from "./services/pages-catalog.service";
 
@@ -85,4 +86,12 @@ export async function sendContactMessage(
   formData: FormData,
 ): Promise<FormState> {
   return svcSendContactMessage(localeInput, _prev, formData);
+}
+
+export async function sendEventInquiry(
+  localeInput: string,
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  return svcSendEventInquiry(localeInput, _prev, formData);
 }

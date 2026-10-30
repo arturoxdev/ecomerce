@@ -59,6 +59,7 @@ export {
   removeHomeMedia,
   saveHomeHeroTexts,
   sendContactMessage,
+  sendEventInquiry,
 } from "./actions";
 
 export {
@@ -70,6 +71,7 @@ export {
 } from "./components/public/static-pages";
 export { MarkdownContent } from "./components/public/markdown-content";
 export { HeroMedia } from "./components/public/hero-media";
+export { EventInquiryForm } from "./components/public/event-inquiry-form";
 
 export { AboutForm } from "./components/admin/about-form";
 export { ContactForm } from "./components/admin/contact-form";

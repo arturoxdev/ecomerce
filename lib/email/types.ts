@@ -20,3 +20,8 @@ export type ContactMessagePayload = {
   message: string;
   locale: string; // idioma del sitio desde el que se envió
 };
+
+export type EventInquiryPayload = {
+  email: string;
+  locale: string; // idioma del sitio desde el que se envió
+};
