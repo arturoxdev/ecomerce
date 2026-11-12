@@ -28,7 +28,6 @@ describe("products-admin schemas", () => {
         about: "",
         categoryId: "cat-1",
         basePrice: "199.99",
-        priceType: "FIXED",
         stock: "3",
         photos: "https://example.com/a.jpg\nhttps://example.com/b.jpg",
         isActive: "true",
@@ -53,7 +52,6 @@ describe("products-admin schemas", () => {
         slug: "slug",
         categoryId: "cat",
         basePrice: "1",
-        priceType: "FIXED",
         stock: "0",
         isActive: "true",
       });
@@ -75,7 +73,6 @@ describe("products-admin schemas", () => {
         slug: "n",
         categoryId: "cat",
         basePrice: "1",
-        priceType: "FIXED",
         stock: "0",
         isActive: "true",
         photos,
@@ -98,7 +95,6 @@ describe("products-admin schemas", () => {
         description: "x".repeat(151),
         categoryId: "cat",
         basePrice: "1",
-        priceType: "FIXED",
         stock: "0",
         isActive: "true",
       });
@@ -121,7 +117,6 @@ describe("products-admin schemas", () => {
         slug: "n",
         categoryId: "cat",
         basePrice: "1",
-        priceType: "FIXED",
         stock: "0",
         isActive: "false",
       });
@@ -144,7 +139,6 @@ describe("products-admin schemas", () => {
         slug: "carpa",
         categoryId: "cat-1",
         basePrice: "100",
-        priceType: "FIXED",
         stock: "1",
         ...extra,
       };
@@ -203,7 +197,6 @@ describe("products-admin schemas", () => {
       about: "",
       categoryId: "cat-1",
       basePrice: 99.5,
-      priceType: "FIXED" as const,
       stock: 5,
       photos: undefined,
       isActive: true,
@@ -279,7 +272,6 @@ describe("products-admin schemas", () => {
         about: "",
         categoryId: "cat",
         basePrice: 10,
-        priceType: "PER_UNIT" as const,
         stock: 0,
         photos: undefined,
         isActive: false,

@@ -129,7 +129,6 @@ test.describe("T2 availability guard", () => {
                 variantName: null,
                 quantity: 1,
                 unitPrice: 60,
-                priceType: "FIXED",
                 date,
                 stock: 1,
               },

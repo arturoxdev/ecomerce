@@ -39,6 +39,7 @@ type ProductLookupResult =
         id: string;
         price: string;
         stock: number;
+        isActive: boolean;
       }>;
     }
   | null
@@ -307,6 +308,18 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
                 (candidate) => candidate.id === item.variantId,
               )
             : null;
+
+          // ADR-014: a product with variants is only rentable through one of
+          // them; its own stock is a separate pool that would double-count.
+          const hasActiveVariants =
+            product.variants?.some((candidate) => candidate.isActive) ?? false;
+          if (
+            (item.variantId && (!variant || !variant.isActive)) ||
+            (!item.variantId && hasActiveVariants)
+          ) {
+            unavailableItems.push(localizedProductName(product, data.locale));
+            continue;
+          }
 
           const expectedPrice = variant
             ? parseFloat(variant.price)

@@ -21,7 +21,6 @@ export type CartItem = {
   variantName: string | null;
   quantity: number;
   unitPrice: number;
-  priceType: "FIXED" | "PER_UNIT";
   date: string; // "YYYY-MM-DD"
   stock: number;
   // Selected Local Services snapshot (ADR-009). Display + line identity only;
@@ -71,7 +70,7 @@ export const useCartStore = create<CartStore>()(
             sameServiceIds(i.selectedServices, incomingServices),
         );
 
-        if (existing && item.priceType === "PER_UNIT") {
+        if (existing) {
           set({
             items: get().items.map((i) =>
               i.id === existing.id
@@ -79,7 +78,7 @@ export const useCartStore = create<CartStore>()(
                 : i,
             ),
           });
-        } else if (!existing) {
+        } else {
           set({
             items: [
               ...get().items,

@@ -179,7 +179,7 @@ Los 7 flujos que cubren el camino crítico del negocio:
 - **Aislamiento:** cada spec recibe IDs únicos por worker (`process.env.TEST_WORKER_INDEX`) para evitar colisiones en paralelo, usando prefijo `e2e-`.
 - **Tenant:** alinear la estrategia con `STORE_ID`, que es la variable que usa realmente la app en runtime.
 - **Cleanup:** `afterAll` elimina lo creado. Nunca borrar filas ajenas (filtrar por prefix `e2e-`).
-- **Restricción de datos:** T2 y T3 deben usar productos `FIXED` o con stock `1` para que la expectativa de indisponibilidad sea determinista.
+- **Restricción de datos:** T2 y T3 deben usar productos con stock `1` para que la expectativa de indisponibilidad sea determinista.
 
 ### 5.3 Variables de entorno requeridas
 

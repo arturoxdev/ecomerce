@@ -105,7 +105,6 @@ export default async function CategoryLandingPage({
                     name: localizedProductName(product, typedLocale),
                     slug: product.slug,
                     basePrice: parseFloat(product.basePrice),
-                    priceType: product.priceType,
                     photos: product.photos,
                     category: product.category,
                     hasVariants,
@@ -114,7 +113,6 @@ export default async function CategoryLandingPage({
                   locale={typedLocale}
                   labels={{
                     viewDetails: m.catalog.viewDetails,
-                    perUnit: m.catalog.product.pricePerUnit,
                     price: m.catalog.product.price,
                     fromPrice: m.catalog.product.fromPrice,
                   }}

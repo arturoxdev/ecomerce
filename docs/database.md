@@ -63,8 +63,7 @@ Table products {
   description_en text [note: 'ADR-013: traducción opcional; fallback a description']
   about_en       text [note: 'ADR-013: traducción opcional; fallback a about']
   base_price  decimal(10,2) [not null]
-  price_type  price_type [not null, note: 'FIXED | PER_UNIT']
-  stock       int [default: 1]
+  stock       int [default: 1, note: 'ADR-014: unidades rentables por día']
   photos      text[] [note: 'Array de URLs']
   is_active   boolean [default: true]
   category_id uuid [not null, ref: > categories.id]
@@ -283,11 +282,6 @@ Table verification_tokens {
 
 // --- Enums ---
 
-Enum price_type {
-  FIXED    [note: 'Precio fijo por tiempo']
-  PER_UNIT [note: 'Precio por unidad']
-}
-
 Enum payment_status {
   AUTHORIZED
   CAPTURED
@@ -334,7 +328,7 @@ Enum content_locale {
 
 **Reserva por un solo dia (single-day rental):** Cada `order_item` y cada bloqueo de `availability` tiene una unica fecha (`rent_date` / `date`). El negocio opera por evento de un dia y el carrito permite items con fechas distintas. Ver ADR-006.
 
-**`availability.quantity` para PER_UNIT:** En lugar de crear un registro por unidad, se guarda la cantidad comprometida en un solo registro por dia. Esto hace el `SUM(quantity) FOR UPDATE` eficiente y el indice compuesto en `(product_id, date)` lo acelera.
+**`availability.quantity`:** Todo producto se renta por unidad (ADR-014). En lugar de crear un registro por unidad, se guarda la cantidad comprometida en un solo registro por dia. Esto hace el `SUM(quantity) FOR UPDATE` eficiente y el indice compuesto en `(product_id, date)` lo acelera.
 
 **`order_id = NULL` en availability:** Permite que el admin bloquee fechas manualmente sin crear una orden (ej. equipo en mantenimiento).
 

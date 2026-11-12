@@ -102,7 +102,6 @@
     "viewDetails": "View Details",
     "product": {
       "price": "Price",
-      "pricePerUnit": "per unit",
       "stock": "Stock",
       "category": "Category",
       "gallery": "Product gallery",
@@ -149,7 +148,6 @@
     "addedToCart": "Added to cart!",
     "itemUnavailable": "Some items are no longer available",
     "selectDatesFirst": "Select a date and check availability first",
-    "perUnit": "per unit",
     "pastDateBadge": "Past date",
     "pastDateBlocking": "Some items have a past date. Remove them to continue.",
     "zipcodeLabel": "City and zipcode",

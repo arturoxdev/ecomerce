@@ -22,13 +22,11 @@ type Props = {
   productPhoto: string | null;
   basePrice: number;
   baseStock: number;
-  priceType: "FIXED" | "PER_UNIT";
   variants: Variant[];
   localServices: SelectableService[];
   showSplitNotice?: boolean;
   labels: {
     price: string;
-    pricePerUnit: string;
     stock: string;
     selectVariant: string;
     availability: AvailabilityLabels;
@@ -36,7 +34,6 @@ type Props = {
     addedToCart: string;
     selectDatesFirst: string;
     quantity: string;
-    perUnit: string;
     splitBadge?: string;
     splitNotice?: string;
     services: ServiceSelectorLabels;
@@ -51,7 +48,6 @@ export function ProductDetailActions({
   productPhoto,
   basePrice,
   baseStock,
-  priceType,
   variants,
   localServices,
   showSplitNotice = false,
@@ -87,18 +83,17 @@ export function ProductDetailActions({
   );
 
   const selectedServiceIds = selectedServices.map((s) => s.id);
+  // ADR-014: a product with variants is only rentable through one of them.
+  const needsVariant = hasVariants && !selectedVariant;
 
   return (
     <div className="space-y-6">
       {hasVariants ? (
         <VariantSelector
           basePrice={basePrice}
-          baseStock={baseStock}
-          pricingModel={priceType}
           variants={variants}
           labels={{
             price: labels.price,
-            pricePerUnit: labels.pricePerUnit,
             stock: labels.stock,
             selectVariant: labels.selectVariant,
           }}
@@ -111,20 +106,13 @@ export function ProductDetailActions({
             <p className="text-sm font-medium text-slate-500">{labels.price}</p>
             <p className="text-2xl font-bold text-primary">
               ${basePrice.toFixed(2)}
-              {priceType === "PER_UNIT" && (
-                <span className="ml-1 text-base font-normal text-slate-500">
-                  / {labels.perUnit}
-                </span>
-              )}
             </p>
           </div>
 
-          {/* Stock (PER_UNIT only) */}
-          {priceType === "PER_UNIT" && (
-            <p className="text-sm text-slate-500">
-              <span className="font-medium">{labels.stock}:</span> {baseStock}
-            </p>
-          )}
+          {/* Stock */}
+          <p className="text-sm text-slate-500">
+            <span className="font-medium">{labels.stock}:</span> {baseStock}
+          </p>
         </>
       )}
 
@@ -146,11 +134,6 @@ export function ProductDetailActions({
           </span>
           <span className="text-lg font-bold text-primary">
             ${currentPrice.toFixed(2)}
-            {priceType === "PER_UNIT" && (
-              <span className="ml-1 text-sm font-normal text-slate-500">
-                / {labels.perUnit}
-              </span>
-            )}
           </span>
         </div>
       )}
@@ -164,6 +147,12 @@ export function ProductDetailActions({
             {labels.splitNotice}
           </p>
         </div>
+      )}
+
+      {needsVariant && (
+        <p className="text-sm font-medium text-amber-700">
+          {labels.selectVariant}
+        </p>
       )}
 
       {/* Add to Cart (opens dialog with availability checker inside) */}
@@ -184,8 +173,9 @@ export function ProductDetailActions({
           name: s.name,
           price: s.price,
         }))}
-        priceType={priceType}
         stock={currentStock}
+        disabled={needsVariant}
+        disabledMessage={labels.selectVariant}
         labels={{
           availability: labels.availability,
           addToCart: labels.addToCart,

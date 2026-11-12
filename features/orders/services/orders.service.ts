@@ -92,7 +92,6 @@ export function createOrdersService(deps: OrdersServiceDeps) {
                 nameEn: true,
                 slug: true,
                 photos: true,
-                priceType: true,
               },
             },
             variant: { columns: { id: true, name: true } },

@@ -99,18 +99,12 @@ export function CartItem({
 
         {/* Quantity + Remove */}
         <div className="flex items-center justify-between">
-          {item.priceType === "PER_UNIT" ? (
-            <QuantitySelector
-              value={item.quantity}
-              max={item.stock}
-              onChange={(qty) => onQuantityChange(item.id, qty)}
-              label={labels.quantity}
-            />
-          ) : (
-            <span className="text-xs text-slate-500">
-              ${item.unitPrice.toFixed(2)}
-            </span>
-          )}
+          <QuantitySelector
+            value={item.quantity}
+            max={item.stock}
+            onChange={(qty) => onQuantityChange(item.id, qty)}
+            label={labels.quantity}
+          />
           <Button
             type="button"
             variant="ghost"

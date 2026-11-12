@@ -86,7 +86,6 @@ export default async function EditProductPage({ params }: Props) {
             aboutEn: product.aboutEn ?? "",
             categoryId: product.categoryId,
             basePrice: product.basePrice,
-            priceType: product.priceType,
             stock: product.stock.toString(),
             photos: product.photos.join("\n"),
             isActive: product.isActive,

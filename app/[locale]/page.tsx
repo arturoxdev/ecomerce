@@ -167,10 +167,7 @@ export default async function Home({ params }: HomeProps) {
                 <div key={colIndex} className="flex flex-1 flex-col gap-6">
                   {colProducts.map((product, rowIndex) => {
                     const photo = findThumbnail(product.photos ?? []);
-                    const priceLabel =
-                      product.priceType === "PER_UNIT"
-                        ? `$${product.basePrice}/unit`
-                        : `$${product.basePrice}/day`;
+                    const priceLabel = `$${product.basePrice}`;
                     const imgHeight =
                       heightPatterns[colIndex]?.[rowIndex] ?? 280;
 
@@ -208,9 +205,7 @@ export default async function Home({ params }: HomeProps) {
                         <div className="mt-4 flex items-center justify-between">
                           <div className="flex items-center gap-1 text-xs text-[#64748b]">
                             <Ruler className="size-3.5" />
-                            {product.priceType === "PER_UNIT"
-                              ? `${product.stock} available`
-                              : `Stock: ${product.stock}`}
+                            {`${product.stock} available`}
                           </div>
                           <span className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-primary-foreground">
                             {typedLocale === "es" ? "Reservar" : "Reserve"}

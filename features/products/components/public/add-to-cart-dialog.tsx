@@ -33,8 +33,10 @@ type Props = {
   unitPrice: number;
   // Selected Local Services for this line (charged once per line; ADR-009).
   selectedServices: CartItemService[];
-  priceType: "FIXED" | "PER_UNIT";
   stock: number;
+  /** Blocks opening the dialog (e.g. a variant must be chosen first). */
+  disabled?: boolean;
+  disabledMessage?: string;
   labels: {
     availability: AvailabilityLabels;
     addToCart: string;
@@ -61,8 +63,9 @@ export function AddToCartDialog({
   variantName,
   unitPrice,
   selectedServices,
-  priceType,
   stock,
+  disabled = false,
+  disabledMessage,
   labels,
 }: Props) {
   const [open, setOpen] = useState(false);
@@ -71,7 +74,13 @@ export function AddToCartDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
-          <Button type="button" size="lg" className="w-full gap-2">
+          <Button
+            type="button"
+            size="lg"
+            className="w-full gap-2"
+            disabled={disabled}
+            title={disabled ? disabledMessage : undefined}
+          >
             <ShoppingCart className="size-4" />
             {labels.addToCart}
           </Button>
@@ -91,7 +100,6 @@ export function AddToCartDialog({
             variantName={variantName}
             unitPrice={unitPrice}
             selectedServices={selectedServices}
-            priceType={priceType}
             stock={stock}
             labels={labels}
             onAdded={() => setOpen(false)}
@@ -112,7 +120,6 @@ function AddToCartDialogBody({
   variantName,
   unitPrice,
   selectedServices,
-  priceType,
   stock,
   labels,
   onAdded,
@@ -148,14 +155,13 @@ function AddToCartDialogBody({
       <AvailabilityCheckerBody
         productId={productId}
         variantId={variantId}
-        pricingModel={priceType}
         stock={stock}
         labels={labels.availability}
         onAvailabilityConfirmed={handleConfirmed}
         onUnavailable={handleUnavailable}
       />
 
-      {priceType === "PER_UNIT" && isAvailable && (
+      {isAvailable && (
         <QuantitySelector
           value={quantity}
           max={maxQty}
@@ -173,9 +179,8 @@ function AddToCartDialogBody({
           productPhoto,
           variantId,
           variantName,
-          quantity: priceType === "FIXED" ? 1 : quantity,
+          quantity,
           unitPrice,
-          priceType,
           date: availabilityResult ? toDateString(availabilityResult.date) : "",
           stock: maxQty,
           // ADR-009: chosen Local Services for this line (once per line).

@@ -10,7 +10,6 @@ import {
   findOccupiedQuantity,
 } from "@/lib/services/availability.service";
 import type { Database } from "@/lib/db";
-import type { PriceType } from "@/lib/db/schema";
 import { ProblemType } from "@/lib/types/problem-detail";
 
 const UUID_RE =
@@ -27,7 +26,6 @@ type AvailabilityHandlerProduct = {
   id: string;
   stock: number | null;
   isActive: boolean;
-  priceType: PriceType;
 };
 
 type AvailabilityHandlerVariant = {
@@ -96,10 +94,9 @@ export async function handleAvailabilityRequest(
     const available = calculateAvailableQuantity({
       occupied,
       stock,
-      priceType: product.priceType,
     });
 
-    return NextResponse.json({ available, pricingModel: product.priceType });
+    return NextResponse.json({ available });
   } catch {
     return problemResponse(internalProblem("Internal server error"));
   }

@@ -46,7 +46,6 @@ import {
 import { deleteProduct } from "../../actions";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { PRICE_TYPE_LABEL } from "@/lib/admin/labels";
 import { SlugField } from "./slug-field";
 import {
   ContentLocaleSwitch,
@@ -98,7 +97,6 @@ type Props = {
     aboutEn?: string;
     categoryId?: string;
     basePrice?: string;
-    priceType?: string;
     stock?: string;
     photos?: string;
     isActive?: boolean;
@@ -125,7 +123,7 @@ type Props = {
   ) => Promise<VariantFormState>;
 };
 
-const BASIC_FIELDS = ["name", "nameEn", "slug", "description", "descriptionEn", "categoryId", "basePrice", "priceType", "stock", "photos"];
+const BASIC_FIELDS = ["name", "nameEn", "slug", "description", "descriptionEn", "categoryId", "basePrice", "stock", "photos"];
 const ABOUT_FIELDS = ["about", "aboutEn"];
 // ADR-013: translatable copy, grouped by the language tab that shows it.
 const ES_FIELDS = ["name", "description", "about"];
@@ -447,11 +445,11 @@ export function ProductForm({
             <CardHeader>
               <CardTitle>Precio e inventario</CardTitle>
               <CardDescription>
-                Define la categoría, el modelo de precio y el stock.
+                Define la categoría, el precio y las existencias.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-3">
                 <Field label="Categoría" error={fieldErrors?.categoryId?.[0]}>
                   <Select
                     name="categoryId"
@@ -471,34 +469,6 @@ export function ProductForm({
                   </Select>
                 </Field>
 
-                <Field label="Tipo de precio" error={fieldErrors?.priceType?.[0]}>
-                  <Select
-                    name="priceType"
-                    defaultValue={defaultValues?.priceType ?? "FIXED"}
-                    items={[
-                      { value: "FIXED", label: PRICE_TYPE_LABEL.FIXED },
-                      { value: "PER_UNIT", label: PRICE_TYPE_LABEL.PER_UNIT },
-                    ]}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="FIXED" label={PRICE_TYPE_LABEL.FIXED}>
-                        {PRICE_TYPE_LABEL.FIXED}
-                      </SelectItem>
-                      <SelectItem
-                        value="PER_UNIT"
-                        label={PRICE_TYPE_LABEL.PER_UNIT}
-                      >
-                        {PRICE_TYPE_LABEL.PER_UNIT}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </Field>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Precio base" error={fieldErrors?.basePrice?.[0]}>
                   <Input
                     name="basePrice"

@@ -126,7 +126,6 @@ export default async function ProductDetailPage({
               productPhoto={product.photos[0] ?? null}
               basePrice={basePrice}
               baseStock={product.stock ?? 0}
-              priceType={product.priceType}
               variants={activeVariants.map((v) => ({
                 id: v.id,
                 name: v.name,
@@ -137,7 +136,6 @@ export default async function ProductDetailPage({
               showSplitNotice={showSplitNotice}
               labels={{
                 price: m.catalog.product.price,
-                pricePerUnit: m.catalog.product.pricePerUnit,
                 stock: m.catalog.product.stock,
                 selectVariant:
                   m.catalog.product.selectVariant ?? "Select an option",
@@ -158,7 +156,6 @@ export default async function ProductDetailPage({
                 addedToCart: m.cart.addedToCart,
                 selectDatesFirst: m.cart.selectDatesFirst,
                 quantity: m.cart.quantity,
-                perUnit: m.cart.perUnit,
                 splitBadge: m.payment.splitBadge,
                 splitNotice: m.payment.splitNotice,
               }}

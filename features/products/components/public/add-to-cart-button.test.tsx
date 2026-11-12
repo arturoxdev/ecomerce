@@ -29,7 +29,6 @@ describe("AddToCartButton", () => {
     variantName: null,
     quantity: 1,
     unitPrice: 10,
-    priceType: "FIXED" as const,
     date: "2099-06-01",
     stock: 5,
     selectedServices: [],

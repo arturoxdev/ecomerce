@@ -26,7 +26,6 @@ export type AvailabilityResult = {
 export type AvailabilityCheckerProps = {
   productId: string;
   variantId?: string | null;
-  pricingModel: "FIXED" | "PER_UNIT";
   stock: number;
   labels: AvailabilityLabels;
   onAvailabilityConfirmed?: (result: AvailabilityResult) => void;
@@ -50,7 +49,6 @@ function toDateString(date: Date): string {
 export function AvailabilityCheckerBody({
   productId,
   variantId,
-  pricingModel,
   labels,
   onAvailabilityConfirmed,
   onUnavailable,
@@ -126,9 +124,7 @@ export function AvailabilityCheckerBody({
       case "available":
         return (
           <p className="text-sm font-semibold text-green-600">
-            {pricingModel === "PER_UNIT"
-              ? `${available} ${labels.unitsAvailable}`
-              : labels.available}
+            {`${available} ${labels.unitsAvailable}`}
           </p>
         );
       case "unavailable":

@@ -10,10 +10,10 @@ describe("fetchAvailability", () => {
     vi.restoreAllMocks();
   });
 
-  it("successful response -> ok with clamped available and pricingModel", async () => {
+  it("successful response -> ok with clamped available", async () => {
     const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue({
       ok: true,
-      json: async () => ({ available: -5, pricingModel: "PER_UNIT" }),
+      json: async () => ({ available: -5 }),
     } as Response);
 
     const result = await fetchAvailability({
@@ -24,7 +24,6 @@ describe("fetchAvailability", () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.available).toBe(0);
-    expect(result.pricingModel).toBe("PER_UNIT");
     expect(spy).toHaveBeenCalledWith(
       "/api/availability?productId=product-1&date=2026-06-01",
     );
@@ -33,7 +32,7 @@ describe("fetchAvailability", () => {
   it("variantId provided -> included in query string", async () => {
     const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue({
       ok: true,
-      json: async () => ({ available: 2, pricingModel: "PER_UNIT" }),
+      json: async () => ({ available: 2 }),
     } as Response);
 
     await fetchAvailability({

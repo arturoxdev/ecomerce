@@ -54,11 +54,6 @@ export async function checkAvailability(
 export function calculateAvailableQuantity(input: {
   occupied: number;
   stock: number;
-  priceType: "FIXED" | "PER_UNIT";
 }): number {
-  if (input.priceType === "FIXED") {
-    return input.occupied >= 1 ? 0 : 1;
-  }
-
   return Math.max(0, input.stock - input.occupied);
 }

@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 import {
-  priceTypeEnum,
   productAdditionalServices,
   products,
   productVariants,
@@ -27,7 +26,6 @@ export const productSchema = z.object({
   aboutEn: z.string().optional(),
   categoryId: z.string().min(1, "La categoría es requerida"),
   basePrice: z.coerce.number().positive("El precio debe ser positivo"),
-  priceType: z.enum(priceTypeEnum.enumValues),
   stock: z.coerce.number().int().min(0, "Las existencias deben ser 0 o mayor"),
   photos: z
     .string()
@@ -92,7 +90,6 @@ export function parseProductForm(formData: FormData) {
     aboutEn: optionalText(formData.get("aboutEn")),
     categoryId: formData.get("categoryId"),
     basePrice: formData.get("basePrice"),
-    priceType: formData.get("priceType"),
     stock: formData.get("stock"),
     photos: formData.get("photos") || undefined,
     isActive: formData.get("isActive") === "true",

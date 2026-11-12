@@ -27,7 +27,6 @@ async function seedProduct(stock = 2) {
       name: "Prod",
       slug: `prod-${Date.now()}`,
       basePrice: "50.00",
-      priceType: "PER_UNIT",
       stock,
       categoryId: category.id,
       isActive: true,

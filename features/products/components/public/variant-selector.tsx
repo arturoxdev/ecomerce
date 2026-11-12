@@ -13,12 +13,9 @@ export type Variant = {
 
 type Props = {
   basePrice: number;
-  baseStock: number;
-  pricingModel: "FIXED" | "PER_UNIT";
   variants: Variant[];
   labels: {
     price: string;
-    pricePerUnit: string;
     stock: string;
     selectVariant: string;
   };
@@ -27,8 +24,6 @@ type Props = {
 
 export function VariantSelector({
   basePrice,
-  baseStock,
-  pricingModel,
   variants,
   labels,
   onVariantChange,
@@ -37,7 +32,6 @@ export function VariantSelector({
 
   const selected = variants.find((v) => v.id === selectedId);
   const displayPrice = selected ? selected.price : basePrice;
-  const displayStock = selected ? selected.stock : baseStock;
 
   function handleVariantClick(variantId: string) {
     const newId = selectedId === variantId ? null : variantId;
@@ -53,11 +47,6 @@ export function VariantSelector({
         <p className="text-sm font-medium text-slate-500">{labels.price}</p>
         <p className="text-2xl font-bold text-primary">
           ${displayPrice.toFixed(2)}
-          {pricingModel === "PER_UNIT" && (
-            <span className="ml-1 text-base font-normal text-slate-500">
-              / {labels.pricePerUnit}
-            </span>
-          )}
         </p>
       </div>
 
@@ -85,10 +74,10 @@ export function VariantSelector({
         </div>
       </div>
 
-      {/* Stock (PER_UNIT only) */}
-      {pricingModel === "PER_UNIT" && (
+      {/* Stock: only a chosen variant has rentable stock (ADR-014) */}
+      {selected && (
         <p className="text-sm text-slate-500">
-          <span className="font-medium">{labels.stock}:</span> {displayStock}
+          <span className="font-medium">{labels.stock}:</span> {selected.stock}
         </p>
       )}
     </div>

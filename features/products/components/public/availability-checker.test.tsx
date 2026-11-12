@@ -47,13 +47,12 @@ describe("AvailabilityChecker", () => {
         .spyOn(globalThis, "fetch")
         .mockResolvedValue({
           ok: true,
-          json: async () => ({ available: 3, pricingModel: "PER_UNIT" }),
+          json: async () => ({ available: 3 }),
         } as Response);
 
       render(
         <AvailabilityChecker
           productId="product-1"
-          pricingModel="PER_UNIT"
           stock={5}
           labels={labels}
           onAvailabilityConfirmed={onAvailabilityConfirmed}
@@ -85,7 +84,6 @@ describe("AvailabilityChecker", () => {
       render(
         <AvailabilityChecker
           productId="product-1"
-          pricingModel="FIXED"
           stock={1}
           labels={labels}
         />,

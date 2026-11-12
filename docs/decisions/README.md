@@ -14,3 +14,4 @@
 | ADR-010 | Hora de inicio del evento (a nivel orden, informativa) | Aceptado | 2026-05-31 |
 | ADR-011 | Notificación de nueva orden post-commit (fire-and-forget) | Aceptado | 2026-06-16 |
 | ADR-013 | Textos de producto bilingües con columnas `_en` | Aceptado | 2026-11-12 |
+| ADR-014 | Un solo modelo de precio: por unidad, limitado por existencias | Aceptado | 2026-11-12 |

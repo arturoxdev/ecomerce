@@ -135,7 +135,7 @@ export function AddItemDialog({ product, open, onOpenChange, onConfirm }: Props)
             </div>
           </div>
 
-          {date && product.priceType === "PER_UNIT" && (
+          {date && (
             <div>
               <Label className="text-sm font-medium">Cantidad</Label>
               <div className="mt-2">

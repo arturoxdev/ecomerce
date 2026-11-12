@@ -1,6 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
-import { getCartSubtotal, getItemCount, type CartItem } from "./cart-store";
+import {
+  getCartSubtotal,
+  getItemCount,
+  useCartStore,
+  type CartItem,
+} from "./cart-store";
 
 function buildItem(partial: Partial<CartItem> = {}): CartItem {
   return {
@@ -13,7 +18,6 @@ function buildItem(partial: Partial<CartItem> = {}): CartItem {
     variantName: null,
     quantity: 1,
     unitPrice: 0,
-    priceType: "PER_UNIT",
     date: "2099-05-01",
     stock: 10,
     selectedServices: [],
@@ -61,5 +65,58 @@ describe("cart-store pure selectors", () => {
       // Assert
       expect(result).toBe(7);
     });
+  });
+});
+
+describe("cart-store addItem", () => {
+  function newLine(partial: Partial<CartItem> = {}) {
+    const item: Partial<CartItem> = buildItem(partial);
+    delete item.id;
+    return item as Omit<CartItem, "id">;
+  }
+
+  beforeEach(() => {
+    useCartStore.setState({ items: [] });
+  });
+
+  it("same product, date, variant and services -> sums quantity on one line", () => {
+    useCartStore.getState().addItem(newLine({ quantity: 2 }));
+    useCartStore.getState().addItem(newLine({ quantity: 3 }));
+
+    const { items } = useCartStore.getState();
+    expect(items).toHaveLength(1);
+    expect(items[0]!.quantity).toBe(5);
+  });
+
+  it("summed quantity -> capped at the line's stock", () => {
+    useCartStore.getState().addItem(newLine({ quantity: 4, stock: 5 }));
+    useCartStore.getState().addItem(newLine({ quantity: 4, stock: 5 }));
+
+    expect(useCartStore.getState().items[0]!.quantity).toBe(5);
+  });
+
+  it("different date -> separate line", () => {
+    useCartStore.getState().addItem(newLine({ date: "2099-05-01" }));
+    useCartStore.getState().addItem(newLine({ date: "2099-05-02" }));
+
+    expect(useCartStore.getState().items).toHaveLength(2);
+  });
+
+  it("different variant -> separate line", () => {
+    useCartStore.getState().addItem(newLine({ variantId: null }));
+    useCartStore.getState().addItem(newLine({ variantId: "variant-1" }));
+
+    expect(useCartStore.getState().items).toHaveLength(2);
+  });
+
+  it("different services -> separate line", () => {
+    useCartStore.getState().addItem(newLine({ selectedServices: [] }));
+    useCartStore.getState().addItem(
+      newLine({
+        selectedServices: [{ id: "svc-1", name: "Setup", price: 20 }],
+      }),
+    );
+
+    expect(useCartStore.getState().items).toHaveLength(2);
   });
 });

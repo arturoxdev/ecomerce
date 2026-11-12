@@ -7,7 +7,6 @@ import { problemResponse } from "@/lib/api/problem-response";
 import { internalProblem, notFoundProblem } from "@/lib/problems";
 import { calculateAvailableQuantity } from "@/lib/services/availability.service";
 import type { Database } from "@/lib/db";
-import type { PriceType } from "@/lib/db/schema";
 import { ProblemType } from "@/lib/types/problem-detail";
 
 const UUID_RE =
@@ -24,7 +23,6 @@ type Product = {
   id: string;
   stock: number | null;
   isActive: boolean;
-  priceType: PriceType;
 };
 
 type Variant = {
@@ -112,7 +110,6 @@ export async function handleAvailabilityMonthRequest(
       const available = calculateAvailableQuantity({
         occupied,
         stock,
-        priceType: product.priceType,
       });
       if (available <= 0) unavailableDates.push(row.day);
     }

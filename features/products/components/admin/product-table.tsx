@@ -35,7 +35,6 @@ type Product = {
   name: string;
   nameEn?: string | null;
   basePrice: string;
-  priceType: string;
   stock: number;
   isActive: boolean;
   category: { name: string };
@@ -177,9 +176,6 @@ export function ProductTable({
                       )}
                     >
                       {formatAdminCurrency(product.basePrice)}
-                      <span className="ml-1 text-muted-foreground">
-                        {product.priceType === "PER_UNIT" ? "/unidad" : ""}
-                      </span>
                     </TableCell>
                     <TableCell
                       className={cn(

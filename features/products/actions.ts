@@ -136,7 +136,6 @@ export type ProductSearchSuggestion = {
   id: string;
   name: string;
   basePrice: string;
-  priceType: "FIXED" | "PER_UNIT";
   stock: number;
   photos: string[];
   variants: Array<{
@@ -156,7 +155,6 @@ export async function searchActiveProducts(
     id: p.id,
     name: p.name,
     basePrice: p.basePrice,
-    priceType: p.priceType,
     stock: p.stock,
     photos: p.photos,
     variants: (p.variants ?? []).map((v) => ({
