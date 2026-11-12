@@ -8,6 +8,10 @@ import { ProductCard } from "@/features/products";
 import {
   findAllByCategorySlug,
 } from "@/features/products/services/products.service";
+import {
+  localizeCategory,
+  localizedCategoryName,
+} from "@/features/categories/lib/localize-category";
 import { findBySlug as findBySlug } from "@/features/categories/services/categories.service";
 import { products } from "@/lib/db/schema";
 import { siteConfig } from "@/lib/config/site";
@@ -21,12 +25,13 @@ type CategoryLandingProps = {
 export async function generateMetadata({
   params,
 }: CategoryLandingProps): Promise<Metadata> {
-  const { categorySlug } = await params;
+  const { locale, categorySlug } = await params;
   const category = await findBySlug(categorySlug);
   if (!category) return {};
+  const copy = localizeCategory(category, isLocale(locale) ? locale : "es");
   return {
-    title: `${category.name} | ${siteConfig.name}`,
-    description: category.description ?? undefined,
+    title: `${copy.name} | ${siteConfig.name}`,
+    description: copy.description ?? undefined,
   };
 }
 
@@ -45,6 +50,7 @@ export default async function CategoryLandingPage({
   if (!category) {
     notFound();
   }
+  const copy = localizeCategory(category, typedLocale);
 
   const productList = await findAllByCategorySlug(categorySlug, {
     orderBy: asc(products.name),
@@ -68,17 +74,17 @@ export default async function CategoryLandingPage({
             {m.catalog.title}
           </Link>
           <span>/</span>
-          <span className="text-slate-900">{category.name}</span>
+          <span className="text-slate-900">{copy.name}</span>
         </nav>
 
         {/* Page header */}
         <div className="mb-10 space-y-3">
           <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-            {category.name}
+            {copy.name}
           </h1>
-          {category.description && (
+          {copy.description && (
             <p className="max-w-3xl text-lg leading-relaxed text-slate-600">
-              {category.description}
+              {copy.description}
             </p>
           )}
         </div>
@@ -106,7 +112,10 @@ export default async function CategoryLandingPage({
                     slug: product.slug,
                     basePrice: parseFloat(product.basePrice),
                     photos: product.photos,
-                    category: product.category,
+                    category: {
+                      slug: product.category.slug,
+                      name: localizedCategoryName(product.category, typedLocale),
+                    },
                     hasVariants,
                     minVariantPrice,
                   }}
