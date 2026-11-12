@@ -10,7 +10,6 @@ export type ProductCardProduct = {
   name: string;
   slug: string;
   basePrice: number; // Already converted from Decimal via .toNumber() by the parent
-  priceType: "FIXED" | "PER_UNIT";
   photos: string[];
   category: { name: string; slug: string };
   hasVariants?: boolean;
@@ -19,7 +18,6 @@ export type ProductCardProduct = {
 
 export type ProductCardLabels = {
   viewDetails: string; // m.catalog.viewDetails
-  perUnit: string; // m.catalog.product.pricePerUnit
   price: string; // m.catalog.product.price
   fromPrice?: string; // m.catalog.product.fromPrice
 };
@@ -38,10 +36,7 @@ export function ProductCard({ product, locale, labels }: ProductCardProps) {
     : product.basePrice;
 
   const prefix = product.hasVariants ? `${labels.fromPrice ?? "From"} ` : "";
-  const priceDisplay =
-    product.priceType === "PER_UNIT"
-      ? `${prefix}$${lowestPrice.toFixed(2)} / ${labels.perUnit}`
-      : `${prefix}$${lowestPrice.toFixed(2)}`;
+  const priceDisplay = `${prefix}$${lowestPrice.toFixed(2)}`;
 
   return (
     <div className="group relative rounded-xl border border-slate-100 bg-white p-4 shadow-sm transition-all duration-300 hover:shadow-lg">

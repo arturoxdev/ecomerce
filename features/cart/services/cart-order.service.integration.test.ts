@@ -32,7 +32,6 @@ async function seedCategoryAndProduct(
       name: "Bouncy Castle",
       slug: `bouncy-${Date.now()}`,
       basePrice: "50.00",
-      priceType: "FIXED",
       stock: 1,
       categoryId: category.id,
       isActive: true,

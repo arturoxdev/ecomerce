@@ -62,7 +62,6 @@ test.describe("T1 checkout order happy path", () => {
     const product = await seed.createProduct({
       categoryId: category.id,
       basePrice: "100.00",
-      priceType: "FIXED",
       stock: 2,
     });
 

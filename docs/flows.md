@@ -51,18 +51,14 @@ sequenceDiagram
 
 ## Flujo 2: Verificación de Disponibilidad (Lógica Core)
 
-Cómo el sistema calcula unidades disponibles para un rango de fechas dado, considerando tanto productos FIXED (brincolines) como PER_UNIT (sillas).
+Cómo el sistema calcula unidades disponibles para un rango de fechas dado, con un único modelo: todo producto se renta por unidad y el tope diario son sus existencias (ADR-014).
 
 ```mermaid
 flowchart TD
     A[Usuario selecciona fechas] --> B[Query: SUM availability WHERE fechas se cruzan]
-    B --> C{Tipo de producto}
-    C -->|FIXED stock=1| D{ocupado >= 1?}
-    C -->|PER_UNIT stock=N| E[disponible = stock - ocupado]
-    D -->|Sí| F[❌ No disponible]
-    D -->|No| G[✅ Disponible]
+    B --> E[disponible = stock - ocupado]
     E --> H{disponible > 0?}
-    H -->|No| F
+    H -->|No| F[❌ No disponible]
     H -->|Sí| I[✅ Mostrar cantidad disponible]
 ```
 

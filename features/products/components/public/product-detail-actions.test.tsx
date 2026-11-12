@@ -16,7 +16,6 @@ describe("ProductDetailActions", () => {
 
   const labels = {
     price: "Price",
-    pricePerUnit: "Price per unit",
     stock: "Stock",
     selectVariant: "Select variant",
     availability: {
@@ -32,7 +31,6 @@ describe("ProductDetailActions", () => {
     addedToCart: "Added",
     selectDatesFirst: "Select dates first",
     quantity: "Quantity",
-    perUnit: "day",
     services: {
       sectionTitle: "Additional Services",
       optionalAddOns: "Optional add-ons",
@@ -56,7 +54,6 @@ describe("ProductDetailActions", () => {
           productPhoto="/chair.png"
           basePrice={25}
           baseStock={6}
-          priceType="PER_UNIT"
           variants={[]}
           localServices={[]}
           labels={labels}
@@ -73,7 +70,6 @@ describe("ProductDetailActions", () => {
         variantId: null,
         variantName: null,
         unitPrice: 25,
-        priceType: "PER_UNIT",
         stock: 6,
         labels: {
           addToCart: "Add to cart",
@@ -94,7 +90,6 @@ describe("ProductDetailActions", () => {
           productPhoto="/chair.png"
           basePrice={25}
           baseStock={6}
-          priceType="PER_UNIT"
           variants={[
             { id: "v1", name: "Red", price: 20, stock: 5 },
             { id: "v2", name: "Blue", price: 30, stock: 2 },

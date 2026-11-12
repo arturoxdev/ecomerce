@@ -28,7 +28,6 @@ function buildDeps(
       id: VALID_PRODUCT,
       stock: 5,
       isActive: true,
-      priceType: "PER_UNIT" as const,
     })),
     findVariantById: vi.fn(async () => ({
       id: VALID_VARIANT,
@@ -147,7 +146,7 @@ describe("handleAvailabilityRequest", () => {
 
       expect(res.status).toBe(200);
       const body = await res.json();
-      expect(body).toEqual({ available: 5, pricingModel: "PER_UNIT" });
+      expect(body).toEqual({ available: 5 });
     });
 
     it("variant present -> uses variant stock for calculation", async () => {

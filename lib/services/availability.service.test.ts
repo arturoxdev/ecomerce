@@ -45,30 +45,57 @@ describe("availability service", () => {
       expect(result.occupied).toBe(3);
       expect(result.isAvailable).toBe(false);
     });
+
+    it("stock 5 -> the 5th unit of the day is accepted, the 6th rejected", async () => {
+      const base = {
+        productId: "11111111-1111-1111-1111-111111111111",
+        date: new Date("2026-04-20T00:00:00.000Z"),
+        quantity: 1,
+        stock: 5,
+      };
+
+      const fifth = await checkAvailability(
+        { execute: async () => ({ rows: [{ occupied: 4 }] }) },
+        base,
+      );
+      const sixth = await checkAvailability(
+        { execute: async () => ({ rows: [{ occupied: 5 }] }) },
+        base,
+      );
+
+      expect(fifth.isAvailable).toBe(true);
+      expect(sixth.isAvailable).toBe(false);
+    });
   });
 
   describe("available quantity calculation", () => {
-    it("FIXED with occupied slot -> returns 0", () => {
+    it("one booking against stock 99 -> the other 98 stay available", () => {
       // Arrange
       const input = {
         occupied: 1,
         stock: 99,
-        priceType: "FIXED" as const,
       };
 
       // Act
       const result = calculateAvailableQuantity(input);
 
       // Assert
-      expect(result).toBe(0);
+      expect(result).toBe(98);
     });
 
-    it("PER_UNIT with stock 10 and occupied 4 -> returns 6", () => {
+    it("occupied equals stock -> returns 0", () => {
+      expect(calculateAvailableQuantity({ occupied: 5, stock: 5 })).toBe(0);
+    });
+
+    it("zero stock -> returns 0", () => {
+      expect(calculateAvailableQuantity({ occupied: 0, stock: 0 })).toBe(0);
+    });
+
+    it("stock 10 and occupied 4 -> returns 6", () => {
       // Arrange
       const input = {
         occupied: 4,
         stock: 10,
-        priceType: "PER_UNIT" as const,
       };
 
       // Act

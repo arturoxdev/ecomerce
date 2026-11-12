@@ -39,6 +39,7 @@
 - **Estado:** ✅ Respondido
 - **Impacto:** Define el enum `price_type` (FIXED vs PER_UNIT) y el cálculo del total en el carrito.
 - **Respuesta:** Sí. Dos tipos: FIXED (brincolín: $130/8hrs — precio fijo por tiempo) y PER_UNIT (sillas: $2 c/u — se suma según cantidad).
+- **Actualización 2026-11-12:** Reemplazado por ADR-014. Ya no existe el tipo de precio: todo producto se cobra por unidad y se limita por existencias.
 
 #### ¿Se cobra depósito de garantía?
 - **Área:** Pagos

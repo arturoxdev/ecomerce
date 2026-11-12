@@ -379,7 +379,7 @@ describe("manual-order.service", () => {
   });
 
   describe("availability conflict", () => {
-    it("FIXED product already taken -> unavailable", async () => {
+    it("single-stock product already taken -> unavailable", async () => {
       const { db } = buildTx({ occupied: 1 });
       const service = createManualOrderService({
         db: db as never,

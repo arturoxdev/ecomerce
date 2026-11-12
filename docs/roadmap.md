@@ -66,7 +66,7 @@ Catálogo de productos con rutas dinámicas por categoría optimizadas para SEO 
 - [ ] CRUD de productos en admin: crear, editar, desactivar
 - [ ] Subida de fotos de productos
 - [ ] Gestión de categorías en admin: crear, editar, reordenar
-- [ ] Edición de precio, tipo (FIXED / PER_UNIT) y stock por producto
+- [ ] Edición de precio y stock por producto
 - [ ] Bloqueo manual de fechas en `availability` sin orden asociada (mantenimiento, reservas externas)
 
 ---
@@ -94,7 +94,7 @@ Los clientes pueden agregar productos al carrito y navegar el sitio sin perder s
 El carrito consulta disponibilidad en tiempo real antes de permitir agregar un producto, y el admin configura las reglas de entrega.
 
 - [ ] Mini-calendario en la página de producto para seleccionar fechas de renta
-- [ ] Endpoint `GET /api/availability` con lógica FIXED vs PER_UNIT
+- [ ] Endpoint `GET /api/availability` (disponible = stock − ocupado, ADR-014)
 - [ ] Bloquear "agregar al carrito" si el producto no está disponible en las fechas seleccionadas
 - [ ] Panel en admin para configurar modo de delivery global: INCLUDED / FIXED_FEE / ZIP_CODE
 - [ ] Panel en admin para gestionar zonas por ZIP code con precio individual

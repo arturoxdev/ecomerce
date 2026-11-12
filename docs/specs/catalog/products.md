@@ -45,7 +45,6 @@ Campos principales:
 - `about`
 - `categoryId`
 - `basePrice`
-- `priceType`
 - `stock`
 - `photos`
 - `isArchived`
@@ -79,7 +78,6 @@ Campos requeridos:
 - `slug`
 - `categoryId`
 - `basePrice`
-- `priceType`
 
 #### Scenario: Creación exitosa
 - **WHEN** el admin envía un formulario válido

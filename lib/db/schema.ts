@@ -15,9 +15,6 @@ import {
 
 // ── Enums ──────────────────────────────────────────────────────
 
-export const priceTypeEnum = pgEnum("price_type", ["FIXED", "PER_UNIT"]);
-export type PriceType = (typeof priceTypeEnum.enumValues)[number];
-
 export const paymentStatusEnum = pgEnum("payment_status", [
   "AUTHORIZED",
   "CAPTURED",
@@ -107,7 +104,6 @@ export const products = pgTable(
     descriptionEn: text("description_en"),
     aboutEn: text("about_en"),
     basePrice: numeric("base_price", { precision: 10, scale: 2 }).notNull(),
-    priceType: priceTypeEnum("price_type").notNull(),
     stock: integer("stock").notNull().default(1),
     photos: text("photos").array().notNull().default([]),
     isActive: boolean("is_active").notNull().default(true),

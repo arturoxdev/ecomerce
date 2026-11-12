@@ -104,7 +104,7 @@ describe("AddToCartDialog", () => {
   describe("✅ Happy path", () => {
     it("trigger click opens modal and surfaces the availability header", () => {
       // Arrange
-      render(<AddToCartDialog {...baseProps} priceType="FIXED" />);
+      render(<AddToCartDialog {...baseProps} />);
 
       // Act
       fireEvent.click(
@@ -117,7 +117,7 @@ describe("AddToCartDialog", () => {
 
     it("confirming availability enables the inner Add button and adds item with dates on click", () => {
       // Arrange
-      render(<AddToCartDialog {...baseProps} priceType="PER_UNIT" />);
+      render(<AddToCartDialog {...baseProps} />);
       fireEvent.click(
         screen.getAllByRole("button", { name: "Add to cart" })[0]!,
       );
@@ -140,7 +140,6 @@ describe("AddToCartDialog", () => {
         expect.objectContaining({
           productId: "p1",
           variantId: null,
-          priceType: "PER_UNIT",
           quantity: 1,
           date: "2099-05-10",
           stock: 4,
@@ -151,7 +150,7 @@ describe("AddToCartDialog", () => {
 
     it("quantity change -> add-to-cart payload reflects new quantity", () => {
       // Arrange
-      render(<AddToCartDialog {...baseProps} priceType="PER_UNIT" />);
+      render(<AddToCartDialog {...baseProps} />);
       fireEvent.click(
         screen.getAllByRole("button", { name: "Add to cart" })[0]!,
       );
@@ -171,7 +170,7 @@ describe("AddToCartDialog", () => {
 
     it("clearing availability re-disables the inner Add button", () => {
       // Arrange
-      render(<AddToCartDialog {...baseProps} priceType="PER_UNIT" />);
+      render(<AddToCartDialog {...baseProps} />);
       fireEvent.click(
         screen.getAllByRole("button", { name: "Add to cart" })[0]!,
       );

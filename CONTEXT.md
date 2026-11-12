@@ -8,7 +8,8 @@ order code.
 ## Language
 
 **Product**:
-A rentable item with a `basePrice`, a `priceType` (`FIXED` or `PER_UNIT`), and stock.
+A rentable item with a `basePrice` and a stock. The price is always per unit and a customer may rent any quantity up to the units still free that day (stock minus units already booked). There is no fixed/per-unit distinction (ADR-014).
+_Avoid_: price type, fixed price, per-unit product.
 
 **Variant**:
 A single-select option of a Product that **replaces** the base price and carries its own price and stock (e.g. size "Large"). Exactly one variant applies per line.

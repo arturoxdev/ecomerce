@@ -7,7 +7,7 @@ export type AvailabilityFetchInput = {
 };
 
 export type AvailabilityFetchResult =
-  | { ok: true; available: number; pricingModel: "FIXED" | "PER_UNIT" }
+  | { ok: true; available: number }
   | { ok: false };
 
 export async function fetchAvailability(
@@ -22,15 +22,8 @@ export async function fetchAvailability(
   const res = await fetch(`/api/availability?${params}`);
   if (!res.ok) return { ok: false };
 
-  const data = (await res.json()) as {
-    available: number;
-    pricingModel: "FIXED" | "PER_UNIT";
-  };
-  return {
-    ok: true,
-    available: Math.max(0, data.available),
-    pricingModel: data.pricingModel,
-  };
+  const data = (await res.json()) as { available: number };
+  return { ok: true, available: Math.max(0, data.available) };
 }
 
 export type AvailabilityMonthFetchInput = {

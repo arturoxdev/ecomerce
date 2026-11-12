@@ -8,7 +8,6 @@ describe("VariantSelector", () => {
 
   const labels = {
     price: "Price",
-    pricePerUnit: "day",
     stock: "Stock",
     selectVariant: "Pick one",
   };
@@ -24,7 +23,6 @@ describe("VariantSelector", () => {
       <VariantSelector
         basePrice={15}
         baseStock={10}
-        pricingModel="PER_UNIT"
         variants={variants}
         labels={labels}
       />,
@@ -42,7 +40,6 @@ describe("VariantSelector", () => {
       <VariantSelector
         basePrice={15}
         baseStock={10}
-        pricingModel="PER_UNIT"
         variants={variants}
         labels={labels}
         onVariantChange={onVariantChange}
@@ -66,7 +63,6 @@ describe("VariantSelector", () => {
       <VariantSelector
         basePrice={15}
         baseStock={10}
-        pricingModel="PER_UNIT"
         variants={variants}
         labels={labels}
         onVariantChange={onVariantChange}
@@ -82,19 +78,18 @@ describe("VariantSelector", () => {
     expect(screen.getByText("$15.00", { exact: false })).toBeInTheDocument();
   });
 
-  it("FIXED pricing -> no stock label rendered", () => {
+  it("no variant selected -> base stock label rendered", () => {
     // Arrange / Act
     render(
       <VariantSelector
         basePrice={15}
         baseStock={10}
-        pricingModel="FIXED"
         variants={variants}
         labels={labels}
       />,
     );
 
     // Assert
-    expect(screen.queryByText("Stock:", { exact: false })).not.toBeInTheDocument();
+    expect(screen.getByText("Stock:", { exact: false })).toBeInTheDocument();
   });
 });

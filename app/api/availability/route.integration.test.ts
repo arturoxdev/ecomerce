@@ -14,7 +14,7 @@ function futureDate(daysFromNow: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-async function seedProduct(priceType: "FIXED" | "PER_UNIT" = "PER_UNIT") {
+async function seedProduct() {
   const [category] = await testDb
     .insert(schema.categories)
     .values({ storeId: STORE_ID, name: "Cat", slug: `cat-${Date.now()}` })
@@ -27,7 +27,6 @@ async function seedProduct(priceType: "FIXED" | "PER_UNIT" = "PER_UNIT") {
       name: "Prod",
       slug: `prod-${Date.now()}`,
       basePrice: "10.00",
-      priceType,
       stock: 4,
       categoryId: category.id,
       isActive: true,
@@ -56,7 +55,7 @@ describe("/api/availability — integration", () => {
 
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body).toEqual({ available: 4, pricingModel: "PER_UNIT" });
+    expect(body).toEqual({ available: 4 });
   });
 
   it("occupied reduces availability -> available reflects subtraction", async () => {
@@ -77,6 +76,46 @@ describe("/api/availability — integration", () => {
 
     const body = await res.json();
     expect(body.available).toBe(1);
+  });
+
+  it("one unit booked out of 4 -> remaining units stay rentable the same day", async () => {
+    const product = await seedProduct();
+    const date = new Date(`${futureDate(5)}T00:00:00.000Z`);
+    await testDb.insert(schema.availability).values({
+      productId: product.id,
+      date,
+      quantity: 1,
+    });
+
+    const res = await GET(
+      buildRequest({
+        productId: product.id,
+        date: futureDate(5),
+      }) as never,
+    );
+
+    const body = await res.json();
+    expect(body.available).toBe(3);
+  });
+
+  it("all 4 units booked -> available 0", async () => {
+    const product = await seedProduct();
+    const date = new Date(`${futureDate(5)}T00:00:00.000Z`);
+    await testDb.insert(schema.availability).values({
+      productId: product.id,
+      date,
+      quantity: 4,
+    });
+
+    const res = await GET(
+      buildRequest({
+        productId: product.id,
+        date: futureDate(5),
+      }) as never,
+    );
+
+    const body = await res.json();
+    expect(body.available).toBe(0);
   });
 
   it("inactive product -> 404 problem+json", async () => {

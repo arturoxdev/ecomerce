@@ -4,7 +4,6 @@ import type {
   PaymentMethod,
   PaymentMode,
   PaymentStatus,
-  PriceType,
   UserRole,
 } from "@/lib/db/schema";
 
@@ -46,11 +45,6 @@ export const DELIVERY_MODE_LABEL: Record<DeliveryMode, string> = {
   FIXED_FEE: "Tarifa fija",
   ZIP_CODE: "Por código postal",
   DISTANCE_MILES: "Por distancia (millas)",
-};
-
-export const PRICE_TYPE_LABEL: Record<PriceType, string> = {
-  FIXED: "Fijo",
-  PER_UNIT: "Por unidad",
 };
 
 export const PRODUCT_STATUS_LABEL = {

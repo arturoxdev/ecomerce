@@ -33,7 +33,6 @@ type Props = {
   unitPrice: number;
   // Selected Local Services for this line (charged once per line; ADR-009).
   selectedServices: CartItemService[];
-  priceType: "FIXED" | "PER_UNIT";
   stock: number;
   labels: {
     availability: AvailabilityLabels;
@@ -61,7 +60,6 @@ export function AddToCartDialog({
   variantName,
   unitPrice,
   selectedServices,
-  priceType,
   stock,
   labels,
 }: Props) {
@@ -91,7 +89,6 @@ export function AddToCartDialog({
             variantName={variantName}
             unitPrice={unitPrice}
             selectedServices={selectedServices}
-            priceType={priceType}
             stock={stock}
             labels={labels}
             onAdded={() => setOpen(false)}
@@ -112,7 +109,6 @@ function AddToCartDialogBody({
   variantName,
   unitPrice,
   selectedServices,
-  priceType,
   stock,
   labels,
   onAdded,
@@ -148,14 +144,13 @@ function AddToCartDialogBody({
       <AvailabilityCheckerBody
         productId={productId}
         variantId={variantId}
-        pricingModel={priceType}
         stock={stock}
         labels={labels.availability}
         onAvailabilityConfirmed={handleConfirmed}
         onUnavailable={handleUnavailable}
       />
 
-      {priceType === "PER_UNIT" && isAvailable && (
+      {isAvailable && (
         <QuantitySelector
           value={quantity}
           max={maxQty}
@@ -173,9 +168,8 @@ function AddToCartDialogBody({
           productPhoto,
           variantId,
           variantName,
-          quantity: priceType === "FIXED" ? 1 : quantity,
+          quantity,
           unitPrice,
-          priceType,
           date: availabilityResult ? toDateString(availabilityResult.date) : "",
           stock: maxQty,
           // ADR-009: chosen Local Services for this line (once per line).

@@ -50,7 +50,6 @@ export function createOrderItemsService(deps: OrderItemsServiceDeps) {
             name: true,
             slug: true,
             photos: true,
-            priceType: true,
           },
         },
         variant: { columns: { id: true, name: true } },

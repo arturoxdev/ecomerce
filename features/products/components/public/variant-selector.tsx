@@ -14,11 +14,9 @@ export type Variant = {
 type Props = {
   basePrice: number;
   baseStock: number;
-  pricingModel: "FIXED" | "PER_UNIT";
   variants: Variant[];
   labels: {
     price: string;
-    pricePerUnit: string;
     stock: string;
     selectVariant: string;
   };
@@ -28,7 +26,6 @@ type Props = {
 export function VariantSelector({
   basePrice,
   baseStock,
-  pricingModel,
   variants,
   labels,
   onVariantChange,
@@ -53,11 +50,6 @@ export function VariantSelector({
         <p className="text-sm font-medium text-slate-500">{labels.price}</p>
         <p className="text-2xl font-bold text-primary">
           ${displayPrice.toFixed(2)}
-          {pricingModel === "PER_UNIT" && (
-            <span className="ml-1 text-base font-normal text-slate-500">
-              / {labels.pricePerUnit}
-            </span>
-          )}
         </p>
       </div>
 
@@ -85,12 +77,10 @@ export function VariantSelector({
         </div>
       </div>
 
-      {/* Stock (PER_UNIT only) */}
-      {pricingModel === "PER_UNIT" && (
-        <p className="text-sm text-slate-500">
-          <span className="font-medium">{labels.stock}:</span> {displayStock}
-        </p>
-      )}
+      {/* Stock */}
+      <p className="text-sm text-slate-500">
+        <span className="font-medium">{labels.stock}:</span> {displayStock}
+      </p>
     </div>
   );
 }

@@ -25,7 +25,6 @@ function buildItem(partial: Partial<CartItemType> = {}): CartItemType {
     variantName: null,
     quantity: 1,
     unitPrice: 10,
-    priceType: "PER_UNIT",
     date: "2099-06-01",
     stock: 5,
     selectedServices: [],
@@ -78,7 +77,7 @@ describe("CartItem", () => {
     expect(screen.getByText("Silla")).toBeInTheDocument();
   });
 
-  it("PER_UNIT item with quantity 2 -> shows subtotal 20.00", () => {
+  it("item with quantity 2 -> shows subtotal 20.00", () => {
     // Arrange / Act
     render(
       <CartItem
@@ -94,21 +93,21 @@ describe("CartItem", () => {
     expect(screen.getByText("$20.00")).toBeInTheDocument();
   });
 
-  it("FIXED priceType -> shows unit price instead of quantity selector", () => {
+  it("single-stock item -> still shows the quantity selector", () => {
     // Arrange / Act
     render(
       <CartItem
         locale="en"
-        item={buildItem({ priceType: "FIXED", quantity: 1, unitPrice: 50 })}
+        item={buildItem({ quantity: 1, unitPrice: 50, stock: 1 })}
         onRemove={() => {}}
         onQuantityChange={() => {}}
         labels={labels}
       />,
     );
 
-    // Assert — unit price + subtotal both render at $50 for quantity 1
+    // Assert
     expect(screen.getAllByText("$50.00").length).toBeGreaterThanOrEqual(1);
-    expect(screen.queryByText("Qty")).not.toBeInTheDocument();
+    expect(screen.getByText("Qty")).toBeInTheDocument();
   });
 
   it("remove click -> onRemove called with item id", async () => {

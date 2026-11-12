@@ -15,7 +15,6 @@ const {
   users,
 } = schema;
 
-type PriceType = (typeof schema.priceTypeEnum.enumValues)[number];
 type OrderStatus = (typeof schema.orderStatusEnum.enumValues)[number];
 type DeliveryMode = (typeof schema.deliveryModeEnum.enumValues)[number];
 type UserRole = (typeof schema.userRoleEnum.enumValues)[number];
@@ -75,7 +74,6 @@ export type SeedFactories = {
     slug?: string;
     name?: string;
     basePrice?: string;
-    priceType?: PriceType;
     stock?: number;
     isActive?: boolean;
     description?: string;
@@ -158,7 +156,6 @@ export function makeFactories(
           name,
           description: opts.description ?? "E2E test product",
           basePrice: opts.basePrice ?? "100.00",
-          priceType: opts.priceType ?? "FIXED",
           stock: opts.stock ?? 1,
           isActive: opts.isActive ?? true,
           categoryId: opts.categoryId,
