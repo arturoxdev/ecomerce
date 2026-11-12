@@ -90,14 +90,6 @@ export default async function Home({ params }: HomeProps) {
                   {m.hero.secondaryCta}
                 </Link>
               </div>
-              <div className="mt-8 flex items-center gap-3">
-                <div className="flex -space-x-2">
-                  <div className="size-8 rounded-full border-2 border-white bg-orange-200" />
-                  <div className="size-8 rounded-full border-2 border-white bg-green-200" />
-                  <div className="size-8 rounded-full border-2 border-white bg-blue-200" />
-                </div>
-                <p className="text-sm text-slate-500">{m.hero.trusted}</p>
-              </div>
             </div>
 
             <div className="relative w-full">
@@ -205,10 +197,10 @@ export default async function Home({ params }: HomeProps) {
                         <div className="mt-4 flex items-center justify-between">
                           <div className="flex items-center gap-1 text-xs text-[#64748b]">
                             <Ruler className="size-3.5" />
-                            {`${product.stock} available`}
+                            {`${product.stock} ${product.stock === 1 ? m.equipment.availableOne : m.equipment.availableOther}`}
                           </div>
                           <span className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-primary-foreground">
-                            {typedLocale === "es" ? "Reservar" : "Reserve"}
+                            {m.equipment.reserve}
                           </span>
                         </div>
                       </Link>
