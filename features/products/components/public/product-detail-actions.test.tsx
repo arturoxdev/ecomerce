@@ -80,7 +80,7 @@ describe("ProductDetailActions", () => {
       });
     });
 
-    it("with variants and none selected -> add to cart is blocked until one is chosen", () => {
+    it("with variants -> opens on the cheapest one, never on the base price", () => {
       // Arrange / Act
       render(
         <ProductDetailActions
@@ -90,20 +90,24 @@ describe("ProductDetailActions", () => {
           productPhoto="/chair.png"
           basePrice={25}
           baseStock={6}
-          variants={[{ id: "v1", name: "Red", price: 20, stock: 5 }]}
+          variants={[
+            { id: "v2", name: "Blue", price: 30, stock: 2 },
+            { id: "v1", name: "Red", price: 20, stock: 5 },
+          ]}
           localServices={[]}
           labels={labels}
         />,
       );
 
       // Assert
-      expect(readDialogProps()).toMatchObject({ disabled: true });
-
-      // Act
-      fireEvent.click(screen.getByRole("button", { name: "Red" }));
-
-      // Assert
-      expect(readDialogProps()).toMatchObject({ disabled: false });
+      expect(screen.getByText("$20.00", { exact: false })).toBeInTheDocument();
+      expect(screen.queryByText("$25.00", { exact: false })).not.toBeInTheDocument();
+      expect(readDialogProps()).toMatchObject({
+        variantId: "v1",
+        variantName: "Red",
+        unitPrice: 20,
+        stock: 5,
+      });
     });
 
     it("with variants -> selecting a variant forwards its id/price/stock to the dialog", () => {

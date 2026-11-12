@@ -1,7 +1,11 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { VariantSelector, type Variant } from "./variant-selector";
+import {
+  cheapestVariant,
+  VariantSelector,
+  type Variant,
+} from "./variant-selector";
 
 describe("VariantSelector", () => {
   afterEach(() => cleanup());
@@ -17,28 +21,31 @@ describe("VariantSelector", () => {
     { id: "v2", name: "Blue", price: 30, stock: 2 },
   ];
 
-  it("no variant selected -> shows base price and no stock", () => {
+  it("selected variant -> shows its price and stock and marks its chip", () => {
     // Arrange / Act
     render(
       <VariantSelector
-        basePrice={15}
         variants={variants}
+        selected={variants[0]}
         labels={labels}
+        onVariantChange={vi.fn()}
       />,
     );
 
     // Assert
-    expect(screen.getByText("$15.00", { exact: false })).toBeInTheDocument();
-    expect(screen.queryByText("Stock:", { exact: false })).not.toBeInTheDocument();
+    expect(screen.getByText("$20.00", { exact: false })).toBeInTheDocument();
+    expect(screen.getByText("Stock:", { exact: false }).parentElement).toHaveTextContent("Stock: 5");
+    expect(screen.getByRole("button", { name: "Red" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Blue" })).toHaveAttribute("aria-pressed", "false");
   });
 
-  it("variant click -> switches price and notifies parent", () => {
+  it("variant click -> notifies parent with that variant", () => {
     // Arrange
     const onVariantChange = vi.fn();
     render(
       <VariantSelector
-        basePrice={15}
         variants={variants}
+        selected={variants[0]}
         labels={labels}
         onVariantChange={onVariantChange}
       />,
@@ -48,46 +55,32 @@ describe("VariantSelector", () => {
     fireEvent.click(screen.getByRole("button", { name: "Blue" }));
 
     // Assert
-    expect(screen.getByText("$30.00", { exact: false })).toBeInTheDocument();
     expect(onVariantChange).toHaveBeenCalledWith(
       expect.objectContaining({ id: "v2", name: "Blue" }),
     );
   });
+});
 
-  it("click selected variant again -> deselects and restores base price", () => {
-    // Arrange
-    const onVariantChange = vi.fn();
-    render(
-      <VariantSelector
-        basePrice={15}
-        variants={variants}
-        labels={labels}
-        onVariantChange={onVariantChange}
-      />,
-    );
-    fireEvent.click(screen.getByRole("button", { name: "Red" }));
-
-    // Act
-    fireEvent.click(screen.getByRole("button", { name: "Red" }));
-
-    // Assert
-    expect(onVariantChange).toHaveBeenLastCalledWith(null);
-    expect(screen.getByText("$15.00", { exact: false })).toBeInTheDocument();
+describe("cheapestVariant", () => {
+  it("returns the lowest-priced variant regardless of order", () => {
+    expect(
+      cheapestVariant([
+        { id: "v2", name: "Blue", price: 30, stock: 2 },
+        { id: "v1", name: "Red", price: 20, stock: 5 },
+      ])?.id,
+    ).toBe("v1");
   });
 
-  it("variant selected -> its stock label rendered", () => {
-    // Arrange / Act
-    render(
-      <VariantSelector
-        basePrice={15}
-        variants={variants}
-        labels={labels}
-      />,
-    );
+  it("price tie -> keeps the first one", () => {
+    expect(
+      cheapestVariant([
+        { id: "a", name: "A", price: 10, stock: 1 },
+        { id: "b", name: "B", price: 10, stock: 1 },
+      ])?.id,
+    ).toBe("a");
+  });
 
-    fireEvent.click(screen.getByRole("button", { name: "Blue" }));
-
-    // Assert
-    expect(screen.getByText("Stock:", { exact: false })).toBeInTheDocument();
+  it("no variants -> null", () => {
+    expect(cheapestVariant([])).toBeNull();
   });
 });
