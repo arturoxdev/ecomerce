@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { sendContactMessage } from "../../actions";
 import { ContactMessageForm } from "./contact-message-form";
+import { MarkdownContent } from "./markdown-content";
 
 type HeroProps = {
   eyebrow?: string;
@@ -103,7 +104,7 @@ export function AboutStorySection({
             <h2 className="text-3xl font-bold tracking-tight text-slate-900">
               {storyTitle}
             </h2>
-            <p className="mt-5 text-lg leading-8 text-slate-600">{storyBody}</p>
+            <MarkdownContent markdown={storyBody} className="mt-5 text-lg" />
           </div>
         </div>
       </section>
@@ -114,7 +115,7 @@ export function AboutStorySection({
             <h2 className="text-3xl font-bold tracking-tight text-slate-900">
               {valuesTitle}
             </h2>
-            <p className="mt-4 text-lg leading-8 text-slate-600">{valuesBody}</p>
+            <MarkdownContent markdown={valuesBody} className="mt-4 text-lg" />
           </div>
 
           <div className="mt-10 grid gap-6 md:grid-cols-3">

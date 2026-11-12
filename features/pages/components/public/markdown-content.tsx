@@ -1,9 +1,17 @@
 import Markdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 
-export function MarkdownContent({ markdown }: { markdown: string }) {
+import { cn } from "@/lib/utils";
+
+export function MarkdownContent({
+  markdown,
+  className,
+}: {
+  markdown: string;
+  className?: string;
+}) {
   return (
-    <div className="space-y-6 text-base leading-8 text-slate-600">
+    <div className={cn("space-y-6 text-base leading-8 text-slate-600", className)}>
     <Markdown
       rehypePlugins={[rehypeRaw]}
       components={{

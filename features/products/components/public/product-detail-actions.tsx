@@ -11,7 +11,11 @@ import {
   type SelectableService,
   type ServiceSelectorLabels,
 } from "./service-selector";
-import { VariantSelector, type Variant } from "./variant-selector";
+import {
+  cheapestVariant,
+  VariantSelector,
+  type Variant,
+} from "./variant-selector";
 
 type Props = {
   productId: string;
@@ -53,9 +57,12 @@ export function ProductDetailActions({
   showSplitNotice = false,
   labels,
 }: Props) {
-  const hasVariants = variants.length > 0;
-
-  const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
+  // ADR-014: a product with variants is only rentable through one of them.
+  // The page opens on the cheapest one so the price shown matches the "from"
+  // price of the product card; the base price is never shown for these.
+  const [selectedVariant, setSelectedVariant] = useState<Variant | null>(() =>
+    cheapestVariant(variants),
+  );
   const [selectedServices, setSelectedServices] = useState<SelectableService[]>(
     [],
   );
@@ -66,10 +73,6 @@ export function ProductDetailActions({
   // amount to the displayed unit/base price preview (ADR-009).
   const servicesTotal = selectedServices.reduce((sum, s) => sum + s.price, 0);
   const currentPrice = variantPrice + servicesTotal;
-
-  const handleVariantChange = useCallback((variant: Variant | null) => {
-    setSelectedVariant(variant);
-  }, []);
 
   const handleServiceToggle = useCallback(
     (service: SelectableService, checked: boolean) => {
@@ -83,21 +86,19 @@ export function ProductDetailActions({
   );
 
   const selectedServiceIds = selectedServices.map((s) => s.id);
-  // ADR-014: a product with variants is only rentable through one of them.
-  const needsVariant = hasVariants && !selectedVariant;
 
   return (
     <div className="space-y-6">
-      {hasVariants ? (
+      {selectedVariant ? (
         <VariantSelector
-          basePrice={basePrice}
           variants={variants}
+          selected={selectedVariant}
           labels={{
             price: labels.price,
             stock: labels.stock,
             selectVariant: labels.selectVariant,
           }}
-          onVariantChange={handleVariantChange}
+          onVariantChange={setSelectedVariant}
         />
       ) : (
         <>
@@ -149,12 +150,6 @@ export function ProductDetailActions({
         </div>
       )}
 
-      {needsVariant && (
-        <p className="text-sm font-medium text-amber-700">
-          {labels.selectVariant}
-        </p>
-      )}
-
       {/* Add to Cart (opens dialog with availability checker inside) */}
       <AddToCartDialog
         // Remount when variant or service selection changes so the internal
@@ -174,8 +169,6 @@ export function ProductDetailActions({
           price: s.price,
         }))}
         stock={currentStock}
-        disabled={needsVariant}
-        disabledMessage={labels.selectVariant}
         labels={{
           availability: labels.availability,
           addToCart: labels.addToCart,

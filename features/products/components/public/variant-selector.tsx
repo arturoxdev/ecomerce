@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 import { cn } from "@/lib/utils";
 
 export type Variant = {
@@ -12,41 +10,41 @@ export type Variant = {
 };
 
 type Props = {
-  basePrice: number;
   variants: Variant[];
+  /** The chosen variant. A product with variants always has one (ADR-014). */
+  selected: Variant;
   labels: {
     price: string;
     stock: string;
     selectVariant: string;
   };
-  onVariantChange?: (variant: Variant | null) => void;
+  onVariantChange: (variant: Variant) => void;
 };
 
+/**
+ * The variant the detail page opens on: the cheapest one, so the price matches
+ * the "from" price of the product card. Ties keep the first in list order.
+ */
+export function cheapestVariant(variants: Variant[]): Variant | null {
+  return variants.reduce<Variant | null>(
+    (cheapest, v) => (cheapest === null || v.price < cheapest.price ? v : cheapest),
+    null,
+  );
+}
+
 export function VariantSelector({
-  basePrice,
   variants,
+  selected,
   labels,
   onVariantChange,
 }: Props) {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-
-  const selected = variants.find((v) => v.id === selectedId);
-  const displayPrice = selected ? selected.price : basePrice;
-
-  function handleVariantClick(variantId: string) {
-    const newId = selectedId === variantId ? null : variantId;
-    setSelectedId(newId);
-    const newVariant = variants.find((v) => v.id === newId) ?? null;
-    onVariantChange?.(newVariant);
-  }
-
   return (
     <div className="space-y-6">
       {/* Price */}
       <div>
         <p className="text-sm font-medium text-slate-500">{labels.price}</p>
         <p className="text-2xl font-bold text-primary">
-          ${displayPrice.toFixed(2)}
+          ${selected.price.toFixed(2)}
         </p>
       </div>
 
@@ -60,10 +58,11 @@ export function VariantSelector({
             <button
               key={variant.id}
               type="button"
-              onClick={() => handleVariantClick(variant.id)}
+              aria-pressed={selected.id === variant.id}
+              onClick={() => onVariantChange(variant)}
               className={cn(
                 "rounded-lg border px-4 py-2 text-sm font-medium transition-all",
-                selectedId === variant.id
+                selected.id === variant.id
                   ? "border-primary bg-primary text-white shadow-sm"
                   : "border-slate-200 bg-white text-slate-700 hover:border-primary hover:text-primary",
               )}
@@ -74,12 +73,10 @@ export function VariantSelector({
         </div>
       </div>
 
-      {/* Stock: only a chosen variant has rentable stock (ADR-014) */}
-      {selected && (
-        <p className="text-sm text-slate-500">
-          <span className="font-medium">{labels.stock}:</span> {selected.stock}
-        </p>
-      )}
+      {/* Stock of the chosen variant (ADR-014) */}
+      <p className="text-sm text-slate-500">
+        <span className="font-medium">{labels.stock}:</span> {selected.stock}
+      </p>
     </div>
   );
 }

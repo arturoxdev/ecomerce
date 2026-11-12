@@ -22,6 +22,7 @@ Además había una incoherencia: la validación al crear la orden (`checkAvailab
 7. **Variante obligatoria:** un producto con variantes activas solo se renta eligiendo una. Las existencias del producto y las de cada variante son contadores separados; permitir reservar "sin variante" sumaba ambos (2 sillas del producto + 1 dorada + 1 plateada = 4 reservables con 2 físicas). La tienda bloquea el botón hasta elegir variante y el servidor rechaza la línea, tanto en el checkout como en órdenes manuales. En esos productos el total rentable es la suma de las existencias de sus variantes.
 8. **Líneas del mismo pedido:** al validar un pedido, las líneas que comparten producto, variante y fecha se suman antes de comparar contra existencias (los bloqueos se insertan hasta después de validar todas).
 9. **Bloqueo manual:** el admin elige cuántas unidades bloquear, o todas las libres de ese día, y en productos con variantes debe elegir la variante. Antes siempre bloqueaba 1 unidad del producto.
+10. **Variante preseleccionada:** la página del producto abre con la variante más barata ya elegida y no se puede dejar sin variante. Así el precio coincide con el "Desde" de la tarjeta; el precio base de un producto con variantes no se muestra en la tienda.
 
 ## Razón
 
