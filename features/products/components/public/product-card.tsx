@@ -31,8 +31,10 @@ export type ProductCardProps = {
 export function ProductCard({ product, locale, labels }: ProductCardProps) {
   const photo = findThumbnail(product.photos);
 
+  // ADR-014: a product with variants is only rentable through one of them,
+  // so its "from" price is the cheapest variant, not the base price.
   const lowestPrice = product.hasVariants && product.minVariantPrice !== undefined
-    ? Math.min(product.basePrice, product.minVariantPrice)
+    ? product.minVariantPrice
     : product.basePrice;
 
   const prefix = product.hasVariants ? `${labels.fromPrice ?? "From"} ` : "";

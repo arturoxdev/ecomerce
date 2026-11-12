@@ -34,6 +34,9 @@ type Props = {
   // Selected Local Services for this line (charged once per line; ADR-009).
   selectedServices: CartItemService[];
   stock: number;
+  /** Blocks opening the dialog (e.g. a variant must be chosen first). */
+  disabled?: boolean;
+  disabledMessage?: string;
   labels: {
     availability: AvailabilityLabels;
     addToCart: string;
@@ -61,6 +64,8 @@ export function AddToCartDialog({
   unitPrice,
   selectedServices,
   stock,
+  disabled = false,
+  disabledMessage,
   labels,
 }: Props) {
   const [open, setOpen] = useState(false);
@@ -69,7 +74,13 @@ export function AddToCartDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
-          <Button type="button" size="lg" className="w-full gap-2">
+          <Button
+            type="button"
+            size="lg"
+            className="w-full gap-2"
+            disabled={disabled}
+            title={disabled ? disabledMessage : undefined}
+          >
             <ShoppingCart className="size-4" />
             {labels.addToCart}
           </Button>

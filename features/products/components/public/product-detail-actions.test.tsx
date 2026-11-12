@@ -80,6 +80,32 @@ describe("ProductDetailActions", () => {
       });
     });
 
+    it("with variants and none selected -> add to cart is blocked until one is chosen", () => {
+      // Arrange / Act
+      render(
+        <ProductDetailActions
+          productId="product-1"
+          productName="Chair"
+          productSlug="chair"
+          productPhoto="/chair.png"
+          basePrice={25}
+          baseStock={6}
+          variants={[{ id: "v1", name: "Red", price: 20, stock: 5 }]}
+          localServices={[]}
+          labels={labels}
+        />,
+      );
+
+      // Assert
+      expect(readDialogProps()).toMatchObject({ disabled: true });
+
+      // Act
+      fireEvent.click(screen.getByRole("button", { name: "Red" }));
+
+      // Assert
+      expect(readDialogProps()).toMatchObject({ disabled: false });
+    });
+
     it("with variants -> selecting a variant forwards its id/price/stock to the dialog", () => {
       // Arrange
       render(

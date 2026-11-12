@@ -68,6 +68,7 @@ function buildFindProductByIdWithVariants() {
         id: v.id,
         price: v.price,
         stock: v.stock,
+        isActive: v.isActive,
       })),
     };
   };
@@ -180,6 +181,48 @@ describe("cart-order service — integration", () => {
     if (result.success) return;
     expect(result.unavailableItems).toBeDefined();
 
+    const orderCount = await testDb.query.orders.findMany({
+      where: eq(schema.orders.storeId, STORE_ID),
+    });
+    expect(orderCount).toHaveLength(0);
+  });
+
+  it("product with variants ordered without a variant -> UNAVAILABLE and no rows inserted", async () => {
+    // Arrange: base stock 2 plus one variant; the base pool must not be rentable
+    await seedSettings();
+    const { productId } = await seedCategoryAndProduct({ stock: 2 });
+    await testDb.insert(schema.productVariants).values({
+      productId,
+      name: "Gold",
+      price: "50.00",
+      stock: 1,
+    });
+    const service = createCartOrderService({
+      db: testDb,
+      storeId: STORE_ID,
+      findProductByIdWithVariants: buildFindProductByIdWithVariants(),
+      loadStoreSettings,
+    });
+
+    // Act
+    const result = await service.placeOrder({
+      customerName: "Jane",
+      customerEmail: "jane@example.com",
+      customerPhone: "555",
+      deliveryAddress: "",
+      items: [
+        {
+          productId,
+          variantId: null,
+          quantity: 1,
+          unitPrice: 50,
+          date: "2099-06-01",
+        },
+      ],
+    });
+
+    // Assert
+    expect(result.success).toBe(false);
     const orderCount = await testDb.query.orders.findMany({
       where: eq(schema.orders.storeId, STORE_ID),
     });

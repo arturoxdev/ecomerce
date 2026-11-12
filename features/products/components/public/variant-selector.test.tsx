@@ -17,12 +17,11 @@ describe("VariantSelector", () => {
     { id: "v2", name: "Blue", price: 30, stock: 2 },
   ];
 
-  it("no variant selected -> shows base price and base stock", () => {
+  it("no variant selected -> shows base price and no stock", () => {
     // Arrange / Act
     render(
       <VariantSelector
         basePrice={15}
-        baseStock={10}
         variants={variants}
         labels={labels}
       />,
@@ -30,7 +29,7 @@ describe("VariantSelector", () => {
 
     // Assert
     expect(screen.getByText("$15.00", { exact: false })).toBeInTheDocument();
-    expect(screen.getByText("Stock:", { exact: false })).toBeInTheDocument();
+    expect(screen.queryByText("Stock:", { exact: false })).not.toBeInTheDocument();
   });
 
   it("variant click -> switches price and notifies parent", () => {
@@ -39,7 +38,6 @@ describe("VariantSelector", () => {
     render(
       <VariantSelector
         basePrice={15}
-        baseStock={10}
         variants={variants}
         labels={labels}
         onVariantChange={onVariantChange}
@@ -62,7 +60,6 @@ describe("VariantSelector", () => {
     render(
       <VariantSelector
         basePrice={15}
-        baseStock={10}
         variants={variants}
         labels={labels}
         onVariantChange={onVariantChange}
@@ -78,16 +75,17 @@ describe("VariantSelector", () => {
     expect(screen.getByText("$15.00", { exact: false })).toBeInTheDocument();
   });
 
-  it("no variant selected -> base stock label rendered", () => {
+  it("variant selected -> its stock label rendered", () => {
     // Arrange / Act
     render(
       <VariantSelector
         basePrice={15}
-        baseStock={10}
         variants={variants}
         labels={labels}
       />,
     );
+
+    fireEvent.click(screen.getByRole("button", { name: "Blue" }));
 
     // Assert
     expect(screen.getByText("Stock:", { exact: false })).toBeInTheDocument();

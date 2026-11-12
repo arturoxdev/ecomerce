@@ -139,7 +139,14 @@ export function createManualOrderService(deps: ManualOrderServiceDeps) {
             ? product.variants?.find((v) => v.id === item.variantId)
             : null;
 
-          if (item.variantId && (!variant || !variant.isActive)) {
+          // ADR-014: a product with variants is only rentable through one of
+          // them; its own stock is a separate pool that would double-count.
+          const hasActiveVariants =
+            product.variants?.some((v) => v.isActive) ?? false;
+          if (
+            (item.variantId && (!variant || !variant.isActive)) ||
+            (!item.variantId && hasActiveVariants)
+          ) {
             unavailableItems.push(product.name);
             continue;
           }

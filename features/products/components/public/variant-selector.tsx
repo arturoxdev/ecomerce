@@ -13,7 +13,6 @@ export type Variant = {
 
 type Props = {
   basePrice: number;
-  baseStock: number;
   variants: Variant[];
   labels: {
     price: string;
@@ -25,7 +24,6 @@ type Props = {
 
 export function VariantSelector({
   basePrice,
-  baseStock,
   variants,
   labels,
   onVariantChange,
@@ -34,7 +32,6 @@ export function VariantSelector({
 
   const selected = variants.find((v) => v.id === selectedId);
   const displayPrice = selected ? selected.price : basePrice;
-  const displayStock = selected ? selected.stock : baseStock;
 
   function handleVariantClick(variantId: string) {
     const newId = selectedId === variantId ? null : variantId;
@@ -77,10 +74,12 @@ export function VariantSelector({
         </div>
       </div>
 
-      {/* Stock */}
-      <p className="text-sm text-slate-500">
-        <span className="font-medium">{labels.stock}:</span> {displayStock}
-      </p>
+      {/* Stock: only a chosen variant has rentable stock (ADR-014) */}
+      {selected && (
+        <p className="text-sm text-slate-500">
+          <span className="font-medium">{labels.stock}:</span> {selected.stock}
+        </p>
+      )}
     </div>
   );
 }

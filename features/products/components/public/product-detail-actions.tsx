@@ -83,13 +83,14 @@ export function ProductDetailActions({
   );
 
   const selectedServiceIds = selectedServices.map((s) => s.id);
+  // ADR-014: a product with variants is only rentable through one of them.
+  const needsVariant = hasVariants && !selectedVariant;
 
   return (
     <div className="space-y-6">
       {hasVariants ? (
         <VariantSelector
           basePrice={basePrice}
-          baseStock={baseStock}
           variants={variants}
           labels={{
             price: labels.price,
@@ -148,6 +149,12 @@ export function ProductDetailActions({
         </div>
       )}
 
+      {needsVariant && (
+        <p className="text-sm font-medium text-amber-700">
+          {labels.selectVariant}
+        </p>
+      )}
+
       {/* Add to Cart (opens dialog with availability checker inside) */}
       <AddToCartDialog
         // Remount when variant or service selection changes so the internal
@@ -167,6 +174,8 @@ export function ProductDetailActions({
           price: s.price,
         }))}
         stock={currentStock}
+        disabled={needsVariant}
+        disabledMessage={labels.selectVariant}
         labels={{
           availability: labels.availability,
           addToCart: labels.addToCart,

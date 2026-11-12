@@ -19,6 +19,7 @@ Además había una incoherencia: la validación al crear la orden (`checkAvailab
 4. El selector de cantidad y el texto de existencias se muestran en todos los productos (tienda, carrito y órdenes manuales del admin), con el máximo según lo disponible ese día.
 5. Se quita el sufijo "/ por unidad" junto al precio en tienda y admin.
 6. Carrito: agregar otra vez un producto suma cantidad solo si coinciden fecha, variante y servicios elegidos; si algo difiere es una línea aparte.
+7. **Variante obligatoria:** un producto con variantes activas solo se renta eligiendo una. Las existencias del producto y las de cada variante son contadores separados; permitir reservar "sin variante" sumaba ambos (2 sillas del producto + 1 dorada + 1 plateada = 4 reservables con 2 físicas). La tienda bloquea el botón hasta elegir variante y el servidor rechaza la línea, tanto en el checkout como en órdenes manuales. En esos productos el total rentable es la suma de las existencias de sus variantes.
 
 ## Razón
 
@@ -30,5 +31,6 @@ Además había una incoherencia: la validación al crear la orden (`checkAvailab
 
 - Productos que eran `FIXED` con existencias mayores a 1 pasan a aceptar esa cantidad de reservas por día. Hay que revisarlos antes de aplicar la migración.
 - Productos que eran `FIXED` con existencias en 0 dejan de ser rentables hasta que se corrija el número.
+- Carritos guardados con una línea "sin variante" de un producto que tiene variantes se rechazan en el checkout como no disponibles.
 - Reemplaza la respuesta "¿Los precios varían por producto?" de `docs/questions.md`.
 - Despliegue: primero el código, después la migración. Entre ambos, crear productos desde el admin falla porque la columna sigue siendo obligatoria.

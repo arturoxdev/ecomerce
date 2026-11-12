@@ -378,6 +378,53 @@ describe("manual-order.service", () => {
     });
   });
 
+  describe("variant required", () => {
+    it("product with active variants and no variantId -> unavailable", async () => {
+      const { db } = buildTx();
+      const service = createManualOrderService({
+        db: db as never,
+        storeId: "store-A",
+        userId: "user-1",
+        clock: () => TODAY,
+        findProductByIdWithVariants: vi.fn(async () =>
+          buildProduct({
+            stock: 2,
+            variants: [
+              {
+                id: "22222222-2222-4222-8222-222222222222",
+                price: "100.00",
+                stock: 1,
+                isActive: true,
+              },
+            ],
+          }),
+        ),
+        recordAudit: vi.fn(async () => undefined),
+      });
+
+      const result = await service.createManualOrder({
+        customerName: "Jane",
+        customerEmail: "jane@example.com",
+        customerPhone: "555",
+        items: [
+          {
+            productId: "11111111-1111-4111-8111-111111111111",
+            variantId: null,
+            quantity: 1,
+            unitPrice: 100,
+            date: "2026-05-10",
+          },
+        ],
+        amountPaid: 0,
+        paymentMethod: "CASH",
+      });
+
+      expect(result.success).toBe(false);
+      if (result.success) return;
+      expect(result.unavailableItems).toEqual(["Bouncy Castle"]);
+    });
+  });
+
   describe("availability conflict", () => {
     it("single-stock product already taken -> unavailable", async () => {
       const { db } = buildTx({ occupied: 1 });

@@ -12,7 +12,7 @@ A rentable item with a `basePrice` and a stock. The price is always per unit and
 _Avoid_: price type, fixed price, per-unit product.
 
 **Variant**:
-A single-select option of a Product that **replaces** the base price and carries its own price and stock (e.g. size "Large"). Exactly one variant applies per line.
+A single-select option of a Product that **replaces** the base price and carries its own price and stock (e.g. size "Large"). Exactly one variant applies per line. A Product that has active Variants can only be rented through one of them: the Product's own stock is then ignored (ADR-014).
 _Avoid_: option, modifier (those imply additive).
 
 **Additional Service** (es: _Servicio adicional_):
