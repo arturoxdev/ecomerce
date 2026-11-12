@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import { Field } from "@/components/admin/field";
+import { MarkdownEditor } from "@/components/admin/markdown-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useFormActionToast } from "@/hooks/use-form-action-toast";
@@ -26,6 +27,8 @@ type Props = {
 export function AboutForm({ action, defaultValues, canWrite }: Props) {
   const [state, formAction, pending] = useActionState(action, {} as StaticPageFormState);
   const fieldErrors = getFieldErrors(state);
+  const [storyBody, setStoryBody] = useState(defaultValues.storyBody);
+  const [valuesBody, setValuesBody] = useState(defaultValues.valuesBody);
   useFormActionToast(state, "Página Acerca de actualizada");
 
   return (
@@ -49,43 +52,37 @@ export function AboutForm({ action, defaultValues, canWrite }: Props) {
         />
       </Field>
 
-      <div className="grid gap-5 md:grid-cols-2">
-        <Field label="Título de la historia" error={fieldErrors?.storyTitle?.[0]} className="space-y-2">
-          <Input
-            name="storyTitle"
-            defaultValue={defaultValues.storyTitle}
-            disabled={!canWrite}
-          />
-        </Field>
-        <Field label="Título de los valores" error={fieldErrors?.valuesTitle?.[0]} className="space-y-2">
-          <Input
-            name="valuesTitle"
-            defaultValue={defaultValues.valuesTitle}
-            disabled={!canWrite}
-          />
-        </Field>
-      </div>
+      <Field label="Título de la historia" error={fieldErrors?.storyTitle?.[0]} className="space-y-2">
+        <Input
+          name="storyTitle"
+          defaultValue={defaultValues.storyTitle}
+          disabled={!canWrite}
+        />
+      </Field>
+      <Field label="Cuerpo de la historia" error={fieldErrors?.storyBody?.[0]} className="space-y-2">
+        <MarkdownEditor
+          value={storyBody}
+          onChange={setStoryBody}
+          name="storyBody"
+          readOnly={!canWrite}
+        />
+      </Field>
 
-      <div className="grid gap-5 md:grid-cols-2">
-        <Field label="Cuerpo de la historia" error={fieldErrors?.storyBody?.[0]} className="space-y-2">
-          <textarea
-            name="storyBody"
-            defaultValue={defaultValues.storyBody}
-            rows={8}
-            disabled={!canWrite}
-            className="w-full rounded-xl border border-[#e2e8f0] px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-primary disabled:bg-slate-50"
-          />
-        </Field>
-        <Field label="Cuerpo de los valores" error={fieldErrors?.valuesBody?.[0]} className="space-y-2">
-          <textarea
-            name="valuesBody"
-            defaultValue={defaultValues.valuesBody}
-            rows={8}
-            disabled={!canWrite}
-            className="w-full rounded-xl border border-[#e2e8f0] px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-primary disabled:bg-slate-50"
-          />
-        </Field>
-      </div>
+      <Field label="Título de los valores" error={fieldErrors?.valuesTitle?.[0]} className="space-y-2">
+        <Input
+          name="valuesTitle"
+          defaultValue={defaultValues.valuesTitle}
+          disabled={!canWrite}
+        />
+      </Field>
+      <Field label="Cuerpo de los valores" error={fieldErrors?.valuesBody?.[0]} className="space-y-2">
+        <MarkdownEditor
+          value={valuesBody}
+          onChange={setValuesBody}
+          name="valuesBody"
+          readOnly={!canWrite}
+        />
+      </Field>
 
       {canWrite ? (
         <div className="flex justify-end">
