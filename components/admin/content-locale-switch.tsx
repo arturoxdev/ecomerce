@@ -17,7 +17,8 @@ type Props = {
 };
 
 /**
- * ES | EN selector for the translatable product copy (ADR-013). It only swaps
+ * ES | EN selector for translatable admin copy — products (ADR-013) and
+ * categories (ADR-015). It only swaps
  * which language's fields are visible — both languages stay mounted and are
  * submitted together by the surrounding form.
  */

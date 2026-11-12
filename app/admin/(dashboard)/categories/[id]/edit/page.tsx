@@ -42,6 +42,8 @@ export default async function EditCategoryPage({ params }: Props) {
                   name: category.name,
                   slug: category.slug,
                   description: category.description ?? "",
+                  nameEn: category.nameEn ?? "",
+                  descriptionEn: category.descriptionEn ?? "",
                 }}
               />
             </CardContent>

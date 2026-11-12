@@ -11,6 +11,7 @@ import { notFound } from "next/navigation";
 import { asc } from "drizzle-orm";
 
 import { findAllWithCategory } from "@/features/products/services/products.service";
+import { localizedCategoryName } from "@/features/categories/lib/localize-category";
 import { findAll as findAllCategories } from "@/features/categories/services/categories.service";
 import {
   EventInquiryForm,
@@ -138,7 +139,7 @@ export default async function Home({ params }: HomeProps) {
                   href={`/${typedLocale}/${cat.slug}`}
                   className="whitespace-nowrap rounded-full bg-[#f1f5f9] px-5 py-2 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-200"
                 >
-                  {cat.name}
+                  {localizedCategoryName(cat, typedLocale)}
                 </Link>
               ))}
             </div>
@@ -187,7 +188,7 @@ export default async function Home({ params }: HomeProps) {
                               {localizedProductName(product, typedLocale)}
                             </h3>
                             <p className="text-sm text-[#64748b]">
-                              {product.category.name}
+                              {localizedCategoryName(product.category, typedLocale)}
                             </p>
                           </div>
                           <span className="rounded-md bg-[#fff7ed] px-2 py-1 text-xs font-bold text-primary">

@@ -7,6 +7,7 @@ import {
   findAllByCategorySlug,
   findAllWithCategory,
 } from "@/features/products/services/products.service";
+import { localizedCategoryName } from "@/features/categories/lib/localize-category";
 import { findAll as findAllCategories } from "@/features/categories/services/categories.service";
 import { categories, products } from "@/lib/db/schema";
 import { isLocale, type Locale } from "@/lib/i18n/config";
@@ -33,7 +34,7 @@ export default async function CatalogPage({
 
   const categoryList = await findAllCategories({
     orderBy: asc(categories.sortOrder),
-    columns: { id: true, name: true, slug: true },
+    columns: { id: true, name: true, nameEn: true, slug: true },
   });
 
   const productList =
@@ -64,7 +65,11 @@ export default async function CatalogPage({
         {/* Category filter (client island) */}
         <div className="mb-8">
           <CategoryFilter
-            categories={categoryList}
+            categories={categoryList.map((category) => ({
+              id: category.id,
+              slug: category.slug,
+              name: localizedCategoryName(category, typedLocale),
+            }))}
             currentSlug={categorySlug ?? null}
             allLabel={m.catalog.filterAll}
           />
@@ -91,7 +96,10 @@ export default async function CatalogPage({
                     slug: product.slug,
                     basePrice: parseFloat(product.basePrice),
                     photos: product.photos,
-                    category: product.category,
+                    category: {
+                      slug: product.category.slug,
+                      name: localizedCategoryName(product.category, typedLocale),
+                    },
                     hasVariants,
                     minVariantPrice,
                   }}

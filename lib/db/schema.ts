@@ -79,6 +79,11 @@ export const categories = pgTable(
     name: text("name").notNull(),
     slug: text("slug").notNull(),
     description: text("description"),
+    // ADR-015: name/description are the Spanish (base) copy. The *_en columns
+    // are optional English translations; the storefront falls back to the
+    // Spanish value field by field when one is null.
+    nameEn: text("name_en"),
+    descriptionEn: text("description_en"),
     sortOrder: integer("sort_order").notNull().default(0),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at")

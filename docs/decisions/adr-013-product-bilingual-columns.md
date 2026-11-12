@@ -40,7 +40,7 @@ El storefront ya es bilingüe (`/en`, `/es`) pero el nombre, la descripción cor
 
 ## Consecuencias
 
-- Variantes, categorías y servicios adicionales **siguen en un solo idioma**: en `/en` un producto traducido puede mostrar variantes y categoría en español. Queda como siguiente iteración.
+- Variantes, categorías y servicios adicionales **siguen en un solo idioma**: en `/en` un producto traducido puede mostrar variantes y categoría en español. Queda como siguiente iteración. *(Categorías: resuelto en ADR-015.)*
 - Los carritos guardados en el navegador antes de este cambio no tienen el nombre en inglés y muestran español hasta que el producto se vuelve a agregar.
 - El catálogo se ordena por `name` (español) en ambos idiomas.
 

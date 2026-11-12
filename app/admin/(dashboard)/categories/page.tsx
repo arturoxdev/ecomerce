@@ -27,6 +27,7 @@ export default async function AdminCategoriesPage({
     ? all.filter(
         (c) =>
           c.name.toLowerCase().includes(search.toLowerCase()) ||
+          (c.nameEn ?? "").toLowerCase().includes(search.toLowerCase()) ||
           c.slug.toLowerCase().includes(search.toLowerCase()),
       )
     : all;

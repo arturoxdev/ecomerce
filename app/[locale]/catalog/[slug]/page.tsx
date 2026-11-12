@@ -12,6 +12,7 @@ import {
 import { MarkdownContent } from "@/features/pages";
 import { Badge } from "@/components/ui/badge";
 import { siteConfig } from "@/lib/config/site";
+import { localizedCategoryName } from "@/features/categories/lib/localize-category";
 import { localizeProduct } from "@/features/products/lib/localize-product";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
@@ -105,7 +106,9 @@ export default async function ProductDetailPage({
           {/* Product info */}
           <div className="space-y-6">
             <div className="space-y-2">
-              <Badge variant="outline">{product.category.name}</Badge>
+              <Badge variant="outline">
+                {localizedCategoryName(product.category, typedLocale)}
+              </Badge>
               <h1 className="text-3xl font-bold tracking-tight text-slate-900">
                 {copy.name}
               </h1>

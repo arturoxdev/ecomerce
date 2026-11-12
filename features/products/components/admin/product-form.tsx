@@ -50,7 +50,7 @@ import { SlugField } from "./slug-field";
 import {
   ContentLocaleSwitch,
   type ContentLocale,
-} from "./content-locale-switch";
+} from "@/components/admin/content-locale-switch";
 import {
   isVideoUrl,
   isVideoMime,

@@ -64,6 +64,44 @@ describe("categories-admin schemas", () => {
       if (!result.success) return;
       expect(result.data.description).toBeUndefined();
     });
+
+    it("english copy present -> parsed", () => {
+      // Arrange
+      const fd = buildFormData({
+        name: "Sillas",
+        slug: "sillas",
+        nameEn: "Chairs",
+        descriptionEn: "All kinds of chairs",
+      });
+
+      // Act
+      const result = parseCategoryForm(fd);
+
+      // Assert
+      expect(result.success).toBe(true);
+      if (!result.success) return;
+      expect(result.data.nameEn).toBe("Chairs");
+      expect(result.data.descriptionEn).toBe("All kinds of chairs");
+    });
+
+    it("blank english copy -> undefined (translation is optional)", () => {
+      // Arrange
+      const fd = buildFormData({
+        name: "Sillas",
+        slug: "sillas",
+        nameEn: "   ",
+        descriptionEn: "",
+      });
+
+      // Act
+      const result = parseCategoryForm(fd);
+
+      // Assert
+      expect(result.success).toBe(true);
+      if (!result.success) return;
+      expect(result.data.nameEn).toBeUndefined();
+      expect(result.data.descriptionEn).toBeUndefined();
+    });
   });
 
   describe("buildCategoryInsert", () => {
@@ -78,6 +116,18 @@ describe("categories-admin schemas", () => {
       expect(result.storeId).toBe("store-1");
       expect(result.sortOrder).toBe(3);
       expect(result.slug).toBe("folding-tables");
+    });
+
+    it("no english copy -> *_en columns are null", () => {
+      // Act
+      const result = buildCategoryInsert(
+        { name: "Mesas", slug: "mesas" },
+        { storeId: "store-1", sortOrder: 0 },
+      );
+
+      // Assert
+      expect(result.nameEn).toBeNull();
+      expect(result.descriptionEn).toBeNull();
     });
   });
 
@@ -95,7 +145,23 @@ describe("categories-admin schemas", () => {
         name: "Tables",
         slug: "folding-tables",
         description: "desc",
+        nameEn: null,
+        descriptionEn: null,
       });
+    });
+
+    it("english copy -> trimmed into *_en columns", () => {
+      // Act
+      const result = buildCategoryUpdate({
+        name: "Mesas",
+        slug: "mesas",
+        nameEn: " Tables ",
+        descriptionEn: "Folding tables",
+      });
+
+      // Assert
+      expect(result.nameEn).toBe("Tables");
+      expect(result.descriptionEn).toBe("Folding tables");
     });
   });
 

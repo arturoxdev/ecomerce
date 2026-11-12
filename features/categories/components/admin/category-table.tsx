@@ -16,6 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CountPill } from "@/components/admin/count-pill";
@@ -34,6 +35,7 @@ import { deleteCategory, updateCategoryOrder } from "../../actions";
 type Category = {
   id: string;
   name: string;
+  nameEn: string | null;
   slug: string;
   description: string | null;
   sortOrder: number;
@@ -134,6 +136,15 @@ export function CategoryTable({ categories, canWrite = true }: Props) {
                     )}
                   >
                     {category.name}
+                    {!category.nameEn?.trim() && (
+                      <Badge
+                        variant="warning"
+                        className="ml-2 align-middle"
+                        title="Falta el nombre en inglés"
+                      >
+                        Sin EN
+                      </Badge>
+                    )}
                   </TableCell>
                   <TableCell
                     className={cn(

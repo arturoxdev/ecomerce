@@ -10,6 +10,7 @@ import { categories as categoriesTable } from "@/lib/db/schema";
 import { isLocale, locales, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
 import { getThemeById, serializeTheme } from "@/lib/themes";
+import { localizedCategoryName } from "@/features/categories/lib/localize-category";
 import { findAll as findAllCategories } from "@/features/categories/services/categories.service";
 
 function interpolate(text: string): string {
@@ -71,7 +72,7 @@ export default async function LocaleLayout({
   const messages = getMessages(typedLocale);
   const [cats, themeId, socialLinks] = await Promise.all([
     findAllCategories({
-      columns: { name: true, slug: true },
+      columns: { name: true, nameEn: true, slug: true },
       orderBy: asc(categoriesTable.sortOrder),
     }),
     getThemeId(),
@@ -82,7 +83,11 @@ export default async function LocaleLayout({
   return (
     <div lang={locale} className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-background font-sans text-foreground antialiased">
       <style dangerouslySetInnerHTML={{ __html: serializeTheme(theme) }} />
-      <PublicHeader locale={typedLocale} messages={messages} categories={cats} />
+      <PublicHeader locale={typedLocale} messages={messages} categories={cats.map((cat) => ({
+          slug: cat.slug,
+          name: localizedCategoryName(cat, typedLocale),
+        }))}
+      />
       <main className="flex-1">{children}</main>
       <PublicFooter
         locale={typedLocale}
