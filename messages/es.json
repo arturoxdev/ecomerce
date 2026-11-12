@@ -23,7 +23,6 @@
     "description": "Brincolines, mesas y sillas premium para cualquier ocasión. Nosotros llevamos la diversión.",
     "primaryCta": "Ver catálogo",
     "secondaryCta": "Contactar soporte",
-    "trusted": "Más de 500 familias felices confían en nosotros",
     "safetyTitle": "Seguridad Certificada",
     "safetySubtitle": "Equipo inspeccionado"
   },
@@ -47,6 +46,10 @@
       "tables": "Mesas y sillas",
       "concessions": "Concesiones"
     }
+ ,
+    "availableOne": "disponible",
+    "availableOther": "disponibles",
+    "reserve": "Reservar"
   },
   "products": [
     {

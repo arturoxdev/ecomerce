@@ -23,7 +23,6 @@
     "description": "Premium bounce houses, tables, and chairs for every occasion. We bring the fun, you make the memories.",
     "primaryCta": "View Catalogue",
     "secondaryCta": "Contact Support",
-    "trusted": "Trusted by 500+ happy families",
     "safetyTitle": "Safety Certified",
     "safetySubtitle": "Inspected Equipment"
   },
@@ -47,6 +46,10 @@
       "tables": "Tables & Chairs",
       "concessions": "Concessions"
     }
+ ,
+    "availableOne": "available",
+    "availableOther": "available",
+    "reserve": "Reserve"
   },
   "products": [
     {
