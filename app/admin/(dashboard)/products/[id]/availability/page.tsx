@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getProductBlocks, AvailabilityBlockTable, ManualBlockForm } from "@/features/products";
-import { findProductById } from "@/features/products/services/products.service";
+import { findByIdWithVariants } from "@/features/products/services/products.service";
 import { SiteHeader } from "@/components/admin/site-header";
 
 type Props = {
@@ -17,7 +17,7 @@ type Props = {
 export default async function ProductAvailabilityPage({ params }: Props) {
   const { id } = await params;
 
-  const product = await findProductById(id);
+  const product = await findByIdWithVariants(id);
   if (!product) notFound();
 
   const blocks = await getProductBlocks(id);
@@ -32,7 +32,12 @@ export default async function ProductAvailabilityPage({ params }: Props) {
               <CardTitle>Crear bloqueo manual</CardTitle>
             </CardHeader>
             <CardContent>
-              <ManualBlockForm productId={id} />
+              <ManualBlockForm
+                productId={id}
+                variants={product.variants
+                  .filter((v) => v.isActive)
+                  .map((v) => ({ id: v.id, name: v.name, stock: v.stock }))}
+              />
             </CardContent>
           </Card>
         </div>

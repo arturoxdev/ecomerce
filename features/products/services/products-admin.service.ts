@@ -9,6 +9,7 @@ import {
   findAllVariantsByProductId,
   findBlockById,
   findBlocksByProduct,
+  findByIdWithVariants,
   findLocalServiceById,
   findProductById,
   findVariantById,
@@ -43,9 +44,13 @@ import {
   uniqueViolationProblem,
   validationProblem,
 } from "@/lib/problems";
-import { checkAvailability } from "@/lib/services/availability.service";
+import {
+  checkAvailability,
+  findOccupiedQuantity,
+} from "@/lib/services/availability.service";
 import { getObjectKeyFromPublicMediaUrl } from "@/lib/services/media-url.service";
 import type { FormState } from "@/lib/types/form-state";
+import { ProblemType } from "@/lib/types/problem-detail";
 import type { ProblemDetail } from "@/lib/types/problem-detail";
 
 // ---------------------------------------------------------------------------
@@ -420,13 +425,19 @@ export async function getProductLocalServices(productId: string) {
 export function checkOverlapAndCreate(
   productId: string,
   date: Date,
-  quantity: number,
+  // "ALL" blocks every unit still free that day.
+  requestedQuantity: number | "ALL",
   stock: number,
   extra?: { reason?: string; variantId?: string | null; orderId?: string | null },
 ) {
   const variantId = extra?.variantId ?? null;
 
   return db.transaction(async (tx) => {
+    const quantity =
+      requestedQuantity === "ALL"
+        ? stock - (await findOccupiedQuantity(tx, { productId, date, variantId }))
+        : requestedQuantity;
+
     const availabilityCheck = await checkAvailability(tx, {
       productId,
       date,
@@ -435,7 +446,7 @@ export function checkOverlapAndCreate(
       variantId,
     });
 
-    if (!availabilityCheck.isAvailable) {
+    if (quantity < 1 || !availabilityCheck.isAvailable) {
       return { ok: false as const, occupied: availabilityCheck.occupied };
     }
 
@@ -455,6 +466,16 @@ export function checkOverlapAndCreate(
   });
 }
 
+function manualBlockFieldProblem(field: string, message: string): ProblemDetail {
+  return {
+    type: ProblemType.VALIDATION_ERROR,
+    status: 422,
+    title: "Validación fallida",
+    detail: message,
+    fieldErrors: { [field]: [message] },
+  };
+}
+
 export async function createManualBlock(
   productId: string,
   _prev: ManualBlockFormState,
@@ -467,23 +488,36 @@ export async function createManualBlock(
     return check.problem;
   }
 
-  const { date, reason } = check.data;
+  const { date, reason, variantId, quantity, blockAll } = check.data;
 
-  const product = await findProductById(productId);
+  const product = await findByIdWithVariants(productId);
   if (!product) {
     return notFoundProblem("Product not found");
+  }
+
+  // ADR-014: a product with variants is only rentable through one of them, so
+  // a block must target a variant to take anything out of circulation.
+  const activeVariants = product.variants.filter((v) => v.isActive);
+  const variant = variantId
+    ? activeVariants.find((v) => v.id === variantId)
+    : undefined;
+  if (activeVariants.length > 0 ? !variant : Boolean(variantId)) {
+    return manualBlockFieldProblem("variantId", "Selecciona una variante");
   }
 
   const result = await checkOverlapAndCreate(
     productId,
     date,
-    1,
-    product.stock,
-    { reason },
+    blockAll ? "ALL" : quantity,
+    variant ? variant.stock : product.stock,
+    { reason, variantId: variant?.id ?? null },
   );
 
   if (!result.ok) {
-    return internalProblem("No stock available for the selected date");
+    return manualBlockFieldProblem(
+      "quantity",
+      "No hay suficientes unidades libres en esa fecha",
+    );
   }
 
   revalidatePath(`/admin/products/${productId}/availability`);

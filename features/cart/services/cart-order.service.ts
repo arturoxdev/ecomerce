@@ -294,6 +294,11 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
           servicesCharge: number;
         }> = [];
 
+        // Units already claimed by earlier lines of THIS order, keyed by
+        // product + variant + date. Blocks are only inserted after every line
+        // is validated, so each check must count its sibling lines too.
+        const claimedInOrder = new Map<string, number>();
+
         for (const item of data.items) {
           const product = await deps.findProductByIdWithVariants(
             item.productId,
@@ -337,17 +342,20 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
             continue;
           }
 
+          const claimKey = `${item.productId}|${item.variantId ?? ""}|${item.date}`;
+          const claimedBefore = claimedInOrder.get(claimKey) ?? 0;
           const availabilityCheck = await checkAvailability(tx, {
             productId: item.productId,
             variantId: item.variantId,
             date,
-            quantity: item.quantity,
+            quantity: claimedBefore + item.quantity,
             stock,
           });
           if (!availabilityCheck.isAvailable) {
             unavailableItems.push(localizedProductName(product, data.locale));
             continue;
           }
+          claimedInOrder.set(claimKey, claimedBefore + item.quantity);
 
           // ADR-009: re-derive Local Service prices server-side. Never trust
           // the client. Load this product's live services, keep only the ones

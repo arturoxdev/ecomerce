@@ -214,7 +214,10 @@ export function createProductsService(deps: ProductsServiceDeps) {
     return dbx.query.availability.findMany({
       where: eq(availability.productId, productId),
       orderBy: [desc(availability.date)],
-      with: { order: { columns: { id: true, customerName: true } } },
+      with: {
+        order: { columns: { id: true, customerName: true } },
+        variant: { columns: { id: true, name: true } },
+      },
     });
   }
 

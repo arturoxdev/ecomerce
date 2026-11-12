@@ -425,6 +425,74 @@ describe("manual-order.service", () => {
     });
   });
 
+  describe("lines sharing product and date", () => {
+    it("two lines of 1 against stock 1 -> second line unavailable", async () => {
+      const { db } = buildTx({ occupied: 0 });
+      const service = createManualOrderService({
+        db: db as never,
+        storeId: "store-A",
+        userId: "user-1",
+        clock: () => TODAY,
+        findProductByIdWithVariants: vi.fn(async () =>
+          buildProduct({ stock: 1 }),
+        ),
+        recordAudit: vi.fn(async () => undefined),
+      });
+      const line = {
+        productId: "11111111-1111-4111-8111-111111111111",
+        variantId: null,
+        quantity: 1,
+        unitPrice: 100,
+        date: "2026-05-10",
+      };
+
+      const result = await service.createManualOrder({
+        customerName: "Jane",
+        customerEmail: "jane@example.com",
+        customerPhone: "555",
+        items: [line, { ...line }],
+        amountPaid: 0,
+        paymentMethod: "CASH",
+      });
+
+      expect(result.success).toBe(false);
+      if (result.success) return;
+      expect(result.unavailableItems).toEqual(["Bouncy Castle"]);
+    });
+
+    it("two lines of 1 against stock 2 -> order created", async () => {
+      const { db } = buildTx({ occupied: 0 });
+      const service = createManualOrderService({
+        db: db as never,
+        storeId: "store-A",
+        userId: "user-1",
+        clock: () => TODAY,
+        findProductByIdWithVariants: vi.fn(async () =>
+          buildProduct({ stock: 2 }),
+        ),
+        recordAudit: vi.fn(async () => undefined),
+      });
+      const line = {
+        productId: "11111111-1111-4111-8111-111111111111",
+        variantId: null,
+        quantity: 1,
+        unitPrice: 100,
+        date: "2026-05-10",
+      };
+
+      const result = await service.createManualOrder({
+        customerName: "Jane",
+        customerEmail: "jane@example.com",
+        customerPhone: "555",
+        items: [line, { ...line }],
+        amountPaid: 0,
+        paymentMethod: "CASH",
+      });
+
+      expect(result.success).toBe(true);
+    });
+  });
+
   describe("availability conflict", () => {
     it("single-stock product already taken -> unavailable", async () => {
       const { db } = buildTx({ occupied: 1 });

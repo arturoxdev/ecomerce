@@ -36,6 +36,41 @@ describe("manual-block service", () => {
       expect(result.data.reason).toBe("Maintenance");
     });
 
+    it("no quantity fields -> defaults to 1 unit, not block-all", () => {
+      const result = parseManualBlockForm(buildFormData({ date: "2026-05-01" }));
+
+      expect(result.success).toBe(true);
+      if (!result.success) return;
+      expect(result.data.quantity).toBe(1);
+      expect(result.data.blockAll).toBe(false);
+      expect(result.data.variantId).toBeUndefined();
+    });
+
+    it("variant, quantity and block-all checkbox -> parsed", () => {
+      const result = parseManualBlockForm(
+        buildFormData({
+          date: "2026-05-01",
+          variantId: "22222222-2222-4222-8222-222222222222",
+          quantity: "5",
+          blockAll: "on",
+        }),
+      );
+
+      expect(result.success).toBe(true);
+      if (!result.success) return;
+      expect(result.data.variantId).toBe("22222222-2222-4222-8222-222222222222");
+      expect(result.data.quantity).toBe(5);
+      expect(result.data.blockAll).toBe(true);
+    });
+
+    it("quantity 0 -> validation error", () => {
+      const result = parseManualBlockForm(
+        buildFormData({ date: "2026-05-01", quantity: "0" }),
+      );
+
+      expect(result.success).toBe(false);
+    });
+
     it("invalid date -> validation error", () => {
       const fd = buildFormData({
         date: "not-a-date",

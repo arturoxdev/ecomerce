@@ -121,6 +121,11 @@ export function createManualOrderService(deps: ManualOrderServiceDeps) {
           productName: string;
         }> = [];
 
+        // Units already claimed by earlier lines of THIS order, keyed by
+        // product + variant + date. Blocks are only inserted after every line
+        // is validated, so each check must count its sibling lines too.
+        const claimedInOrder = new Map<string, number>();
+
         for (const item of data.items) {
           const product = await deps.findProductByIdWithVariants(
             item.productId,
@@ -169,17 +174,20 @@ export function createManualOrderService(deps: ManualOrderServiceDeps) {
             };
           }
 
+          const claimKey = `${item.productId}|${item.variantId ?? ""}|${item.date}`;
+          const claimedBefore = claimedInOrder.get(claimKey) ?? 0;
           const availabilityCheck = await checkAvailability(tx, {
             productId: item.productId,
             variantId: item.variantId,
             date,
-            quantity: item.quantity,
+            quantity: claimedBefore + item.quantity,
             stock,
           });
           if (!availabilityCheck.isAvailable) {
             unavailableItems.push(product.name);
             continue;
           }
+          claimedInOrder.set(claimKey, claimedBefore + item.quantity);
 
           validatedItems.push({
             productId: item.productId,
