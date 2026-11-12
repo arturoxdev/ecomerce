@@ -35,6 +35,7 @@ type Block = {
   reason: string | null;
   orderId: string | null;
   order: { id: string; customerName: string } | null;
+  variant: { id: string; name: string } | null;
 };
 
 type Props = {
@@ -75,6 +76,7 @@ export function AvailabilityBlockTable({ blocks }: Props) {
           <TableRow>
             <TableHead>Tipo</TableHead>
             <TableHead>Fecha</TableHead>
+            <TableHead>Variante</TableHead>
             <TableHead>Cantidad</TableHead>
             <TableHead>Motivo</TableHead>
             <TableHead className="w-16">Acciones</TableHead>
@@ -95,6 +97,7 @@ export function AvailabilityBlockTable({ blocks }: Props) {
                 )}
               </TableCell>
               <TableCell>{formatAdminDate(toDisplayDate(block.date))}</TableCell>
+              <TableCell>{block.variant?.name ?? "—"}</TableCell>
               <TableCell>{block.quantity}</TableCell>
               <TableCell className="max-w-xs truncate text-sm text-gray-500">
                 {block.reason ?? "—"}

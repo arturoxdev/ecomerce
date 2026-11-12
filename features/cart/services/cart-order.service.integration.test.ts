@@ -229,6 +229,41 @@ describe("cart-order service — integration", () => {
     expect(orderCount).toHaveLength(0);
   });
 
+  it("two lines of the same product and date exceeding stock -> UNAVAILABLE, nothing inserted", async () => {
+    // Arrange: stock 1, the same unit requested on two lines of one order
+    await seedSettings();
+    const { productId } = await seedCategoryAndProduct({ stock: 1 });
+    const service = createCartOrderService({
+      db: testDb,
+      storeId: STORE_ID,
+      findProductByIdWithVariants: buildFindProductByIdWithVariants(),
+      loadStoreSettings,
+    });
+    const line = {
+      productId,
+      variantId: null,
+      quantity: 1,
+      unitPrice: 50,
+      date: "2099-06-01",
+    };
+
+    // Act
+    const result = await service.placeOrder({
+      customerName: "Jane",
+      customerEmail: "jane@example.com",
+      customerPhone: "555",
+      deliveryAddress: "",
+      items: [line, { ...line }],
+    });
+
+    // Assert
+    expect(result.success).toBe(false);
+    const blocks = await testDb.query.availability.findMany({
+      where: eq(schema.availability.productId, productId),
+    });
+    expect(blocks).toHaveLength(0);
+  });
+
   it("price mismatch -> UNAVAILABLE with product name reported", async () => {
     // Arrange
     await seedSettings();

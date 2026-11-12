@@ -7,6 +7,15 @@ import type { ProblemDetail } from "@/lib/types/problem-detail";
 export const manualBlockSchema = z.object({
   date: z.coerce.date(),
   reason: z.string().max(255).optional(),
+  // Required by the action when the product has active variants (ADR-014).
+  variantId: z.string().uuid().optional(),
+  quantity: z.coerce
+    .number()
+    .int()
+    .min(1, "La cantidad debe ser 1 o mayor")
+    .default(1),
+  // Blocks every unit still free that day; `quantity` is then ignored.
+  blockAll: z.boolean().default(false),
 });
 
 export type ManualBlockInput = z.infer<typeof manualBlockSchema>;
@@ -19,11 +28,14 @@ export function parseManualBlockForm(formData: FormData) {
   return manualBlockSchema.safeParse({
     date: formData.get("date"),
     reason: formData.get("reason") || undefined,
+    variantId: formData.get("variantId") || undefined,
+    quantity: formData.get("quantity") || undefined,
+    blockAll: formData.get("blockAll") === "on",
   });
 }
 
 export function validateManualBlockDates(
-  input: ManualBlockInput,
+  input: Pick<ManualBlockInput, "date">,
   clock: Clock = defaultClock,
 ): { ok: true } | { ok: false; problem: ProblemDetail } {
   const today = new Date(clock.now().toDateString());

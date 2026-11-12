@@ -20,6 +20,8 @@ Además había una incoherencia: la validación al crear la orden (`checkAvailab
 5. Se quita el sufijo "/ por unidad" junto al precio en tienda y admin.
 6. Carrito: agregar otra vez un producto suma cantidad solo si coinciden fecha, variante y servicios elegidos; si algo difiere es una línea aparte.
 7. **Variante obligatoria:** un producto con variantes activas solo se renta eligiendo una. Las existencias del producto y las de cada variante son contadores separados; permitir reservar "sin variante" sumaba ambos (2 sillas del producto + 1 dorada + 1 plateada = 4 reservables con 2 físicas). La tienda bloquea el botón hasta elegir variante y el servidor rechaza la línea, tanto en el checkout como en órdenes manuales. En esos productos el total rentable es la suma de las existencias de sus variantes.
+8. **Líneas del mismo pedido:** al validar un pedido, las líneas que comparten producto, variante y fecha se suman antes de comparar contra existencias (los bloqueos se insertan hasta después de validar todas).
+9. **Bloqueo manual:** el admin elige cuántas unidades bloquear, o todas las libres de ese día, y en productos con variantes debe elegir la variante. Antes siempre bloqueaba 1 unidad del producto.
 
 ## Razón
 
