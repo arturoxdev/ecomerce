@@ -59,6 +59,9 @@ Table products {
   slug        text [not null]
   description text
   about       text
+  name_en        text [note: 'ADR-013: traducción opcional; fallback a name']
+  description_en text [note: 'ADR-013: traducción opcional; fallback a description']
+  about_en       text [note: 'ADR-013: traducción opcional; fallback a about']
   base_price  decimal(10,2) [not null]
   price_type  price_type [not null, note: 'FIXED | PER_UNIT']
   stock       int [default: 1]

@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "@/components/admin/status-badge";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import {
   Pagination,
@@ -32,6 +33,7 @@ import { toggleProductActive } from "../../actions";
 type Product = {
   id: string;
   name: string;
+  nameEn?: string | null;
   basePrice: string;
   priceType: string;
   stock: number;
@@ -153,6 +155,15 @@ export function ProductTable({
                       >
                         {product.name}
                       </Link>
+                      {!product.nameEn?.trim() && (
+                        <Badge
+                          variant="warning"
+                          className="ml-2 align-middle"
+                          title="Falta el nombre en inglés"
+                        >
+                          Sin EN
+                        </Badge>
+                      )}
                     </TableCell>
                     <TableCell
                       className={cn(bodyCellCn, "text-[13px] text-muted-foreground")}

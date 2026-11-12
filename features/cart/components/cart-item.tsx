@@ -7,12 +7,14 @@ import { QuantitySelector } from "@/components/quantity-selector";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
+  getCartItemName,
   isCartItemPastDue,
   type CartItem as CartItemType,
 } from "@/lib/stores/cart-store";
 
 type Props = {
   item: CartItemType;
+  locale: string;
   onRemove: (id: string) => void;
   onQuantityChange: (id: string, qty: number) => void;
   labels: {
@@ -22,7 +24,14 @@ type Props = {
   };
 };
 
-export function CartItem({ item, onRemove, onQuantityChange, labels }: Props) {
+export function CartItem({
+  item,
+  locale,
+  onRemove,
+  onQuantityChange,
+  labels,
+}: Props) {
+  const productName = getCartItemName(item, locale);
   const lineSubtotal = item.unitPrice * item.quantity;
   const isPast = isCartItemPastDue(item);
 
@@ -33,7 +42,7 @@ export function CartItem({ item, onRemove, onQuantityChange, labels }: Props) {
         {item.productPhoto ? (
           <Image
             src={item.productPhoto}
-            alt={item.productName}
+            alt={productName}
             fill
             className="object-cover"
             sizes="80px"
@@ -50,7 +59,7 @@ export function CartItem({ item, onRemove, onQuantityChange, labels }: Props) {
         <div className="flex items-start justify-between">
           <div>
             <h3 className="text-sm font-semibold text-slate-900">
-              {item.productName}
+              {productName}
             </h3>
             {item.variantName && (
               <p className="text-xs text-slate-500">{item.variantName}</p>

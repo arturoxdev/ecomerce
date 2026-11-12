@@ -5,6 +5,7 @@ import {
   Truck,
   Utensils,
 } from "lucide-react";
+import { localizedProductName } from "@/features/products/lib/localize-product";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { asc } from "drizzle-orm";
@@ -186,7 +187,7 @@ export default async function Home({ params }: HomeProps) {
                           {photo && (
                             <img
                               src={photo}
-                              alt={product.name}
+                              alt={localizedProductName(product, typedLocale)}
                               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                             />
                           )}
@@ -194,7 +195,7 @@ export default async function Home({ params }: HomeProps) {
                         <div className="mt-4 flex items-start justify-between gap-3">
                           <div>
                             <h3 className="text-lg font-bold text-[#0f172a]">
-                              {product.name}
+                              {localizedProductName(product, typedLocale)}
                             </h3>
                             <p className="text-sm text-[#64748b]">
                               {product.category.name}

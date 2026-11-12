@@ -12,6 +12,7 @@ import {
 import { MarkdownContent } from "@/features/pages";
 import { Badge } from "@/components/ui/badge";
 import { siteConfig } from "@/lib/config/site";
+import { localizeProduct } from "@/features/products/lib/localize-product";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
 
@@ -22,12 +23,13 @@ type ProductDetailPageProps = {
 export async function generateMetadata({
   params,
 }: ProductDetailPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const product = await findBySlugMeta(slug);
   if (!product) return {};
+  const copy = localizeProduct(product, isLocale(locale) ? locale : "en");
   return {
-    title: `${product.name} | ${siteConfig.name}`,
-    description: product.description ?? undefined,
+    title: `${copy.name} | ${siteConfig.name}`,
+    description: copy.description ?? undefined,
   };
 }
 
@@ -51,6 +53,8 @@ export default async function ProductDetailPage({
     notFound();
   }
 
+  // ADR-013: localized copy with per-field fallback to Spanish.
+  const copy = localizeProduct(product, typedLocale);
   const basePrice = parseFloat(product.basePrice);
   const activeVariants = product.variants?.filter((v) => v.isActive) ?? [];
   const activeLocalServices =
@@ -80,7 +84,7 @@ export default async function ProductDetailPage({
             {m.catalog.title}
           </Link>
           <span>/</span>
-          <span className="text-slate-900">{product.name}</span>
+          <span className="text-slate-900">{copy.name}</span>
         </nav>
 
         <div className="grid gap-10 lg:grid-cols-2">
@@ -89,7 +93,7 @@ export default async function ProductDetailPage({
             {product.photos.length > 0 ? (
               <ProductGallery
                 photos={product.photos}
-                productName={product.name}
+                productName={copy.name}
               />
             ) : (
               <div className="flex aspect-[4/3] w-full items-center justify-center rounded-xl bg-slate-100 text-slate-400">
@@ -103,20 +107,21 @@ export default async function ProductDetailPage({
             <div className="space-y-2">
               <Badge variant="outline">{product.category.name}</Badge>
               <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-                {product.name}
+                {copy.name}
               </h1>
             </div>
 
             {/* Description */}
-            {product.description && (
+            {copy.description && (
               <p className="text-slate-600 leading-relaxed">
-                {product.description}
+                {copy.description}
               </p>
             )}
 
             <ProductDetailActions
               productId={product.id}
               productName={product.name}
+              productNameEn={product.nameEn}
               productSlug={product.slug}
               productPhoto={product.photos[0] ?? null}
               basePrice={basePrice}
@@ -162,14 +167,14 @@ export default async function ProductDetailPage({
         </div>
 
         {/* About This Product */}
-        {product.about && (
+        {copy.about && (
           <div className="mt-16 space-y-6">
             <div className="border-t border-slate-200" />
             <h2 className="text-2xl font-extrabold text-slate-900">
               About This Product
             </h2>
             <div className="rounded-2xl border border-slate-100 bg-white p-8">
-              <MarkdownContent markdown={product.about} />
+              <MarkdownContent markdown={copy.about} />
             </div>
           </div>
         )}

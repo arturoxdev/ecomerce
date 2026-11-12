@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { PaymentBreakdown } from "@/features/checkout";
 import { findByIdWithItems } from "@/features/orders/services/orders.service";
 import { getSettings } from "@/features/admin-settings";
+import { localizedProductName } from "@/features/products/lib/localize-product";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
@@ -39,7 +40,8 @@ export default async function SuccessPage({ params, searchParams }: Props) {
   const settings = await getSettings();
   const paymentMode = settings?.paymentMode ?? "SPLIT_50_50";
 
-  const m = getMessages(isLocale(locale) ? (locale as Locale) : "en");
+  const productLocale: Locale = isLocale(locale) ? locale : "en";
+  const m = getMessages(productLocale);
   // ADR-009: snapshots persisted at checkout — name + price copied onto the
   // order, stable even if a service is later repriced or deleted.
   const orderServices = order.services ?? [];
@@ -129,7 +131,7 @@ export default async function SuccessPage({ params, searchParams }: Props) {
                       {photo ? (
                         <Image
                           src={photo}
-                          alt={item.product.name}
+                          alt={localizedProductName(item.product, productLocale)}
                           fill
                           className="object-cover"
                           sizes="80px"
@@ -143,7 +145,7 @@ export default async function SuccessPage({ params, searchParams }: Props) {
                     <div className="flex flex-1 items-center justify-between gap-3">
                       <div className="min-w-0">
                         <h3 className="truncate text-sm font-semibold text-slate-900">
-                          {item.product.name}
+                          {localizedProductName(item.product, productLocale)}
                         </h3>
                         <p className="text-xs text-slate-500">
                           Qty: {item.quantity}

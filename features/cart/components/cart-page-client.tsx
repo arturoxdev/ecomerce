@@ -446,6 +446,7 @@ export function CartPageClient({ locale, globalServices, labels }: Props) {
               <CartItem
                 key={item.id}
                 item={item}
+                locale={locale}
                 onRemove={removeItem}
                 onQuantityChange={updateQuantity}
                 labels={{

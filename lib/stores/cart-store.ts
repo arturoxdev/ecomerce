@@ -10,7 +10,11 @@ export type CartItemService = {
 export type CartItem = {
   id: string;
   productId: string;
+  // Spanish (base) name. ADR-013.
   productName: string;
+  // English translation, when the product has one. Optional so carts
+  // persisted before translations existed keep working (they show Spanish).
+  productNameEn?: string | null;
   productSlug: string;
   productPhoto: string | null;
   variantId: string | null;
@@ -131,6 +135,15 @@ export const useCartStore = create<CartStore>()(
     },
   ),
 );
+
+// ADR-013: the cart keeps both names so it follows the active locale.
+export function getCartItemName(
+  item: Pick<CartItem, "productName" | "productNameEn">,
+  locale: string,
+): string {
+  if (locale === "en" && item.productNameEn?.trim()) return item.productNameEn;
+  return item.productName;
+}
 
 export function getCartSubtotal(items: CartItem[]): number {
   return items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
