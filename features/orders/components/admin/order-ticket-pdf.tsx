@@ -8,6 +8,7 @@ import {
   type DocumentProps,
 } from "@react-pdf/renderer";
 
+import { localizedProductName } from "@/features/products/lib/localize-product";
 import { siteConfig } from "@/lib/config/site";
 import { toDisplayDate } from "@/lib/date";
 import type {
@@ -276,7 +277,10 @@ export function OrderTicketDocument({ order, generatedAt }: Props) {
               }
             >
               <View style={styles.colProduct}>
-                <Text style={styles.productName}>{item.product.name}</Text>
+                <Text style={styles.productName}>
+                  {/* ADR-013: English name, Spanish when untranslated. */}
+                  {localizedProductName(item.product, "en")}
+                </Text>
                 {item.variant?.name ? (
                   <Text style={styles.itemDetail}>{item.variant.name}</Text>
                 ) : null}

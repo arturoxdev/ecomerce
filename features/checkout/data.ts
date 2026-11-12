@@ -17,6 +17,7 @@ import {
   type PaymentMode,
 } from "@/lib/db/schema";
 import { toDisplayDate } from "@/lib/date";
+import { localizedProductName } from "@/features/products/lib/localize-product";
 import { sendNewOrderNotification } from "@/lib/email";
 import { logger } from "@/lib/logger";
 import { internalProblem, notFoundProblem } from "@/lib/problems";
@@ -284,7 +285,7 @@ export async function handleCheckoutCompleted(
         const settingsRow = await db.query.settings.findFirst();
         const items = await db.query.orderItems.findMany({
           where: eq(orderItems.orderId, orderId),
-          with: { product: { columns: { name: true } } },
+          with: { product: { columns: { name: true, nameEn: true } } },
         });
         const total = parseFloat(confirmed.total);
         const paid = parseFloat(confirmed.amountPaid ?? "0");
@@ -296,7 +297,8 @@ export async function handleCheckoutCompleted(
           customerPhone: confirmed.customerPhone,
           deliveryAddress: confirmed.deliveryAddress,
           items: items.map((it) => ({
-            name: it.product.name,
+            // ADR-013: English name, Spanish when untranslated.
+            name: localizedProductName(it.product, "en"),
             quantity: it.quantity,
             rentDate: format(toDisplayDate(it.rentDate), "d 'de' MMMM 'de' yyyy", {
               locale: es,

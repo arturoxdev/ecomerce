@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { findByIdWithItems } from "@/features/orders/services/orders.service";
+import { localizedProductName } from "@/features/products/lib/localize-product";
 import { toDisplayDate } from "@/lib/date";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/messages";
@@ -53,7 +54,7 @@ export default async function OrderConfirmationPage({ params }: Props) {
             <div key={item.id} className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-slate-900">
-                  {item.product.name}
+                  {localizedProductName(item.product, locale as Locale)}
                   {item.variant?.name && (
                     <span className="ml-1 text-slate-500">
                       — {item.variant.name}

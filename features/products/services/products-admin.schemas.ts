@@ -17,6 +17,14 @@ export const productSchema = z.object({
     .max(150, "La descripción debe tener 150 caracteres o menos")
     .optional(),
   about: z.string().optional(),
+  // ADR-013: optional English translations. Same rules as the Spanish copy
+  // except that the name is not required.
+  nameEn: z.string().optional(),
+  descriptionEn: z
+    .string()
+    .max(150, "La descripción debe tener 150 caracteres o menos")
+    .optional(),
+  aboutEn: z.string().optional(),
   categoryId: z.string().min(1, "La categoría es requerida"),
   basePrice: z.coerce.number().positive("El precio debe ser positivo"),
   priceType: z.enum(priceTypeEnum.enumValues),
@@ -67,12 +75,21 @@ export type LocalService = {
   isActive: boolean;
 };
 
+// Blank / whitespace-only translations are treated as "not translated".
+function optionalText(value: FormDataEntryValue | null): string | undefined {
+  if (typeof value !== "string") return undefined;
+  return value.trim().length > 0 ? value : undefined;
+}
+
 export function parseProductForm(formData: FormData) {
   return productSchema.safeParse({
     name: formData.get("name"),
     slug: formData.get("slug"),
     description: formData.get("description") || undefined,
     about: formData.get("about") || undefined,
+    nameEn: optionalText(formData.get("nameEn")),
+    descriptionEn: optionalText(formData.get("descriptionEn")),
+    aboutEn: optionalText(formData.get("aboutEn")),
     categoryId: formData.get("categoryId"),
     basePrice: formData.get("basePrice"),
     priceType: formData.get("priceType"),
@@ -107,16 +124,32 @@ function splitPhotos(photos: string | undefined): string[] {
     .filter(Boolean);
 }
 
+// Always written (as null when empty) so clearing a translation in the form
+// actually removes it on update.
+function englishColumns(input: {
+  nameEn?: string;
+  descriptionEn?: string;
+  aboutEn?: string;
+}) {
+  return {
+    nameEn: input.nameEn?.trim() || null,
+    descriptionEn: input.descriptionEn?.trim() || null,
+    aboutEn: input.aboutEn || null,
+  };
+}
+
 export function buildProductInsert(
   input: ProductInput,
   ctx: { storeId: string },
 ): typeof products.$inferInsert {
-  const { photos, basePrice, about, ...rest } = input;
+  const { photos, basePrice, about, nameEn, descriptionEn, aboutEn, ...rest } =
+    input;
   return {
     ...rest,
     storeId: ctx.storeId,
     slug: toSlug(input.slug),
     about: about || null,
+    ...englishColumns({ nameEn, descriptionEn, aboutEn }),
     basePrice: basePrice.toString(),
     photos: splitPhotos(photos),
   };
@@ -125,11 +158,13 @@ export function buildProductInsert(
 export function buildProductUpdate(
   input: ProductInput,
 ): Omit<typeof products.$inferInsert, "storeId"> {
-  const { photos, basePrice, about, ...rest } = input;
+  const { photos, basePrice, about, nameEn, descriptionEn, aboutEn, ...rest } =
+    input;
   return {
     ...rest,
     slug: toSlug(input.slug),
     about: about || null,
+    ...englishColumns({ nameEn, descriptionEn, aboutEn }),
     basePrice: basePrice.toString(),
     photos: splitPhotos(photos),
   };

@@ -89,6 +89,7 @@ export function createOrdersService(deps: OrdersServiceDeps) {
               columns: {
                 id: true,
                 name: true,
+                nameEn: true,
                 slug: true,
                 photos: true,
                 priceType: true,

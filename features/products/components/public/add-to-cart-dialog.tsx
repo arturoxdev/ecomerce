@@ -25,6 +25,7 @@ import { AddToCartButton } from "./add-to-cart-button";
 type Props = {
   productId: string;
   productName: string;
+  productNameEn?: string | null;
   productSlug: string;
   productPhoto: string | null;
   variantId: string | null;
@@ -53,6 +54,7 @@ function toDateString(date: Date): string {
 export function AddToCartDialog({
   productId,
   productName,
+  productNameEn,
   productSlug,
   productPhoto,
   variantId,
@@ -82,6 +84,7 @@ export function AddToCartDialog({
           <AddToCartDialogBody
             productId={productId}
             productName={productName}
+            productNameEn={productNameEn}
             productSlug={productSlug}
             productPhoto={productPhoto}
             variantId={variantId}
@@ -102,6 +105,7 @@ export function AddToCartDialog({
 function AddToCartDialogBody({
   productId,
   productName,
+  productNameEn,
   productSlug,
   productPhoto,
   variantId,
@@ -164,6 +168,7 @@ function AddToCartDialogBody({
         item={{
           productId,
           productName,
+          productNameEn: productNameEn ?? null,
           productSlug,
           productPhoto,
           variantId,

@@ -136,6 +136,65 @@ describe("products-admin schemas", () => {
     });
   });
 
+  describe("parseProductForm — English translations (ADR-013)", () => {
+    function baseForm(extra: Record<string, string> = {}) {
+      const fd = new FormData();
+      const fields: Record<string, string> = {
+        name: "Carpa",
+        slug: "carpa",
+        categoryId: "cat-1",
+        basePrice: "100",
+        priceType: "FIXED",
+        stock: "1",
+        ...extra,
+      };
+      for (const [key, value] of Object.entries(fields)) fd.set(key, value);
+      return fd;
+    }
+
+    it("no English fields -> valid, translations undefined", () => {
+      const result = parseProductForm(baseForm());
+
+      expect(result.success).toBe(true);
+      if (!result.success) return;
+      expect(result.data.nameEn).toBeUndefined();
+      expect(result.data.descriptionEn).toBeUndefined();
+      expect(result.data.aboutEn).toBeUndefined();
+    });
+
+    it("English fields present -> parsed", () => {
+      const result = parseProductForm(
+        baseForm({ nameEn: "Tent", descriptionEn: "A tent", aboutEn: "**Big**" }),
+      );
+
+      expect(result.success).toBe(true);
+      if (!result.success) return;
+      expect(result.data.nameEn).toBe("Tent");
+      expect(result.data.descriptionEn).toBe("A tent");
+      expect(result.data.aboutEn).toBe("**Big**");
+    });
+
+    it("whitespace-only English name -> treated as not translated", () => {
+      const result = parseProductForm(baseForm({ nameEn: "   " }));
+
+      expect(result.success).toBe(true);
+      if (!result.success) return;
+      expect(result.data.nameEn).toBeUndefined();
+    });
+
+    it("English description over 150 chars -> validation error on descriptionEn", () => {
+      const result = parseProductForm(
+        baseForm({ descriptionEn: "x".repeat(151) }),
+      );
+
+      expect(result.success).toBe(false);
+      if (result.success) return;
+      expect(result.error.flatten().fieldErrors.descriptionEn?.[0]).toContain(
+        "150",
+      );
+    });
+  });
+
   describe("buildProductInsert", () => {
     const baseInput = {
       name: "Tent",
@@ -160,6 +219,25 @@ describe("products-admin schemas", () => {
       expect(result.basePrice).toBe("99.5");
       expect(result.about).toBeNull();
       expect(result.photos).toEqual([]);
+    });
+
+    it("no translations -> English columns written as null", () => {
+      const result = buildProductInsert(baseInput, { storeId: "store-1" });
+
+      expect(result.nameEn).toBeNull();
+      expect(result.descriptionEn).toBeNull();
+      expect(result.aboutEn).toBeNull();
+    });
+
+    it("translations present -> English columns kept, name trimmed", () => {
+      const result = buildProductInsert(
+        { ...baseInput, nameEn: " Tent ", descriptionEn: "desc en", aboutEn: "about en" },
+        { storeId: "store-1" },
+      );
+
+      expect(result.nameEn).toBe("Tent");
+      expect(result.descriptionEn).toBe("desc en");
+      expect(result.aboutEn).toBe("about en");
     });
 
     it("photos string -> split, trimmed and filtered", () => {

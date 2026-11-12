@@ -1,4 +1,5 @@
 import { asc } from "drizzle-orm";
+import { localizedProductName } from "@/features/products/lib/localize-product";
 import { notFound } from "next/navigation";
 
 import { CategoryFilter, ProductCard } from "@/features/products";
@@ -86,7 +87,7 @@ export default async function CatalogPage({
                   key={product.id}
                   product={{
                     id: product.id,
-                    name: product.name,
+                    name: localizedProductName(product, typedLocale),
                     slug: product.slug,
                     basePrice: parseFloat(product.basePrice),
                     priceType: product.priceType,

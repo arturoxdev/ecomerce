@@ -100,6 +100,12 @@ export const products = pgTable(
     slug: text("slug").notNull(),
     description: text("description"),
     about: text("about"),
+    // ADR-013: name/description/about are the Spanish (base) copy. The *_en
+    // columns are optional English translations; the storefront falls back to
+    // the Spanish value field by field when one is null.
+    nameEn: text("name_en"),
+    descriptionEn: text("description_en"),
+    aboutEn: text("about_en"),
     basePrice: numeric("base_price", { precision: 10, scale: 2 }).notNull(),
     priceType: priceTypeEnum("price_type").notNull(),
     stock: integer("stock").notNull().default(1),

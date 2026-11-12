@@ -1,5 +1,6 @@
 import "server-only";
 
+import { localizedProductName } from "@/features/products/lib/localize-product";
 import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 
@@ -311,7 +312,7 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
             ? parseFloat(variant.price)
             : parseFloat(product.basePrice);
           if (Math.abs(expectedPrice - item.unitPrice) > 0.01) {
-            unavailableItems.push(product.name);
+            unavailableItems.push(localizedProductName(product, data.locale));
             continue;
           }
 
@@ -319,7 +320,7 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
           const date = parseDateOnly(item.date);
 
           if (date < minBookable) {
-            unavailableItems.push(product.name);
+            unavailableItems.push(localizedProductName(product, data.locale));
             continue;
           }
 
@@ -331,7 +332,7 @@ export function createCartOrderService(deps: CartOrderServiceDeps) {
             stock,
           });
           if (!availabilityCheck.isAvailable) {
-            unavailableItems.push(product.name);
+            unavailableItems.push(localizedProductName(product, data.locale));
             continue;
           }
 

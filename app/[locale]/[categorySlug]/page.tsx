@@ -1,4 +1,5 @@
 import { asc } from "drizzle-orm";
+import { localizedProductName } from "@/features/products/lib/localize-product";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -101,7 +102,7 @@ export default async function CategoryLandingPage({
                   key={product.id}
                   product={{
                     id: product.id,
-                    name: product.name,
+                    name: localizedProductName(product, typedLocale),
                     slug: product.slug,
                     basePrice: parseFloat(product.basePrice),
                     priceType: product.priceType,

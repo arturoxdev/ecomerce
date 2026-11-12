@@ -15,7 +15,9 @@ import { VariantSelector, type Variant } from "./variant-selector";
 
 type Props = {
   productId: string;
+  /** Spanish (base) name; stored in the cart alongside the English one. */
   productName: string;
+  productNameEn?: string | null;
   productSlug: string;
   productPhoto: string | null;
   basePrice: number;
@@ -44,6 +46,7 @@ type Props = {
 export function ProductDetailActions({
   productId,
   productName,
+  productNameEn,
   productSlug,
   productPhoto,
   basePrice,
@@ -170,6 +173,7 @@ export function ProductDetailActions({
         key={`${selectedVariant?.id ?? "no-variant"}:${selectedServiceIds.join(",")}`}
         productId={productId}
         productName={productName}
+        productNameEn={productNameEn}
         productSlug={productSlug}
         productPhoto={productPhoto}
         variantId={selectedVariant?.id ?? null}

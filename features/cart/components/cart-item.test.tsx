@@ -38,10 +38,51 @@ describe("CartItem", () => {
 
   const labels = { remove: "Remove", quantity: "Qty", pastDateBadge: "Past date" };
 
+  it("en locale with English name -> shows the translation", () => {
+    render(
+      <CartItem
+        locale="en"
+        item={buildItem({ productName: "Silla", productNameEn: "Chair" })}
+        onRemove={() => {}}
+        onQuantityChange={() => {}}
+        labels={labels}
+      />,
+    );
+
+    expect(screen.getByText("Chair")).toBeInTheDocument();
+    expect(screen.queryByText("Silla")).not.toBeInTheDocument();
+  });
+
+  it("es locale, or en without translation -> shows the Spanish name", () => {
+    const { unmount } = render(
+      <CartItem
+        locale="es"
+        item={buildItem({ productName: "Silla", productNameEn: "Chair" })}
+        onRemove={() => {}}
+        onQuantityChange={() => {}}
+        labels={labels}
+      />,
+    );
+    expect(screen.getByText("Silla")).toBeInTheDocument();
+    unmount();
+
+    render(
+      <CartItem
+        locale="en"
+        item={buildItem({ productName: "Silla" })}
+        onRemove={() => {}}
+        onQuantityChange={() => {}}
+        labels={labels}
+      />,
+    );
+    expect(screen.getByText("Silla")).toBeInTheDocument();
+  });
+
   it("PER_UNIT item with quantity 2 -> shows subtotal 20.00", () => {
     // Arrange / Act
     render(
       <CartItem
+        locale="en"
         item={buildItem({ quantity: 2, unitPrice: 10 })}
         onRemove={() => {}}
         onQuantityChange={() => {}}
@@ -57,6 +98,7 @@ describe("CartItem", () => {
     // Arrange / Act
     render(
       <CartItem
+        locale="en"
         item={buildItem({ priceType: "FIXED", quantity: 1, unitPrice: 50 })}
         onRemove={() => {}}
         onQuantityChange={() => {}}
@@ -75,6 +117,7 @@ describe("CartItem", () => {
     const user = userEvent.setup();
     render(
       <CartItem
+        locale="en"
         item={buildItem({ id: "abc" })}
         onRemove={onRemove}
         onQuantityChange={() => {}}
@@ -92,6 +135,7 @@ describe("CartItem", () => {
   it("variant name present -> rendered below product name", () => {
     render(
       <CartItem
+        locale="en"
         item={buildItem({ variantName: "Red" })}
         onRemove={() => {}}
         onQuantityChange={() => {}}
@@ -105,6 +149,7 @@ describe("CartItem", () => {
   it("date in the past -> renders past date badge", () => {
     render(
       <CartItem
+        locale="en"
         item={buildItem({ date: "2020-01-01" })}
         onRemove={() => {}}
         onQuantityChange={() => {}}

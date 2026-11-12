@@ -49,6 +49,10 @@ import { cn } from "@/lib/utils";
 import { PRICE_TYPE_LABEL } from "@/lib/admin/labels";
 import { SlugField } from "./slug-field";
 import {
+  ContentLocaleSwitch,
+  type ContentLocale,
+} from "./content-locale-switch";
+import {
   isVideoUrl,
   isVideoMime,
   getAcceptString,
@@ -89,6 +93,9 @@ type Props = {
     slug?: string;
     description?: string;
     about?: string;
+    nameEn?: string;
+    descriptionEn?: string;
+    aboutEn?: string;
     categoryId?: string;
     basePrice?: string;
     priceType?: string;
@@ -118,8 +125,26 @@ type Props = {
   ) => Promise<VariantFormState>;
 };
 
-const BASIC_FIELDS = ["name", "slug", "description", "categoryId", "basePrice", "priceType", "stock", "photos"];
-const ABOUT_FIELDS = ["about"];
+const BASIC_FIELDS = ["name", "nameEn", "slug", "description", "descriptionEn", "categoryId", "basePrice", "priceType", "stock", "photos"];
+const ABOUT_FIELDS = ["about", "aboutEn"];
+// ADR-013: translatable copy, grouped by the language tab that shows it.
+const ES_FIELDS = ["name", "description", "about"];
+const EN_FIELDS = ["nameEn", "descriptionEn", "aboutEn"];
+const TEXTAREA_CLASS =
+  "min-h-[70px] w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
+
+function CharCount({ length }: { length: number }) {
+  return (
+    <p
+      className={cn(
+        "text-right text-[11px]",
+        length >= 140 ? "text-warning" : "text-subtle",
+      )}
+    >
+      {length}/150
+    </p>
+  );
+}
 
 export function ProductForm({
   action,
@@ -148,6 +173,16 @@ export function ProductForm({
 
   const [description, setDescription] = useState(defaultValues?.description ?? "");
   const [about, setAbout] = useState(defaultValues?.about ?? "");
+  const [nameEn, setNameEn] = useState(defaultValues?.nameEn ?? "");
+  const [descriptionEn, setDescriptionEn] = useState(
+    defaultValues?.descriptionEn ?? "",
+  );
+  const [aboutEn, setAboutEn] = useState(defaultValues?.aboutEn ?? "");
+
+  const [activeTab, setActiveTab] = useState("basic");
+  // Which language's copy is visible. Both stay mounted and are saved together.
+  const [contentLocale, setContentLocale] = useState<ContentLocale>("es");
+  const showLocaleSwitch = activeTab === "basic" || activeTab === "about";
 
   const [photos, setPhotos] = useState<string[]>(
     defaultValues?.photos?.split("\n").filter(Boolean) ?? [],
@@ -260,6 +295,10 @@ export function ProductForm({
 
   const hasBasicErrors = fieldErrors && BASIC_FIELDS.some((f) => fieldErrors?.[f]);
   const hasAboutErrors = fieldErrors && ABOUT_FIELDS.some((f) => fieldErrors?.[f]);
+  const localeErrors = {
+    es: Boolean(fieldErrors && ES_FIELDS.some((f) => fieldErrors?.[f])),
+    en: Boolean(fieldErrors && EN_FIELDS.some((f) => fieldErrors?.[f])),
+  };
 
   return (
     <form action={formAction} className="flex flex-col gap-6">
@@ -269,8 +308,13 @@ export function ProductForm({
         </div>
       )}
 
-      <Tabs defaultValue="basic" className="flex-col">
-        <TabsList variant="line">
+      <Tabs
+        value={activeTab}
+        onValueChange={(value) => setActiveTab(String(value))}
+        className="flex-col"
+      >
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <TabsList variant="line" className="w-auto flex-1">
           <TabsTrigger value="basic" className="relative">
             Información básica
             {hasBasicErrors && (
@@ -286,6 +330,14 @@ export function ProductForm({
           <TabsTrigger value="variants">Variantes</TabsTrigger>
           <TabsTrigger value="servicios">Servicios adicionales</TabsTrigger>
         </TabsList>
+          {showLocaleSwitch && (
+            <ContentLocaleSwitch
+              value={contentLocale}
+              onChange={setContentLocale}
+              errors={localeErrors}
+            />
+          )}
+        </div>
 
         <TabsContent value="basic" keepMounted className="flex flex-col gap-6 pt-6">
           <Card>
@@ -297,13 +349,42 @@ export function ProductForm({
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Nombre" error={fieldErrors?.name?.[0]}>
+                <Field
+                  label="Nombre"
+                  error={fieldErrors?.name?.[0]}
+                  className={cn(
+                    "flex flex-col gap-1.5",
+                    contentLocale !== "es" && "hidden",
+                  )}
+                >
                   <Input
                     name="name"
                     value={name}
                     onChange={handleNameChange}
                     placeholder="Nombre del producto"
                     required
+                    // The Spanish name is required; if it is empty while the
+                    // English copy is showing, reveal it so the browser's
+                    // validation message has somewhere to land.
+                    onInvalid={() => {
+                      setActiveTab("basic");
+                      setContentLocale("es");
+                    }}
+                  />
+                </Field>
+                <Field
+                  label="Nombre (inglés)"
+                  error={fieldErrors?.nameEn?.[0]}
+                  className={cn(
+                    "flex flex-col gap-1.5",
+                    contentLocale !== "en" && "hidden",
+                  )}
+                >
+                  <Input
+                    name="nameEn"
+                    value={nameEn}
+                    onChange={(e) => setNameEn(e.target.value)}
+                    placeholder={name || "Product name"}
                   />
                 </Field>
 
@@ -315,7 +396,14 @@ export function ProductForm({
                 />
               </div>
 
-              <Field label="Descripción" error={fieldErrors?.description?.[0]}>
+              <Field
+                label="Descripción"
+                error={fieldErrors?.description?.[0]}
+                className={cn(
+                  "flex flex-col gap-1.5",
+                  contentLocale !== "es" && "hidden",
+                )}
+              >
                 <textarea
                   name="description"
                   value={description}
@@ -323,17 +411,35 @@ export function ProductForm({
                   maxLength={150}
                   rows={3}
                   placeholder="Breve descripción del producto"
-                  className="min-h-[70px] w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                  className={TEXTAREA_CLASS}
                 />
-                <p
-                  className={cn(
-                    "text-right text-[11px]",
-                    description.length >= 140 ? "text-warning" : "text-subtle",
-                  )}
-                >
-                  {description.length}/150
-                </p>
+                <CharCount length={description.length} />
               </Field>
+              <Field
+                label="Descripción (inglés)"
+                error={fieldErrors?.descriptionEn?.[0]}
+                className={cn(
+                  "flex flex-col gap-1.5",
+                  contentLocale !== "en" && "hidden",
+                )}
+              >
+                <textarea
+                  name="descriptionEn"
+                  value={descriptionEn}
+                  onChange={(e) => setDescriptionEn(e.target.value)}
+                  maxLength={150}
+                  rows={3}
+                  placeholder="Short product description"
+                  className={TEXTAREA_CLASS}
+                />
+                <CharCount length={descriptionEn.length} />
+              </Field>
+              {contentLocale === "en" && (
+                <p className="text-xs text-muted-foreground">
+                  La traducción es opcional: lo que quede vacío se muestra en
+                  español en la tienda.
+                </p>
+              )}
             </CardContent>
           </Card>
 
@@ -542,12 +648,37 @@ export function ProductForm({
               Descripción enriquecida que aparece en la página del producto.
             </p>
           </div>
-          <Field label="Contenido" error={fieldErrors?.about?.[0]}>
+          <Field
+            label="Contenido"
+            error={fieldErrors?.about?.[0]}
+            className={cn(
+              "flex flex-col gap-1.5",
+              contentLocale !== "es" && "hidden",
+            )}
+          >
             <MarkdownEditor
               value={about}
               onChange={setAbout}
               name="about"
             />
+          </Field>
+          <Field
+            label="Contenido (inglés)"
+            error={fieldErrors?.aboutEn?.[0]}
+            className={cn(
+              "flex flex-col gap-1.5",
+              contentLocale !== "en" && "hidden",
+            )}
+          >
+            <MarkdownEditor
+              value={aboutEn}
+              onChange={setAboutEn}
+              name="aboutEn"
+            />
+            <p className="text-xs text-muted-foreground">
+              Opcional: si queda vacío, la tienda muestra el contenido en
+              español.
+            </p>
           </Field>
         </TabsContent>
 

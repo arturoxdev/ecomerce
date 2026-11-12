@@ -7,6 +7,7 @@ import {
   desc,
   eq,
   ilike,
+  or,
   SQL,
 } from "drizzle-orm";
 
@@ -25,6 +26,12 @@ export type ProductsServiceDeps = {
   db: Database;
   storeId: string;
 };
+
+// ADR-013: search matches the Spanish name or its English translation.
+function nameMatches(search: string): SQL {
+  const pattern = `%${search}%`;
+  return or(ilike(products.name, pattern), ilike(products.nameEn, pattern))!;
+}
 
 export function createProductsService(deps: ProductsServiceDeps) {
   const { db: dbx, storeId } = deps;
@@ -62,7 +69,7 @@ export function createProductsService(deps: ProductsServiceDeps) {
       conditions.push(eq(products.categoryId, opts.where.categoryId));
     }
     if (opts?.where?.search) {
-      conditions.push(ilike(products.name, `%${opts.where.search}%`));
+      conditions.push(nameMatches(opts.where.search));
     }
 
     return dbx.query.products.findMany({
@@ -122,7 +129,7 @@ export function createProductsService(deps: ProductsServiceDeps) {
       where: and(
         eq(products.storeId, storeId),
         eq(products.isActive, true),
-        ilike(products.name, `%${trimmed}%`),
+        nameMatches(trimmed),
       ),
       orderBy: [asc(products.name)],
       limit,
@@ -133,7 +140,12 @@ export function createProductsService(deps: ProductsServiceDeps) {
   function findBySlugMeta(slug: string) {
     return dbx.query.products.findFirst({
       where: and(eq(products.slug, slug), eq(products.storeId, storeId)),
-      columns: { name: true, description: true },
+      columns: {
+        name: true,
+        nameEn: true,
+        description: true,
+        descriptionEn: true,
+      },
     });
   }
 
@@ -150,7 +162,7 @@ export function createProductsService(deps: ProductsServiceDeps) {
       conditions.push(eq(products.categoryId, where.categoryId));
     }
     if (where?.search) {
-      conditions.push(ilike(products.name, `%${where.search}%`));
+      conditions.push(nameMatches(where.search));
     }
     return dbx
       .select({ count: countFn() })
